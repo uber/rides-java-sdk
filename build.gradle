@@ -41,4 +41,11 @@ allprojects {
     task checkstyleTest(type: Checkstyle, overwrite: true) {
         configFile = new File("{$project.projectDir}/config/checkstyle/checkstyle-test.xml")
     }
+
+    release {
+        failOnCommitNeeded = false
+        failOnPublishNeeded = false
+        failOnSnapshotDependencies = false
+        revertOnFail = true
+    }
 }
