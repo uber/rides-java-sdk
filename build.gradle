@@ -1,0 +1,44 @@
+apply plugin: 'net.researchgate.release'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+	dependencies {
+            classpath 'net.saliman:gradle-cobertura-plugin:2.2.7'
+            classpath 'net.researchgate:gradle-release:2.2.2'
+	}
+}
+
+allprojects {
+    apply plugin: 'checkstyle'
+    apply plugin: 'maven'
+    apply plugin: 'net.saliman.cobertura'
+
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        compile 'org.slf4j:slf4j-log4j12:1.7.5'
+    }
+
+    checkstyle {
+        toolVersion = "6.4.1"
+    }
+
+    cobertura {
+        coverageFormats = ['html', 'xml']
+        coverageIgnoreTrivial = true
+        coverageCheckTotalLineRate = 100
+        coverageCheckTotalBranchRate = 100
+    }
+
+    task checkstyleMain(type: Checkstyle, overwrite: true) {
+        configFile = new File("{$project.projectDir}/config/checkstyle/checkstyle-main.xml")
+    }
+
+    task checkstyleTest(type: Checkstyle, overwrite: true) {
+        configFile = new File("{$project.projectDir}/config/checkstyle/checkstyle-test.xml")
+    }
+}
