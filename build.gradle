@@ -5,8 +5,8 @@ buildscript {
         jcenter()
     }
 	dependencies {
-            classpath 'net.saliman:gradle-cobertura-plugin:2.2.7'
-            classpath 'net.researchgate:gradle-release:2.2.2'
+        classpath 'net.saliman:gradle-cobertura-plugin:2.2.7'
+        classpath 'net.researchgate:gradle-release:2.2.2'
 	}
 }
 

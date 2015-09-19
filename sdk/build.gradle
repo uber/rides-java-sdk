@@ -1,22 +1,67 @@
-apply plugin: 'checkstyle'
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
-buildscript {
+targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+uploadArchives {
     repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Official Uber Rides API Java SDK (Beta)'
+                packaging 'jar'
+                artifactId 'rides'
+
+                description 'The official Uber Rides API Java SDK (Beta)'
+                url 'https://devolopers.uber.com'
+
+                scm {
+                    connection 'scm:git:git@github.com:uber/rides-java-sdk.git'
+                    developerConnection 'scm:git:git@github.com:uber/rides-java-sdk.git'
+                    url 'git@github.com:uber/rides-java-sdk.git'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'arogal'
+                        name 'Adam Rogal'
+                        email 'arogal@uber.com'
+                    }
+                }
+            }
+        }
     }
 }
 
-subprojects {
-    checkstyle {
-        configFile = new File(rootDir, "checkstyle.xml")
-    }
-}
 
-allprojects {
-    repositories {
-        jcenter()
-    }
+dependencies {
+    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.http-client:google-http-client-jackson2:1.19.0'
+    compile 'com.google.oauth-client:google-oauth-client:1.19.0'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:1.7.1'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.mockito:mockito-core:1.10.8'
+    testCompile 'com.squareup.okhttp:mockwebserver:2.5.0'
 }
