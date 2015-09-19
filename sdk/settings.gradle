@@ -1,1 +1,0 @@
-include ':sdk-java', ':sdk-android'
