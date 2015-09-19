@@ -568,7 +568,7 @@ public class RetrofitUberRidesClientIntegrationTest {
         assertEquals("Response code does not match", HttpURLConnection.HTTP_NO_CONTENT, response.getStatus());
         assertEquals("Response reason does not match", "NO CONTENT", response.getReason());
     }
-    
+
     @Test
     public void onCall_whenAsyncCredentialNeedsRefresh_shouldRefreshCredential() throws Exception {
         String refreshResponseBody = readFile("src/test/resources/mockresponses/post_refresh_token_response");
@@ -795,7 +795,11 @@ public class RetrofitUberRidesClientIntegrationTest {
     }
 
     private String readFile(String path) throws IOException {
-        return Files.toString(new File(path), StandardCharsets.UTF_8);
+        File file = new File(path);
+        if (!file.exists()) {
+            file = new File("sdk/" + path);
+        }
+        return Files.toString(file, StandardCharsets.UTF_8);
     }
 
     private static class SettableFutureCallback<T> implements Callback<T> {

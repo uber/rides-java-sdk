@@ -1,4 +1,6 @@
+apply plugin: 'distribution'
 apply plugin: 'net.researchgate.release'
+
 
 buildscript {
     repositories {
@@ -47,5 +49,60 @@ allprojects {
         failOnPublishNeeded = false
         failOnSnapshotDependencies = false
         revertOnFail = true
+    }
+}
+
+distributions {
+    github {
+        baseName = 'github'
+        contents {
+            from(rootDir) {
+                include 'build.gradle'
+                include 'CHANGELOG.md'
+                include 'gradle.properties'
+                include 'gradlew'
+                include 'gradlew.bat'
+                include 'LICENSE'
+                include 'README.md'
+                include 'settings.gradle'
+                include 'gradle/'
+            }
+
+            from('sdk') {
+                exclude 'build'
+                exclude '*.iml'
+                into 'sdk'
+            }
+
+            from('samples') {
+                exclude '**/build'
+                exclude '**/*.iml'
+                into 'samples'
+            }
+
+            // TODO: Add samples folders.
+        }
+    }
+
+    cmdlinesample {
+        baseName = 'cmdline-sample'
+        contents {
+            from('samples/cmdline-sample') {
+                into '.'
+                exclude 'build'
+                exclude '*.iml'
+            }
+        }
+    }
+
+    servletsample {
+        baseName = 'servlet-sample'
+        contents {
+            from('samples/servlet-sample') {
+                into '.'
+                exclude 'build'
+                exclude '*.iml'
+            }
+        }
     }
 }

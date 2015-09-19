@@ -72,6 +72,10 @@ public class RetrofitAdapterTest {
     }
 
     private String readFile(String path) throws IOException {
-        return Files.toString(new File(path), StandardCharsets.UTF_8);
+        File file = new File(path);
+        if (!file.exists()) {
+            file = new File("sdk/" + path);
+        }
+        return Files.toString(file, StandardCharsets.UTF_8);
     }
 }
