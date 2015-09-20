@@ -13,6 +13,8 @@ buildscript {
     }
 }
 
+def unsnapshottedVersion = version.replaceAll("-SNAPSHOT", "");
+
 allprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'maven'
@@ -45,29 +47,43 @@ allprojects {
         configFile = new File("{$project.projectDir}/config/checkstyle/checkstyle-test.xml")
     }
 
+    task githubReleaseZip(type: Zip) {
+        version = "v" + unsnapshottedVersion
+        from('.') {
+            filter { String line ->
+                line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${unsnapshottedVersion}'")
+            }
+            into '.'
+            exclude 'build'
+            exclude '*.iml'
+        }
+    }
+
     release {
         failOnCommitNeeded = false
         failOnPublishNeeded = false
         failOnSnapshotDependencies = false
         revertOnFail = true
-        tagTemplate = "v${version}"
+        tagTemplate = "v${unsnapshottedVersion}"
     }
 }
 
 afterReleaseBuild.dependsOn sdk:uploadArchives
-updateVersion.dependsOn ":cmdlinesampleDistZip"
+updateVersion.dependsOn ":githubRelease"
+githubRelease.dependsOn ":samples:cmdline-sample:githubReleaseZip"//, ":servletsampleDistZip"
+//System.out.println(task(":samples:cmdline-sample:zip").archivePath)
 
 github {
     owner = 'uber'
     repo = 'rides-java-sdk'
     token = githubToken
-    tagName = "v${version}"
+    tagName = "v${unsnapshottedVersion}"
     targetCommitish = 'master'
-    name = "v${version}"
+    name = "v${unsnapshottedVersion}"
     body = "sample"
 
     assets = [
-            //cmdlinesampleDistZip.archivePath,
+            project(":samples:cmdline-sample").githubReleaseZip.archivePath,
             //"${project.projectDir}/build/distributions/servlet-sample-${version}.zip",
     ]
 }
@@ -83,14 +99,20 @@ distributions {
                 include 'gradlew'
                 include 'gradlew.bat'
                 include 'LICENSE'
-                include 'README.md'
                 include 'settings.gradle'
                 include 'gradle/'
             }
 
+            from(rootDir) {
+                include 'README.md'
+                filter { String line ->
+                    line.replaceAll("@version@", unsnapshottedVersion)
+                }
+            }
+
             from('sdk') {
                 filter { String line ->
-                    line.replaceAll("@version@", version)
+                    line.replaceAll("@version@", unsnapshottedVersion)
                 }
                 exclude 'build'
                 exclude '*.iml'
@@ -104,32 +126,18 @@ distributions {
             }
         }
     }
-
-    cmdlinesample {
-        baseName = 'cmdline-sample'
-        contents {
-            from('samples/cmdline-sample') {
-                filter { String line ->
-                    line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${version}'")
-                }
-                into '.'
-                exclude 'build'
-                exclude '*.iml'
-            }
-        }
-    }
-
-    servletsample {
-        baseName = 'servlet-sample'
-        contents {
-            from('samples/servlet-sample') {
-                filter { String line ->
-                    line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${version}'")
-                }
-                into '.'
-                exclude 'build'
-                exclude '*.iml'
-            }
-        }
-    }
 }
+
+//servletsample {
+//    baseName = 'servlet-sample'
+//    contents {
+//        from('samples/servlet-sample') {
+//            filter { String line ->
+//                line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${unsnapshottedVersion}'")
+//            }
+//            into '.'
+//            exclude 'build'
+//            exclude '*.iml'
+//        }
+//    }
+//}
