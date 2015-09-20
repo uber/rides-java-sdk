@@ -55,6 +55,7 @@ allprojects {
 }
 
 afterReleaseBuild.dependsOn sdk:uploadArchives
+updateVersion.dependsOn ":cmdlinesampleDistZip"
 
 github {
     owner = 'uber'
