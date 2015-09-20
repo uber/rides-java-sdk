@@ -1,15 +1,16 @@
 apply plugin: 'distribution'
 apply plugin: 'net.researchgate.release'
-
+apply plugin: 'co.riiid.gradle'
 
 buildscript {
     repositories {
         jcenter()
     }
-	dependencies {
+    dependencies {
         classpath 'net.saliman:gradle-cobertura-plugin:2.2.7'
         classpath 'net.researchgate:gradle-release:2.2.2'
-	}
+        classpath 'co.riiid:gradle-github-plugin:0.3.0'
+    }
 }
 
 allprojects {
@@ -49,12 +50,30 @@ allprojects {
         failOnPublishNeeded = false
         failOnSnapshotDependencies = false
         revertOnFail = true
+        tagTemplate = "v${version}"
     }
 }
 
+afterReleaseBuild.dependsOn uploadArchives
+
+github {
+    owner = 'uber'
+    repo = 'rides-java-sdk'
+    token = githubToken
+    tagName = "v${version}"
+    targetCommitish = 'master'
+    name = "v${version}"
+    body = "sample"
+
+    assets = [
+            //cmdlinesampleDistZip.archivePath,
+            //"${project.projectDir}/build/distributions/servlet-sample-${version}.zip",
+    ]
+}
+
 distributions {
-    github {
-        baseName = 'github'
+    publicrepo {
+        baseName = 'publicrepo'
         contents {
             from(rootDir) {
                 include 'build.gradle'
@@ -69,6 +88,9 @@ distributions {
             }
 
             from('sdk') {
+                filter { String line ->
+                    line.replaceAll("@version@", version)
+                }
                 exclude 'build'
                 exclude '*.iml'
                 into 'sdk'
@@ -86,6 +108,9 @@ distributions {
         baseName = 'cmdline-sample'
         contents {
             from('samples/cmdline-sample') {
+                filter { String line ->
+                    line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${version}'")
+                }
                 into '.'
                 exclude 'build'
                 exclude '*.iml'
@@ -97,6 +122,9 @@ distributions {
         baseName = 'servlet-sample'
         contents {
             from('samples/servlet-sample') {
+                filter { String line ->
+                    line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${version}'")
+                }
                 into '.'
                 exclude 'build'
                 exclude '*.iml'

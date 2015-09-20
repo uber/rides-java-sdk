@@ -27,19 +27,17 @@ import com.uber.sdk.rides.client.model.Product;
 import com.uber.sdk.rides.client.model.ProductsResponse;
 import com.uber.sdk.rides.client.model.Promotion;
 import com.uber.sdk.rides.client.model.Ride;
-import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
+import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
+import com.uber.sdk.rides.client.model.SandboxRideRequestParameters;
 import com.uber.sdk.rides.client.model.TimeEstimatesResponse;
 import com.uber.sdk.rides.client.model.UserActivityPage;
-import com.uber.sdk.rides.client.model.SandboxRideRequestParameters;
 import com.uber.sdk.rides.client.model.UserProfile;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.uber.sdk.rides.client.Session.Environment;
 
 /**
  * Represents the asynchronous RPC methods of the Uber API. Can be built using
@@ -185,11 +183,11 @@ public interface UberRidesAsyncService extends UberRidesService {
      * @param callback The request callback.
      */
     void getRideMap(@Nonnull String rideId, Callback<RideMap> callback);
-    
+
     /**
-     * Updates the product in the {@link Environment#SANDBOX sandbox environement}
-     * to simulate the possible responses the Request endpoint will return when requesting a particular product,
-     * such as surge pricing and driver availability.
+     * Updates the product in the {@link Session.Environment#SANDBOX sandbox environement} to
+     * simulate the possible responses the Request endpoint will return when requesting a particular
+     * product, such as surge pricing and driver availability.
      *
      * @param productId The unique product ID to update.
      * @param sandboxProductRequestParameters The sandbox product request parameters.
@@ -199,8 +197,8 @@ public interface UberRidesAsyncService extends UberRidesService {
             Callback<Void> callback);
 
     /**
-     * Updates the ride in the {@link Environment#SANDBOX sandbox environement}
-     * to simulate the possible states of a ride.
+     * Updates the ride in the {@link com.uber.sdk.rides.client.Session.Environment#SANDBOX
+     * sandbox environement} to simulate the possible states of a ride.
      *
      * @param rideId Unique identifier representing a ride.
      * @param sandboxRideRequestParameters The sandbox ride request parameters.

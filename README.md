@@ -7,7 +7,7 @@ Official Java SDK (beta) to support the Uber Rides API.
 To use the Uber Rides Java SDK, add the compile dependency with the latest version of the Uber SDK in the `build.gradle` file:
 ```
 dependencies {
-    compile ‘com.uber.sdk:rides:0.1.0’
+    compile 'com.uber.sdk:rides:0.1.0'
 }
 ```
 
@@ -68,7 +68,7 @@ Keep each user's access token in a secure data store. Reuse the same token to ma
 
 ## Samples
 
-There are sample java classes in the `samples` folder.  Before you can run a sample, you need to edit the appriopriate `secrets.properties` file and add your app credentials.
+There are sample Java classes in the `samples` folder.  Before you can run a sample, you need to edit the appropriate `secrets.properties` file and add your app credentials.
 
 To run the command line sample, navigate to `samples/cmdline-sample` and run `$ ../../gradlew clean build run`
 
@@ -114,7 +114,7 @@ If the update is successful, `response.getStatus()` will be 204.
 The `updateSandboxRide` method is not valid in the `PRODUCTION` `Environment`, where the ride status will change automatically.  If it is used in a `PRODUCTION` `Environment`, the call will throw an `IllegalStateException`.
 ## Getting help
 
-Uber developers actively monitor the [Uber tag](http://stackoverflow.com/questions/tagged/uber-api) on StackOverflow. If you need help installing or using the library, you can ask a question there.  Make sure to tag your question with `Uber-API` and `Java`!
+Uber developers actively monitor the [Uber tag](http://stackoverflow.com/questions/tagged/uber-api) on StackOverflow. If you need help installing or using the library, you can ask a question there.  Make sure to tag your question with `uber-api` and `java`!
 
 ## Contributing
 

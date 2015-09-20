@@ -5,6 +5,21 @@ apply plugin: 'signing'
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
 uploadArchives {
     repositories {
         mavenDeployer {
@@ -21,7 +36,7 @@ uploadArchives {
             pom.project {
                 name 'Official Uber Rides API Java SDK (Beta)'
                 packaging 'jar'
-                artifactId 'rides'
+                artifactId artifactId
 
                 description 'The official Uber Rides API Java SDK (Beta)'
                 url 'https://devolopers.uber.com'
@@ -50,6 +65,7 @@ uploadArchives {
         }
     }
 }
+
 
 
 dependencies {

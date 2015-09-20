@@ -29,13 +29,13 @@ import com.uber.sdk.rides.client.model.Product;
 import com.uber.sdk.rides.client.model.ProductsResponse;
 import com.uber.sdk.rides.client.model.Promotion;
 import com.uber.sdk.rides.client.model.Ride;
-import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
+import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
+import com.uber.sdk.rides.client.model.SandboxRideRequestParameters;
 import com.uber.sdk.rides.client.model.TimeEstimatesResponse;
 import com.uber.sdk.rides.client.model.UserActivityPage;
-import com.uber.sdk.rides.client.model.SandboxRideRequestParameters;
 import com.uber.sdk.rides.client.model.UserProfile;
 
 import javax.annotation.Nonnull;

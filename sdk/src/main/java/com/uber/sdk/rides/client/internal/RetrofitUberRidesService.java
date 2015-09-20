@@ -22,24 +22,22 @@
 
 package com.uber.sdk.rides.client.internal;
 
-import com.uber.sdk.rides.client.Session;
 import com.uber.sdk.rides.client.model.PriceEstimatesResponse;
 import com.uber.sdk.rides.client.model.Product;
 import com.uber.sdk.rides.client.model.ProductsResponse;
 import com.uber.sdk.rides.client.model.Promotion;
 import com.uber.sdk.rides.client.model.Ride;
-import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
+import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
+import com.uber.sdk.rides.client.model.SandboxRideRequestParameters;
 import com.uber.sdk.rides.client.model.TimeEstimatesResponse;
 import com.uber.sdk.rides.client.model.UserActivityPage;
-import com.uber.sdk.rides.client.model.SandboxRideRequestParameters;
 import com.uber.sdk.rides.client.model.UserProfile;
 
-import javax.annotation.Nullable;
-
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import retrofit.Callback;
 import retrofit.http.Body;
@@ -143,7 +141,6 @@ public interface RetrofitUberRidesService {
     void getProduct(@Path("product_id") String productId, Callback<Product> callback);
 
     /**
-     * Updates the product in the {@link Session.Environment#SANDBOX sandbox environement}
      * Cancel an ongoing Request on behalf of a rider.
      *
      * @param rideId Unique identifier representing a Request.
@@ -198,12 +195,11 @@ public interface RetrofitUberRidesService {
      */
     @GET("/v1/requests/{request_id}/map")
     void getRideMap(@Nonnull @Path("request_id") String rideId , Callback<RideMap> callback);
-    
+
     /**
-     * Updates the product in the {@link Session.Environment#SANDBOX sandbox environement}
-     * Updates the product in the {@link Session.Environment#SANDBOX sandbox environement}
-     * to simulate the possible responses the Request endpoint will return when requesting a particular product,
-     * such as surge pricing and driver availability.
+     * Updates the product in the {@link com.uber.sdk.rides.client.Session.Environment#SANDBOX
+     * sandbox environement} to simulate the possible responses the Request endpoint will return
+     * when requesting a particular product, such as surge pricing and driver availability.
      *
      * @param productId The unique product ID to update.
      * @param sandboxProductRequestParameters The sandbox product request parameters.
@@ -214,10 +210,10 @@ public interface RetrofitUberRidesService {
     void updateSandboxProduct(@Path("product_id") String productId,
             @Body SandboxProductRequestParameters sandboxProductRequestParameters,
             Callback<Void> callback);
-    
+
     /**
-     * Updates the ride in the {@link Session.Environment#SANDBOX sandbox environement}
-     * to simulate the possible states of a the Request.
+     * Updates the ride in the {@link com.uber.sdk.rides.client.Session.Environment#SANDBOX
+     * sandbox environement} to simulate the possible states of a the Request.
      *
      * @param rideId Unique identifier representing a Request.
      * @param sandboxRideRequestParameters The sandbox ride request parameters.

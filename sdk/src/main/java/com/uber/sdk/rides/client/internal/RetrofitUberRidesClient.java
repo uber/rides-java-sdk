@@ -33,8 +33,8 @@ import com.squareup.okhttp.OkHttpClient;
 import com.uber.sdk.rides.auth.OAuth2Helper;
 import com.uber.sdk.rides.client.Session;
 import com.uber.sdk.rides.client.Session.Environment;
-import com.uber.sdk.rides.client.UberRidesServices;
 import com.uber.sdk.rides.client.UberRidesService;
+import com.uber.sdk.rides.client.UberRidesServices;
 
 import java.io.IOException;
 import java.lang.annotation.ElementType;
@@ -57,7 +57,7 @@ import retrofit.converter.GsonConverter;
  */
 public class RetrofitUberRidesClient {
 
-    @VisibleForTesting static final String LIB_VERSION = "0.1.0";
+    @VisibleForTesting static final String LIB_VERSION = "0.1.0-SNAPSHOT";
 
     /**
      * Gets a new Uber API service client.
