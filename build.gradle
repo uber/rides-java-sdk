@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'net.saliman:gradle-cobertura-plugin:2.2.7'
         classpath 'net.researchgate:gradle-release:2.2.2'
-        classpath 'co.riiid:gradle-github-plugin:0.3.0'
+        classpath 'co.riiid:gradle-github-plugin:0.3.1'
     }
 }
 
@@ -68,7 +68,7 @@ allprojects {
     }
 }
 
-afterReleaseBuild.dependsOn sdk:uploadArchives
+afterReleaseBuild.dependsOn ":sdk:uploadArchives"
 updateVersion.dependsOn ":githubRelease"
 githubRelease.dependsOn ":samples:cmdline-sample:githubReleaseZip"//, ":servletsampleDistZip"
 //System.out.println(task(":samples:cmdline-sample:zip").archivePath)
@@ -127,17 +127,3 @@ distributions {
         }
     }
 }
-
-//servletsample {
-//    baseName = 'servlet-sample'
-//    contents {
-//        from('samples/servlet-sample') {
-//            filter { String line ->
-//                line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${unsnapshottedVersion}'")
-//            }
-//            into '.'
-//            exclude 'build'
-//            exclude '*.iml'
-//        }
-//    }
-//}
