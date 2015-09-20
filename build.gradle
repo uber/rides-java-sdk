@@ -54,7 +54,7 @@ allprojects {
     }
 }
 
-afterReleaseBuild.dependsOn uploadArchives
+afterReleaseBuild.dependsOn sdk:uploadArchives
 
 github {
     owner = 'uber'
