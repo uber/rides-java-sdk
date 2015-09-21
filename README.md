@@ -60,8 +60,8 @@ Credential credential = credentials.authenticate(authorizationCode, userId);
 Last, use the credential object to create a session, which can then be used to create a service client instance.
 
 ```
-Session session = new Session.Builder().setCredential(credential).build(); 
-UberRidesService service = UberRidesServices.createSync(session); 
+Session session = new Session.Builder().setCredential(credential).build();
+UberRidesService service = UberRidesServices.createSync(session);
 ```
 
 Keep each user's access token in a secure data store. Reuse the same token to make API calls on behalf of your user without repeating the authorization flow each time the user visits your app. The SDK will handle the token refresh for you automatically when it makes API requests with an `UberRidesService`.
@@ -106,7 +106,7 @@ The default `Environment` of a `Session` is set to `PRODUCTION`. See our [docume
 
 If you are requesting sandbox rides, you will need to step through the different states of a ride.
 ```
-SandboxRideRequestParameters rideParameters = new SandboxRideRequestParameters.Builder().setStatus(“accepted”).build(); 
+SandboxRideRequestParameters rideParameters = new SandboxRideRequestParameters.Builder().setStatus(“accepted”).build();
 Response<Void> response = client.updateSandboxRide(rideId, rideParameters);
 ```
 If the update is successful, `response.getStatus()` will be 204.

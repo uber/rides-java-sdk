@@ -114,6 +114,7 @@ distributions {
                 include 'gradlew'
                 include 'gradlew.bat'
                 include 'LICENSE'
+                include 'releasenotes.gtpl'
                 include 'settings.gradle'
                 include 'gradle/'
             }
