@@ -68,16 +68,16 @@ import retrofit.mime.TypedByteArray;
 /**
  * An adapter uses Retrofit to back our {@link RetrofitUberRidesService} calls.
  */
-public class RetrofitAdapter<U extends RetrofitUberRidesService> implements UberRidesAsyncService, UberRidesSyncService,
+public class RetrofitAdapter<T extends RetrofitUberRidesService> implements UberRidesAsyncService, UberRidesSyncService,
         UberRidesService {
 
-    private final U service;
+    private final T service;
 
     /**
      * Constructor.
      * @param retrofitService The Retrofit service.
      */
-    public RetrofitAdapter(U retrofitService) {
+    public RetrofitAdapter(T retrofitService) {
         this.service = retrofitService;
     }
 
@@ -315,7 +315,7 @@ public class RetrofitAdapter<U extends RetrofitUberRidesService> implements Uber
 
         return transformFuture(future);
     }
-    
+
     /**
      * Callback that sets a {@code SettableFuture}.
      * @param <T> The response object type.

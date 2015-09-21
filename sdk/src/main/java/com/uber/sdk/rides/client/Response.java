@@ -87,7 +87,7 @@ public final class Response<T> {
      * The response object. May be null if the response has no body or there was an error.
      */
     @Nullable
-    public T getResponseObject() {
+    public T getBody() {
         return responseObject;
     }
 }

@@ -38,7 +38,7 @@ Session session = new Session.Builder().setServerToken(“yourServerToken”).bu
 Use this Session to create an UberRidesService and fetch API resources:
 ```
 UberRidesService service = UberRidesServices.createSync(session);
-ProductsResponse products = client.getProducts(37.775, -122.417).getResponseObject();
+ProductsResponse products = client.getProducts(37.775, -122.417).getBody();
 ```
 ## Authorization
 
@@ -81,9 +81,11 @@ Keep each user's access token in a secure data store. Reuse the same token to ma
 
 ## Samples
 
-There are sample Java classes in the `samples` folder.  Before you can run a sample, you need to edit the appropriate `secrets.properties` file and add your app credentials.
+There are sample Java classes in the `samples` folder. Alternatively, you can also download a sample from the [releases page](https://github.com/uber/rides-java-sdk/releases/tag/v0.1.0).
 
-To run the command line sample, navigate to `samples/cmdline-sample` and run `$ ../../gradlew clean build run`
+Before you can run a sample, you need to edit the appropriate `secrets.properties` file and add your app credentials.
+
+To run the command line sample, navigate to `samples/cmdline-sample` and run `$ ../../gradlew clean build run`. Or, if you are using one of the downloaded samples, run `$ ./gradlew clean build run` from the root directory.
 
 This will store user credentials in your home directory under `.uber_credentials`.
 
@@ -91,7 +93,7 @@ For full documentation, visit our [Developer Site](https://developer.uber.com/v1
 
 #### Get Available Products
 ```
-ProductsResponse productsResponse = service.get_products(37.77f, -122.41f).getResponseObject();
+ProductsResponse productsResponse = service.get_products(37.77f, -122.41f).getBody();
 List<Product> products = productsResponse.getProducts();
 String productId = products.get(0).getProductId();
 ```
@@ -103,7 +105,7 @@ RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder(
        .setProductId(productId)
        .setEndLocation(endLocation)
        .build();
-Ride ride = service.requestRide(rideRequestParameters).getResponseObject();
+Ride ride = service.requestRide(rideRequestParameters).getBody();
 String rideId = ride.getRideId();
 ```
 This will make a real-world request and send an Uber driver to the start location specified.

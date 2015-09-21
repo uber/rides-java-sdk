@@ -12,7 +12,6 @@ import com.uber.sdk.rides.client.model.UserProfile;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -39,8 +38,8 @@ public final class GetUserProfile {
         UberRidesSyncService uberRidesService = UberRidesServices.createSync(session);
 
         // Fetch the user's profile.
-        System.out.println("Calling API to get User's Profile");
-        UserProfile userProfile = uberRidesService.getUserProfile().getResponseObject();
+        System.out.println("Calling API to get the user's profile");
+        UserProfile userProfile = uberRidesService.getUserProfile().getBody();
 
         System.out.printf("Logged in as %s%n", userProfile.getEmail());
         System.exit(0);
@@ -85,7 +84,7 @@ public final class GetUserProfile {
     /**
      * Creates an {@link OAuth2Credentials} object that can be used by any of the servlets.
      */
-    public static OAuth2Credentials createOAuth2Credentials() throws IOException {
+    public static OAuth2Credentials createOAuth2Credentials() throws Exception {
         // Load the client ID and secret from {@code resources/secrets.properties}. Ideally, your
         // secrets would not be kept local. Instead, have your server accept the redirect and return
         // you the accessToken for a userId.
@@ -122,15 +121,21 @@ public final class GetUserProfile {
     /**
      * Loads the user's secrets
      */
-    private static Properties loadSecretProperties() throws IOException {
+    private static Properties loadSecretProperties() throws Exception {
         Properties properties = new Properties();
         InputStream propertiesStream = GetUserProfile.class.getClassLoader().getResourceAsStream("secrets.properties");
         if (propertiesStream == null) {
-            // Most IDEs will not run gradle when building to run locally, so the properties stream is null.
-            // We have to reference the file directly in this case to still run in the IDE.
-            File buildPropertiesFile = new File("samples/cmdline-sample/src/main/resources/secrets.properties");
+            // Fallback to file access in the case of running from certain IDEs.
+            File buildPropertiesFile = new File("src/main/resources/secrets.properties");
             if (buildPropertiesFile.exists()) {
                 properties.load(new FileReader(buildPropertiesFile));
+            } else {
+                buildPropertiesFile = new File("samples/cmdline-sample/src/main/resources/secrets.properties");
+                if (buildPropertiesFile.exists()) {
+                    properties.load(new FileReader(buildPropertiesFile));
+                } else {
+                    throw new IllegalStateException("Could not find secrets.properties");
+                }
             }
         } else {
             properties.load(propertiesStream);

@@ -1,0 +1,14 @@
+apply plugin: 'application'
+
+targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+mainClassName = "com.ubercab.sdk.samples.servlet.Server"
+
+dependencies {
+    compile project(':sdk')
+    compile 'com.google.oauth-client:google-oauth-client-jetty:1.19.0'
+    compile 'com.google.oauth-client:google-oauth-client-servlet:1.19.0'
+    compile 'org.eclipse.jetty:jetty-server:9.2.10.v20150310'
+    compile 'org.eclipse.jetty:jetty-servlet:9.2.10.v20150310'
+}

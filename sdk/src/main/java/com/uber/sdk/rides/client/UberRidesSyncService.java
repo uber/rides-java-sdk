@@ -102,7 +102,7 @@ public interface UberRidesSyncService extends UberRidesService {
      *
      * @param startLatitude Latitude component of start location.
      * @param startLongitude Longitude component of start location.
-     * @param productId Unique identifier representing a specific product for a given latitude &
+     * @param productId Unique identifier representing a specific product for a given latitude &amp;
      *                  longitude.
      */
     Response<TimeEstimatesResponse> getPickupTimeEstimates(float startLatitude,
@@ -171,7 +171,7 @@ public interface UberRidesSyncService extends UberRidesService {
      * @param rideId Unique identifier representing a ride.
      */
     Response<RideMap> getRideMap(@Nonnull String rideId) throws ApiException, NetworkException;
-    
+
     /**
      * Updates the product in the {@link Environment#SANDBOX sandbox environement}
      * to simulate the possible responses the Request endpoint will return when requesting a particular product,

@@ -65,6 +65,9 @@ public class SandboxRideRequestParameters {
 
     private SandboxRideRequestParameters() {}
 
+    /**
+     * The sandbox status to set.
+     */
     public String getStatus() {
         return status;
     }

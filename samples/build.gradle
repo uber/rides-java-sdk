@@ -1,38 +1,23 @@
 subprojects {
     task githubReleaseZip(type: Zip) {
         version = "v${unsnapshottedVersion}"
+
         from('.') {
             filter { String line ->
-                line.replaceAll("compile project\\(':sdk'\\)", "compile '${groupId}:${artifactId}:${unsnapshottedVersion}'")
+                line.replaceAll("compile project\\(':sdk'\\)",
+                        "compile '${groupId}:${artifactId}:${unsnapshottedVersion}'")
             }
             into '.'
             exclude 'build'
             exclude '*.iml'
         }
+
         from(rootProject.projectDir.absolutePath) {
             include 'gradle/'
             include 'gradlew'
             include 'gradlew.bat'
             include 'LICENSE'
             into '.'
-        }
-    }
-}
-
-def checkForSecrets(prject) {
-    def secretsText = prject.file('src/main/resources/secrets.properties').text
-    def expectedText = "clientId=INSERT_CLIENT_ID_HERE\nclientSecret=INSERT_CLIENT_SECRET_HERE"
-    if (secretsText != expectedText) {
-        throw new AssertionError("Secrets may be exposed. Please check "
-                + prject.file('src/main/resources/secrets.properties').absolutePath)
-    }
-}
-
-gradle.taskGraph.afterTask { Task task, TaskState state ->
-    if (task.path.endsWith("release") || task.path.endsWith("githubReleaseZip") || task.path.endsWith("publicrepoDistZip")) {
-        Set<Project> projects = project(":samples").subprojects;
-        for (Project prject : projects) {
-            checkForSecrets(prject)
         }
     }
 }

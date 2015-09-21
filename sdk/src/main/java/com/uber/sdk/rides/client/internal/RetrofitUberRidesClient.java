@@ -67,6 +67,7 @@ public class RetrofitUberRidesClient {
      * @param logLevel The log level.
      * @return A Uber API service client.
      */
+    @SuppressWarnings("unchecked") // Class casting is ensured.
     public static <T extends UberRidesService> T getUberApiService(Session session,
             OAuth2Helper oAuth2Helper, UberRidesServices.LogLevel logLevel) {
         return (T) getUberApiService(session, oAuth2Helper, logLevel,
@@ -84,9 +85,10 @@ public class RetrofitUberRidesClient {
      * @return An Uber API service client.
      */
     @VisibleForTesting
-    static <T extends RetrofitUberRidesService> RetrofitAdapter getUberApiService(Session session,
+    @SuppressWarnings("unchecked") // Class casting is ensured.
+    static <T extends RetrofitUberRidesService, U extends UberRidesService> U getUberApiService(Session session,
             OAuth2Helper oAuth2Helper, UberRidesServices.LogLevel logLevel, String endpoint,
-            @Nullable OkHttpClient httpClient, Class<? extends T> apiServiceClass) {
+            @Nullable OkHttpClient httpClient, Class<? extends T> internalApiServiceClass) {
 
         RestAdapter.LogLevel retrofitLogLevel = UberRidesServices.LogLevel.FULL.equals(logLevel) ?
                 RestAdapter.LogLevel.FULL : RestAdapter.LogLevel.NONE;
@@ -98,11 +100,11 @@ public class RetrofitUberRidesClient {
             throw new IllegalStateException("Could not build REST adapter.", e);
         }
 
-        T internalService = Reflection.newProxy(apiServiceClass,
-                new InvocationHandler<>(session.getEnvironment(), apiServiceClass,
-                        restAdapter.create(apiServiceClass)));
+        T internalService = Reflection.newProxy(internalApiServiceClass,
+                new InvocationHandler<>(session.getEnvironment(), internalApiServiceClass,
+                        restAdapter.create(internalApiServiceClass)));
 
-        return new RetrofitAdapter((T) internalService);
+        return (U) new RetrofitAdapter(internalService);
     }
 
     /**

@@ -34,11 +34,11 @@ uploadArchives {
             }
 
             pom.project {
-                name 'Official Uber Rides API Java SDK (Beta)'
+                name 'Uber Rides Java SDK (beta)'
                 packaging 'jar'
                 artifactId artifactId
 
-                description 'The official Uber Rides API Java SDK (Beta)'
+                description 'The official Java SDK (beta) for the Uber Rides API.'
                 url 'https://devolopers.uber.com'
 
                 scm {
@@ -59,6 +59,12 @@ uploadArchives {
                         id 'arogal'
                         name 'Adam Rogal'
                         email 'arogal@uber.com'
+                    }
+
+                    developer {
+                        id 'itstexter'
+                        name 'Alex Texter'
+                        email 'texter@uber.com'
                     }
                 }
             }

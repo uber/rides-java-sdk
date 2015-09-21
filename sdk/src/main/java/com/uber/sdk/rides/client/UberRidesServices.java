@@ -30,7 +30,7 @@ import com.uber.sdk.rides.client.internal.RetrofitUberRidesClient;
 import javax.annotation.Nonnull;
 
 /**
- * A factory for creating {@link UberRidesSyncService synchronous} and
+ * <p>A factory for creating {@link UberRidesSyncService synchronous} and
  * {@link UberRidesAsyncService asynchronous} services. One service should be used per Session to make
  * calls to any number of generated services as demonstrated:</p><br>
  * <pre><code>

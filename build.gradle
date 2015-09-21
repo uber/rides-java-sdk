@@ -21,6 +21,9 @@ allprojects {
     apply plugin: 'maven'
     apply plugin: 'net.saliman.cobertura'
 
+    ["githubToken", "ossrhUsername", "ossrhPassword",
+     "signing.keyId", "signing.password", "signing.secretKeyRingFile",].each {checkAndDefaultProperty(it)}
+
     ext.set("unsnapshottedVersion", version.replaceAll("-SNAPSHOT", ""))
     ext.set("samples", project(":samples").subprojects.collect {it.path})
 
@@ -59,7 +62,8 @@ def generateReleaseNotes() {
                  snippet: changelogSnippet,
                  assets: project.samples.collect {[
                          title: project(it).name,
-                         download: githubDownloadPrefix + "v${unsnapshottedVersion}/" + project(it).name + "-v${unsnapshottedVersion}.zip",
+                         download: githubDownloadPrefix + "v${unsnapshottedVersion}/"
+                                 + project(it).name + "-v${unsnapshottedVersion}.zip",
                          description: project(it).description,
                  ]}]
     def engine = new GStringTemplateEngine()
@@ -82,6 +86,45 @@ def generateChangelogSnippet() {
     return "  " + snippet.trim();
 }
 
+def checkAndDefaultProperty(prop) {
+    if (!project.hasProperty(prop)) {
+        logger.warn("Add " + prop + " to your ~/.gradle/grade.properties file.")
+        rootProject.ext.set(prop, prop)
+    }
+}
+
+def checkForChangelogUpdates() {
+    def changelogtext = rootProject.file('CHANGELOG.MD').text
+    if (!changelogtext.startsWith("v${unsnapshottedVersion} -")) {
+        throw new AssertionError(
+                "Changelog must be updated with v{$unsnapshottedVersion} before release. Please check " +
+                        rootProject.file('CHANGELOG.MD').absolutePath)
+    }
+}
+
+def checkForSecrets(prject) {
+    def secretsText = prject.file('src/main/resources/secrets.properties').text
+    def expectedText = "clientId=INSERT_CLIENT_ID_HERE\nclientSecret=INSERT_CLIENT_SECRET_HERE"
+    if (secretsText != expectedText) {
+        throw new AssertionError("Secrets may be exposed. Please check " +
+                prject.file('src/main/resources/secrets.properties').absolutePath)
+    }
+}
+
+gradle.taskGraph.afterTask { Task task, TaskState state ->
+    if (task.path.endsWith("release") || task.path.endsWith("githubReleaseZip")
+            || task.path.endsWith("publicrepoDistZip")) {
+        checkForChangelogUpdates()
+        for (prject in project(":samples").subprojects) {
+            checkForSecrets(prject)
+        }
+    }
+}
+
+afterReleaseBuild.dependsOn ":sdk:uploadArchives"
+updateVersion.dependsOn ":githubRelease"
+githubRelease.dependsOn project(":samples").subprojects.collect {it.path + ":githubReleaseZip"}
+
 release {
     failOnCommitNeeded = false
     failOnPublishNeeded = false
@@ -93,13 +136,14 @@ release {
 github {
     owner = 'uber'
     repo = 'rides-java-sdk'
-    token = githubToken
+    token = "${githubToken}"
     tagName = "v${unsnapshottedVersion}"
     targetCommitish = 'master'
     name = "v${unsnapshottedVersion}"
     body = generateReleaseNotes()
     assets = project.samples.collect {
-        project(it).buildDir.absolutePath + "/distributions/" + project(it).name + "-v${unsnapshottedVersion}.zip"
+        project(it).buildDir.absolutePath + "/distributions/" + project(it).name +
+                "-v${unsnapshottedVersion}.zip"
     }
 }
 
@@ -143,7 +187,3 @@ distributions {
         }
     }
 }
-
-afterReleaseBuild.dependsOn ":sdk:uploadArchives"
-updateVersion.dependsOn ":githubRelease"
-githubRelease.dependsOn project.samples.collect({it + ":githubReleaseZip"})

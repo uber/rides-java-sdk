@@ -39,6 +39,8 @@ import com.uber.sdk.rides.client.model.UserProfile;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.uber.sdk.rides.client.Session.Environment;
+
 /**
  * Represents the asynchronous RPC methods of the Uber API. Can be built using
  *
@@ -107,7 +109,7 @@ public interface UberRidesAsyncService extends UberRidesService {
      *
      * @param startLatitude Latitude component of start location.
      * @param startLongitude Longitude component of start location.
-     * @param productId Unique identifier representing a specific product for a given latitude &
+     * @param productId Unique identifier representing a specific product for a given latitude &amp;
      *                  longitude.
      * @param callback The request callback.
      */
@@ -185,7 +187,7 @@ public interface UberRidesAsyncService extends UberRidesService {
     void getRideMap(@Nonnull String rideId, Callback<RideMap> callback);
 
     /**
-     * Updates the product in the {@link Session.Environment#SANDBOX sandbox environement} to
+     * Updates the product in the {@link Environment#SANDBOX sandbox environement} to
      * simulate the possible responses the Request endpoint will return when requesting a particular
      * product, such as surge pricing and driver availability.
      *
@@ -197,7 +199,7 @@ public interface UberRidesAsyncService extends UberRidesService {
             Callback<Void> callback);
 
     /**
-     * Updates the ride in the {@link com.uber.sdk.rides.client.Session.Environment#SANDBOX
+     * Updates the ride in the {@link Environment#SANDBOX
      * sandbox environement} to simulate the possible states of a ride.
      *
      * @param rideId Unique identifier representing a ride.

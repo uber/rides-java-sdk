@@ -48,6 +48,8 @@ import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
 
+import static com.uber.sdk.rides.client.Session.Environment;
+
 /**
  * Represents the RPC methods of the Uber API.
  */
@@ -110,7 +112,7 @@ public interface RetrofitUberRidesService {
      *
      * @param startLatitude Latitude component of start location.
      * @param startLongitude Longitude component of start location.
-     * @param productId Unique identifier representing a specific product for a given latitude &
+     * @param productId Unique identifier representing a specific product for a given latitude &amp;
      *                  longitude.
      * @param callback The request callback.
      */
@@ -197,9 +199,9 @@ public interface RetrofitUberRidesService {
     void getRideMap(@Nonnull @Path("request_id") String rideId , Callback<RideMap> callback);
 
     /**
-     * Updates the product in the {@link com.uber.sdk.rides.client.Session.Environment#SANDBOX
-     * sandbox environement} to simulate the possible responses the Request endpoint will return
-     * when requesting a particular product, such as surge pricing and driver availability.
+     * Updates the product in the {@link Environment#SANDBOX sandbox environement} to simulate the
+     * possible responses the Request endpoint will return when requesting a particular product,
+     * such as surge pricing and driver availability.
      *
      * @param productId The unique product ID to update.
      * @param sandboxProductRequestParameters The sandbox product request parameters.
@@ -212,8 +214,8 @@ public interface RetrofitUberRidesService {
             Callback<Void> callback);
 
     /**
-     * Updates the ride in the {@link com.uber.sdk.rides.client.Session.Environment#SANDBOX
-     * sandbox environement} to simulate the possible states of a the Request.
+     * Updates the ride in the {@link Environment#SANDBOX sandbox environement} to simulate the
+     * possible states of a the Request.
      *
      * @param rideId Unique identifier representing a Request.
      * @param sandboxRideRequestParameters The sandbox ride request parameters.

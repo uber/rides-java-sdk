@@ -174,7 +174,7 @@ public class RetrofitUberRidesClientIntegrationTest {
         assertNull(apiException);
         assertNull(networkException);
 
-        ProductsResponse productsResponse = response.getResponseObject();
+        ProductsResponse productsResponse = response.getBody();
         assertNotNull(productsResponse);
 
         assertEquals("Request Path does not match", "/v1/products?latitude=37.613&longitude=-122.477",
@@ -311,7 +311,7 @@ public class RetrofitUberRidesClientIntegrationTest {
                                              ApiException apiException,
                                              NetworkException networkException) {
         assertNotNull(response);
-        assertNull(response.getResponseObject());
+        assertNull(response.getBody());
         assertNull(apiException);
         assertNull(networkException);
 
@@ -434,7 +434,7 @@ public class RetrofitUberRidesClientIntegrationTest {
     private static void assertRideRequest(RecordedRequest request, Response<Ride> response, ApiException apiException,
             NetworkException networkException) {
         assertNotNull(response);
-        assertNotNull(response.getResponseObject());
+        assertNotNull(response.getBody());
         assertNull(apiException);
         assertNull(networkException);
 
@@ -450,7 +450,7 @@ public class RetrofitUberRidesClientIntegrationTest {
         assertEquals("Response code does not match", HttpURLConnection.HTTP_ACCEPTED, response.getStatus());
         assertEquals("Response reason does not match", "Accepted", response.getReason());
 
-        assertThat("Request body does not match", response.getResponseObject(),
+        assertThat("Request body does not match", response.getBody(),
                 allOf(hasProperty("rideId", is("1033c525-746e-48ab-8eee-ab983e039e78")),
                         hasProperty("status", is("processing")),
                         hasProperty("driver", nullValue()),
@@ -601,7 +601,7 @@ public class RetrofitUberRidesClientIntegrationTest {
 
         Response<UserProfile> response = uberApiSyncService.getUserProfile();
 
-        assertCredentialRefresh(response, response.getResponseObject(), null, null);
+        assertCredentialRefresh(response, response.getBody(), null, null);
     }
 
     private void assertCredentialRefresh(Response response, UserProfile userProfile,
@@ -668,7 +668,7 @@ public class RetrofitUberRidesClientIntegrationTest {
 
         Response<ProductsResponse> response = uberApiSyncService.getProducts(37.613f, -122.477f);
 
-        assertProductsWithServerToken(server.takeRequest(), response, response.getResponseObject(), null, null);
+        assertProductsWithServerToken(server.takeRequest(), response, response.getBody(), null, null);
     }
 
     private void assertProductsWithServerToken(RecordedRequest request, Response response,
