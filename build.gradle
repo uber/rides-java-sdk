@@ -98,9 +98,9 @@ github {
     targetCommitish = 'master'
     name = "v${unsnapshottedVersion}"
     body = generateReleaseNotes()
-//    assets = project.assets.collect {
-//            "${rootDir}/build/distributions/" + project(it).name + "/"
-//            [project(":samples:cmdline-sample").githubReleaseZip.archivePath]
+    assets = project.assets.collect {
+        project(it).buildDir.absolutePath + "/distributions/" + project(it).name + "-v${unsnapshottedVersion}.zip"
+    }
 }
 
 distributions {
