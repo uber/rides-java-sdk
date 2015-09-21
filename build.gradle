@@ -59,7 +59,7 @@ def generateReleaseNotes() {
                  snippet: changelogSnippet,
                  assets: project.assets.collect {[
                          title: project(it).name,
-                         download: githubDownloadPrefix + "${unsnapshottedVersion}/" + project(it).name + "-${unsnapshottedVersion}.zip",
+                         download: githubDownloadPrefix + "v${unsnapshottedVersion}/" + project(it).name + "-v${unsnapshottedVersion}.zip",
                          description: project(it).description,
                  ]}]
     def engine = new GStringTemplateEngine()

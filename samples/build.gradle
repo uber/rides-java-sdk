@@ -3,7 +3,7 @@ subprojects {
         version = "v${unsnapshottedVersion}"
         from('.') {
             filter { String line ->
-                line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${unsnapshottedVersion}'")
+                line.replaceAll("compile project\\(':sdk'\\)", "compile '${groupId}:${artifactId}:${unsnapshottedVersion}'")
             }
             into '.'
             exclude 'build'
