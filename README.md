@@ -1,14 +1,27 @@
-# Uber Rides
+# Uber Rides Java SDK (beta)
 
 Official Java SDK (beta) to support the Uber Rides API.
 
 ## Installation
 
-To use the Uber Rides Java SDK, add the compile dependency with the latest version of the Uber SDK in the `build.gradle` file:
+To use the Uber Rides Java SDK, add the compile dependency with the latest version of the Uber SDK.
+
+### Gradle
+In the `build.gradle` file:
 ```
 dependencies {
     compile 'com.uber.sdk:rides:0.1.0'
 }
+```
+### Maven
+In the `pom.xml` file:
+```
+<dependency>
+	<groupId>com.uber.sdk</groupId>
+	<artifactId>rides</artifactId>
+	<version>0.1.0</version>
+</dependency>
+
 ```
 
 ## Sync v.s. Async
