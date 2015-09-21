@@ -2,6 +2,9 @@ apply plugin: 'distribution'
 apply plugin: 'net.researchgate.release'
 apply plugin: 'co.riiid.gradle'
 
+import groovy.text.GStringTemplateEngine
+import org.codehaus.groovy.runtime.DateGroovyMethods
+
 buildscript {
     repositories {
         jcenter()
@@ -13,12 +16,13 @@ buildscript {
     }
 }
 
-def unsnapshottedVersion = version.replaceAll("-SNAPSHOT", "");
-
 allprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'maven'
     apply plugin: 'net.saliman.cobertura'
+
+    ext.set("unsnapshottedVersion", version.replaceAll("-SNAPSHOT", ""))
+    ext.set("assets", [':samples:cmdline-sample'])
 
     repositories {
         jcenter()
@@ -46,32 +50,45 @@ allprojects {
     task checkstyleTest(type: Checkstyle, overwrite: true) {
         configFile = new File("{$project.projectDir}/config/checkstyle/checkstyle-test.xml")
     }
-
-    task githubReleaseZip(type: Zip) {
-        version = "v" + unsnapshottedVersion
-        from('.') {
-            filter { String line ->
-                line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${unsnapshottedVersion}'")
-            }
-            into '.'
-            exclude 'build'
-            exclude '*.iml'
-        }
-    }
-
-    release {
-        failOnCommitNeeded = false
-        failOnPublishNeeded = false
-        failOnSnapshotDependencies = false
-        revertOnFail = true
-        tagTemplate = "v${unsnapshottedVersion}"
-    }
 }
 
-afterReleaseBuild.dependsOn ":sdk:uploadArchives"
-updateVersion.dependsOn ":githubRelease"
-githubRelease.dependsOn ":samples:cmdline-sample:githubReleaseZip"//, ":servletsampleDistZip"
-//System.out.println(task(":samples:cmdline-sample:zip").archivePath)
+def generateReleaseNotes() {
+    def changelogSnippet = generateChangelogSnippet()
+    def model = [title: "Uber Rides API Java SDK (Beta) v${unsnapshottedVersion}",
+                 date: DateGroovyMethods.format(new Date(), 'MM/dd/yyyy'),
+                 snippet: changelogSnippet,
+                 assets: project.assets.collect {[
+                         title: project(it).name,
+                         download: githubDownloadPrefix + "${unsnapshottedVersion}/" + project(it).name + "-${unsnapshottedVersion}.zip",
+                         description: project(it).description,
+                 ]}]
+    def engine = new GStringTemplateEngine()
+    def template = engine.createTemplate(new File('releasenotes.gtpl')).make(model)
+    return template.toString()
+}
+
+def generateChangelogSnippet() {
+    def changelog = new File('CHANGELOG.md').text
+    def snippet = ""
+    def stop = false
+    changelog.eachLine {line, count ->
+        if (count >= 2) {
+            stop = stop || line.startsWith("v");
+            if (!stop) {
+                snippet += line + "\n";
+            }
+        }
+    }
+    return "  " + snippet.trim();
+}
+
+release {
+    failOnCommitNeeded = false
+    failOnPublishNeeded = false
+    failOnSnapshotDependencies = false
+    revertOnFail = true
+    tagTemplate = "v${unsnapshottedVersion}"
+}
 
 github {
     owner = 'uber'
@@ -80,12 +97,10 @@ github {
     tagName = "v${unsnapshottedVersion}"
     targetCommitish = 'master'
     name = "v${unsnapshottedVersion}"
-    body = "sample"
-
-    assets = [
-            project(":samples:cmdline-sample").githubReleaseZip.archivePath,
-            //"${project.projectDir}/build/distributions/servlet-sample-${version}.zip",
-    ]
+    body = generateReleaseNotes()
+//    assets = project.assets.collect {
+//            "${rootDir}/build/distributions/" + project(it).name + "/"
+//            [project(":samples:cmdline-sample").githubReleaseZip.archivePath]
 }
 
 distributions {
@@ -127,3 +142,7 @@ distributions {
         }
     }
 }
+
+afterReleaseBuild.dependsOn ":sdk:uploadArchives"
+updateVersion.dependsOn ":githubRelease"
+githubRelease.dependsOn project.assets.collect({it + ":githubReleaseZip"})

@@ -1,2 +1,3 @@
 include ':sdk'
+include ':samples'
 include ':samples:cmdline-sample'

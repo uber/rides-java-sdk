@@ -1,0 +1,13 @@
+subprojects {
+    task githubReleaseZip(type: Zip) {
+        version = "v${unsnapshottedVersion}"
+        from('.') {
+            filter { String line ->
+                line.replaceAll("compile project\\(':sdk'\\)", "compile '${group}:${artifactId}:${unsnapshottedVersion}'")
+            }
+            into '.'
+            exclude 'build'
+            exclude '*.iml'
+        }
+    }
+}
