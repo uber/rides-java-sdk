@@ -22,7 +22,7 @@ allprojects {
     apply plugin: 'net.saliman.cobertura'
 
     ext.set("unsnapshottedVersion", version.replaceAll("-SNAPSHOT", ""))
-    ext.set("assets", [':samples:cmdline-sample'])
+    ext.set("samples", project(":samples").subprojects.collect {it.path})
 
     repositories {
         jcenter()
@@ -57,7 +57,7 @@ def generateReleaseNotes() {
     def model = [title: "Uber Rides API Java SDK (Beta) v${unsnapshottedVersion}",
                  date: DateGroovyMethods.format(new Date(), 'MM/dd/yyyy'),
                  snippet: changelogSnippet,
-                 assets: project.assets.collect {[
+                 assets: project.samples.collect {[
                          title: project(it).name,
                          download: githubDownloadPrefix + "v${unsnapshottedVersion}/" + project(it).name + "-v${unsnapshottedVersion}.zip",
                          description: project(it).description,
@@ -98,7 +98,7 @@ github {
     targetCommitish = 'master'
     name = "v${unsnapshottedVersion}"
     body = generateReleaseNotes()
-    assets = project.assets.collect {
+    assets = project.samples.collect {
         project(it).buildDir.absolutePath + "/distributions/" + project(it).name + "-v${unsnapshottedVersion}.zip"
     }
 }
@@ -146,4 +146,4 @@ distributions {
 
 afterReleaseBuild.dependsOn ":sdk:uploadArchives"
 updateVersion.dependsOn ":githubRelease"
-githubRelease.dependsOn project.assets.collect({it + ":githubReleaseZip"})
+githubRelease.dependsOn project.samples.collect({it + ":githubReleaseZip"})
