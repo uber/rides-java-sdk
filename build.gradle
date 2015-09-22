@@ -18,6 +18,7 @@ buildscript {
 
 allprojects {
     apply plugin: 'checkstyle'
+    apply plugin: 'idea'
     apply plugin: 'maven'
     apply plugin: 'net.saliman.cobertura'
 

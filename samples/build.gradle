@@ -1,5 +1,45 @@
 subprojects {
-    task githubReleaseZip(type: Zip) {
+    configure(install.repositories.mavenInstaller) {
+        pom.project {
+            name project.name
+            packaging 'jar'
+            artifactId project.name
+            version unsnapshottedVersion
+
+            description project.description
+            url 'https://devoloper.uber.com'
+
+            scm {
+                connection 'scm:git:git@github.com:uber/rides-java-sdk.git'
+                developerConnection 'scm:git:git@github.com:uber/rides-java-sdk.git'
+                url 'git@github.com:uber/rides-java-sdk.git'
+            }
+
+            licenses {
+                license {
+                    name 'MIT License'
+                    url 'http://www.opensource.org/licenses/mit-license.php'
+                }
+            }
+
+            developers {
+                developer {
+                    id 'arogal'
+                    name 'Adam Rogal'
+                    email 'arogal@uber.com'
+                }
+
+                developer {
+                    id 'itstexter'
+                    name 'Alex Texter'
+                    email 'texter@uber.com'
+                }
+            }
+        }
+    }
+
+
+    task githubReleaseZip(type: Zip, dependsOn: "install") {
         version = "v${unsnapshottedVersion}"
 
         from('.') {
@@ -17,6 +57,18 @@ subprojects {
             include 'gradlew'
             include 'gradlew.bat'
             include 'LICENSE'
+            into '.'
+        }
+
+        from(buildDir) {
+            include 'pom-default.xml'
+            rename { String fileName ->
+                if (fileName == 'pom-default.xml') {
+                    'pom.xml'
+                } else {
+                    fileName
+                }
+            }
             into '.'
         }
     }
