@@ -39,7 +39,7 @@ uploadArchives {
                 artifactId artifactId
 
                 description 'The official Java SDK (beta) for the Uber Rides API.'
-                url 'https://devoloper.uber.com'
+                url 'https://developer.uber.com'
 
                 scm {
                     connection 'scm:git:git@github.com:uber/rides-java-sdk.git'

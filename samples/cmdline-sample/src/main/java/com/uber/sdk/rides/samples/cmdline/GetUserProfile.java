@@ -119,7 +119,7 @@ public final class GetUserProfile {
     }
 
     /**
-     * Loads the user's secrets
+     * Loads the application's secrets.
      */
     private static Properties loadSecretProperties() throws Exception {
         Properties properties = new Properties();

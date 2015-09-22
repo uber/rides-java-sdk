@@ -88,7 +88,7 @@ public class Server {
     }
 
     /**
-     * Loads the user's secrets
+     * Loads the application's secrets.
      */
     private static Properties loadSecretProperties() throws IOException {
         Properties properties = new Properties();
