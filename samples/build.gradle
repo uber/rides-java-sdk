@@ -60,14 +60,13 @@ subprojects {
             into '.'
         }
 
-        from(buildDir) {
+        from('build/poms') {
             include 'pom-default.xml'
             rename { String fileName ->
-                if (fileName == 'pom-default.xml') {
-                    'pom.xml'
-                } else {
-                    fileName
-                }
+                fileName.replaceAll('-default', '')
+            }
+            filter { String line ->
+                line.replaceAll('-SNAPSHOT', '')
             }
             into '.'
         }
