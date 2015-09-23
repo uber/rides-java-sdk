@@ -67,12 +67,12 @@ def generateReleaseNotes() {
                          description: project(it).description,
                  ]}]
     def engine = new GStringTemplateEngine()
-    def template = engine.createTemplate(new File('releasenotes.gtpl')).make(model)
+    def template = engine.createTemplate(rootProject.file('releasenotes.gtpl')).make(model)
     return template.toString()
 }
 
 def generateChangelogSnippet() {
-    def changelog = new File('CHANGELOG.md').text
+    def changelog = rootProject.file('CHANGELOG.md').text
     def snippet = ""
     def stop = false
     changelog.eachLine {line, count ->
@@ -88,17 +88,17 @@ def generateChangelogSnippet() {
 
 def checkAndDefaultProperty(prop) {
     if (!project.hasProperty(prop)) {
-        logger.warn("Add " + prop + " to your ~/.gradle/grade.properties file.")
+        logger.warn("Add " + prop + " to your ~/.gradle/gradle.properties file.")
         rootProject.ext.set(prop, prop)
     }
 }
 
-def checkForChangelogUpdates() {
-    def changelogtext = rootProject.file('CHANGELOG.MD').text
+def checkForChangelogUpdates(task) {
+    def changelogtext = rootProject.file('CHANGELOG.md').text
     if (!changelogtext.startsWith("v${unsnapshottedVersion} -")) {
         throw new AssertionError(
                 "Changelog must be updated with v{$unsnapshottedVersion} before release. Please check " +
-                        rootProject.file('CHANGELOG.MD').absolutePath)
+                        rootProject.file('CHANGELOG.md').absolutePath)
     }
 }
 
@@ -114,7 +114,7 @@ def checkForSecrets(prject) {
 gradle.taskGraph.afterTask { Task task, TaskState state ->
     if (task.path.endsWith("release") || task.path.endsWith("githubReleaseZip")
             || task.path.endsWith("publicrepoDistZip")) {
-        checkForChangelogUpdates()
+        checkForChangelogUpdates(task)
         for (prject in project(":samples").subprojects) {
             checkForSecrets(prject)
         }
