@@ -5,6 +5,7 @@ import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.uber.sdk.rides.auth.OAuth2Credentials;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,7 +14,7 @@ import org.junit.rules.ExpectedException;
 
 public class SessionTest {
 
-    private static final GenericUrl TOKEN_SERVER_URL = new GenericUrl("http://api.uber.com/token");
+    private static final GenericUrl TOKEN_SERVER_URL = new GenericUrl(OAuth2Credentials.TOKEN_SERVER_URL);
 
     @Rule public ExpectedException exception = ExpectedException.none();
 

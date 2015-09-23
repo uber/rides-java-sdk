@@ -49,8 +49,8 @@ import static org.junit.Assert.assertTrue;
 public class OAuth2HelperTest {
 
     private static final String ACCESS_TOKEN = "accessToken";
-    private static final GenericUrl TOKEN_SERVER_URL = new GenericUrl("http://api.uber.com/token");
     private static final String REFRESH_TOKEN = "refreshToken";
+    private static final GenericUrl TOKEN_SERVER_URL = new GenericUrl(OAuth2Credentials.TOKEN_SERVER_URL);
 
     @Rule public ExpectedException exception = ExpectedException.none();
 

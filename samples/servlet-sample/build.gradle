@@ -3,7 +3,7 @@ apply plugin: 'application'
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
-mainClassName = "com.ubercab.sdk.samples.servlet.Server"
+mainClassName = "com.uber.sdk.rides.samples.servlet.Server"
 
 dependencies {
     compile project(':sdk')
