@@ -2,6 +2,10 @@
 
 Official Java SDK (beta) to support the Uber Rides API.
 
+## Before you begin
+
+This is a beta Java SDK not intended to be run on Android. An official Android SDK will be released soon.
+
 ## Installation
 
 To use the Uber Rides Java SDK, add the compile dependency with the latest version of the Uber SDK.
@@ -129,7 +133,7 @@ If the update is successful, `response.getStatus()` will be 204.
 The `updateSandboxRide` method is not valid in the `PRODUCTION` `Environment`, where the ride status will change automatically.  If it is used in a `PRODUCTION` `Environment`, the call will throw an `IllegalStateException`.
 ## Getting help
 
-Uber developers actively monitor the [Uber tag](http://stackoverflow.com/questions/tagged/uber-api) on StackOverflow. If you need help installing or using the library, you can ask a question there.  Make sure to tag your question with `uber-api` and `java`!
+Uber developers actively monitor the [uber tag](http://stackoverflow.com/questions/tagged/uber-api) on StackOverflow. If you need help installing or using the library, you can ask a question there.  Make sure to tag your question with `uber-api` and `java`!
 
 ## Contributing
 
