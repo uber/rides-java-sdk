@@ -26,6 +26,7 @@ allprojects {
 
     ext.set("unsnapshottedVersion", version.replaceAll("-SNAPSHOT", ""))
     ext.set("samples", project(":samples").subprojects.collect {it.path})
+    ext.set("isReleaseVersion", !version.endsWith("SNAPSHOT"))
 
     repositories {
         jcenter()
@@ -118,6 +119,13 @@ gradle.taskGraph.afterTask { Task task, TaskState state ->
         for (prject in project(":samples").subprojects) {
             checkForSecrets(prject)
         }
+    }
+}
+
+// Skip signing archives on Jenkins when -SNAPSHOT is being checked in.
+gradle.taskGraph.beforeTask { Task task ->
+    if (task.path.contains("sign") && !ext.isReleaseVersion) {
+        task.enabled = false
     }
 }
 
