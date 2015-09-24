@@ -12,20 +12,19 @@ To use the Uber Rides Java SDK, add the compile dependency with the latest versi
 
 ### Gradle
 In the `build.gradle` file:
-```
+```gradle
 dependencies {
     compile 'com.uber.sdk:rides:0.1.0'
 }
 ```
 ### Maven
 In the `pom.xml` file:
-```
+```xml
 <dependency>
 	<groupId>com.uber.sdk</groupId>
 	<artifactId>rides</artifactId>
 	<version>0.1.0</version>
 </dependency>
-
 ```
 
 ## Sync v.s. Async
@@ -36,11 +35,11 @@ The Uber Rides Java SDK supports both Synchronous and Asynchronous use. Asynchro
 ## Read-Only Use
 
 If you just need read-only access to Uber API resources, create a Session with the server token you received after [registering your app](https://developer.uber.com/dashboard).
-```
+```java
 Session session = new Session.Builder().setServerToken(“yourServerToken”).build();
 ```
 Use this Session to create an UberRidesService and fetch API resources:
-```
+```java
 UberRidesService service = UberRidesServices.createSync(session);
 ProductsResponse products = client.getProducts(37.775, -122.417).getBody();
 ```
@@ -54,7 +53,7 @@ The Authorization Code flow is mandatory if you want to request rides on behalf 
 
 Start by creating an OAuth2Credentials object that has your clientd, clientSecret, scopes, and a redirectUri that is used to capture the user’s authorization code.
 
-```
+```java
 OAuth2Credentials credentials = new OAuth2Credentials.Builder()
         .setClientSecrets(clientId, clientSecret)
         .setScopes(yourScopes)
@@ -64,19 +63,19 @@ OAuth2Credentials credentials = new OAuth2Credentials.Builder()
 The `redirectUri` must match the value you provided when you registered your application
 
 Then, navigate the user to the authorization URL created from the OAuth2Credentials object.
-```
+```java
 String authorizationUrl = credentials.getAuthorizationUrl();
 // Instruct user to open the URL contained within authorizationUrl
 ```
 Once the user logs in and confirms the OAuth2 dialog, they will be redirected to your server which will be listening for authorization code. Exchange that authorization code to retrieve an access token (contained within credential).
-```
+```java
 // Retrieve authorization code from server at redirectUri
 // Authenticate the user with the authorization code.
 Credential credential = credentials.authenticate(authorizationCode, userId);
 ```
 Last, use the credential object to create a session, which can then be used to create a service client instance.
 
-```
+```java
 Session session = new Session.Builder().setCredential(credential).build();
 UberRidesService service = UberRidesServices.createSync(session);
 ```
@@ -96,13 +95,13 @@ This will store user credentials in your home directory under `.uber_credentials
 For full documentation, visit our [Developer Site](https://developer.uber.com/v1/endpoints/).
 
 #### Get Available Products
-```
+```java
 ProductsResponse productsResponse = service.get_products(37.77f, -122.41f).getBody();
 List<Product> products = productsResponse.getProducts();
 String productId = products.get(0).getProductId();
 ```
 #### Request a Ride
-```
+```java
 Location startLocation = new Location(37.77f, -122.41f);
 Location endLocation = new Location(37.49f, -122.41f);
 RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder().setStartLocation(startLocation)
@@ -115,7 +114,7 @@ String rideId = ride.getRideId();
 This will make a real-world request and send an Uber driver to the start location specified.
 
 To develop and test against request endpoints in a sandbox environment, make sure to instantiate your `UberRidesService` with a `Session` whose `Environment` whose is set to `SANDBOX`.
-```
+```java
 Session session = new Session.Builder().setCredential(credential).setEnvironment(Environment.SANDBOX).build();
 UberRidesService service = UberRidesServices.createSync(session);
 ```
@@ -124,7 +123,7 @@ The default `Environment` of a `Session` is set to `PRODUCTION`. See our [docume
 #### Update Sandbox Ride
 
 If you are requesting sandbox rides, you will need to step through the different states of a ride.
-```
+```java
 SandboxRideRequestParameters rideParameters = new SandboxRideRequestParameters.Builder().setStatus(“accepted”).build();
 Response<Void> response = client.updateSandboxRide(rideId, rideParameters);
 ```
