@@ -40,8 +40,8 @@ Session session = new Session.Builder().setServerToken(“yourServerToken”).bu
 ```
 Use this Session to create an UberRidesService and fetch API resources:
 ```java
-UberRidesService service = UberRidesServices.createSync(session);
-ProductsResponse products = client.getProducts(37.775, -122.417).getBody();
+UberRidesSyncService service = UberRidesServices.createSync(session);
+ProductsResponse products = service.getProducts(37.775f, -122.417f).getBody();
 ```
 ## Authorization
 
@@ -58,7 +58,7 @@ OAuth2Credentials credentials = new OAuth2Credentials.Builder()
         .setClientSecrets(clientId, clientSecret)
         .setScopes(yourScopes)
         .setRedirectUri(redirectUri)
-        .build()
+        .build();
 ```
 The `redirectUri` must match the value you provided when you registered your application
 
