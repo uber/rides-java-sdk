@@ -25,6 +25,7 @@ package com.uber.sdk.rides.client;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.uber.sdk.rides.auth.OAuth2Credentials;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,6 +39,7 @@ public class Session {
     private final Credential credential;
     private final Environment environment;
     private final String serverToken;
+    private final Locale locale;
 
     /**
      * An Uber API Environment. See
@@ -55,10 +57,11 @@ public class Session {
         }
     }
 
-    private Session(@Nullable Credential credential, @Nonnull Environment environment, @Nullable String serverToken) {
+    private Session(@Nullable Credential credential, @Nonnull Environment environment, @Nullable String serverToken, @Nullable Locale locale) {
         this.credential = credential;
         this.environment = environment;
         this.serverToken = serverToken;
+        this.locale = locale;
     }
 
     /**
@@ -69,6 +72,7 @@ public class Session {
         private Credential credential;
         private Environment environment;
         private String serverToken;
+        private Locale locale;
 
         /**
          * Sets the OAuth 2.0 Credential. See {@link OAuth2Credentials} for
@@ -96,6 +100,15 @@ public class Session {
             this.serverToken = serverToken;
             return this;
         }
+        
+        /**
+         * Sets the requested locale through the Accept-Language http header. See https://developer.uber.com/docs/localization for
+         * possible Locales
+         */
+        public Builder setAcceptLanguage(Locale l) {
+            this.locale = l;
+            return this;
+        }
 
         private void validate() {
             Preconditions.checkState(credential != null || serverToken != null,
@@ -112,7 +125,7 @@ public class Session {
 
             Environment environment = this.environment != null ? this.environment : Environment.PRODUCTION;
 
-            return new Session(credential, environment, serverToken);
+            return new Session(credential, environment, serverToken, locale);
         }
     }
 
@@ -138,5 +151,13 @@ public class Session {
     @Nullable
     public String getServerToken() {
         return serverToken;
+    }
+    
+    /**
+     * Get the requested language locale for API requests
+     */
+    @Nullable
+    public Locale getLocale() {
+        return locale;
     }
 }
