@@ -8,9 +8,8 @@ The SDK helps your Java app interact with the Uber rides API using libraries tha
 
 #### Before you begin
 To use the API, you need to register your app in the [Uber developer dashboard](https://developer.uber.com/dashboard). When you register, the app gets a client ID, secret, and server token used for authentication. 
-<aside class="notice">
-This beta Java SDK is not suitable for Android development. To that end, we will release an official Android SDK soon.
-</aside>
+
+Note: This beta Java SDK is not suitable for Android development. To that end, we will release an official Android SDK soon.
 
 #### Gradle
 If using Gradle, add this to your project’s `build.gradle` file:
@@ -32,13 +31,9 @@ If using Maven, add this to your project’s `pom.xml` file:
 
 ### Authenticating your app
 
-The oAuth 2.0 authorization flow lets your app request rides on the user’s behalf and access their profile and history without compromising their credentials. It has two parts: First, your app asks the user to authorize and second, it exchanges the authorization code for an access token from Uber.
+The oAuth 2.0 authorization flow lets your app request rides on the user’s behalf and access their profile and history without compromising their credentials. It has two parts: First, your app asks the user to authorize and second, it exchanges the authorization code for an access token from Uber. Here is a sample of the authorization flow:
 
-Here is a sample of the authorization flow:
-
-<aside class="notice">
-Make sure the callback redirect URI matches what’s in the developer dashboard for the app. 
-</aside>
+Note: Make sure the callback redirect URI matches what’s in the developer dashboard for the app. 
 
 ```java
 // Include the Java SDK session, rides, and sync services.
@@ -91,10 +86,7 @@ public class Test {
         }
 }
 ```
-
-<aside class="notice">
-Keep each user's access token in a secure data store. Reuse the same token to make API calls on behalf of your user without repeating the authorization flow each time they visit your app. You don’t have to because the SDK handles the token refresh automatically when it makes API requests with an `UberRidesService`.
-</aside>
+Note: Keep each user's access token in a secure data store. Reuse the same token to make API calls on behalf of your user without repeating the authorization flow each time they visit your app. You don’t have to because the SDK handles the token refresh automatically when it makes API requests with an `UberRidesService`.
 
 ## Sync vs. Async Calls
 
@@ -191,9 +183,7 @@ Response<Void> response = client.updateSandboxRide(rideId, rideParameters);
 ```
 A successful update returns a 204 for `response.getStatus()`.
 
-<aside class="notice">
-The `updateSandboxRide` method is not valid in the `PRODUCTION` `Environment`, where the ride status changes automatically. In a `PRODUCTION` `Environment`, the call throws an `IllegalStateException`.
-</aside>
+Note: The `updateSandboxRide` method is not valid in the `PRODUCTION` `Environment`, where the ride status changes automatically. In a `PRODUCTION` `Environment`, the call throws an `IllegalStateException`.
 
 ## Getting Help
 
