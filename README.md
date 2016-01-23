@@ -1,9 +1,9 @@
 # Uber Rides Java SDK (Beta)
-***
+
 The SDK helps your Java app interact with the Uber rides API using libraries that wrap the raw HTTP calls made to the Uber API.
 
 ## Setup
-***
+
 ### Installing
 
 #### Before you begin
@@ -31,7 +31,7 @@ If using Maven, add this to your project’s `pom.xml` file:
 ```
 
 ### Authenticating your app
-***
+
 The oAuth 2.0 authorization flow lets your app request rides on the user’s behalf and access their profile and history without compromising their credentials. It has two parts: First, your app asks the user to authorize and second, it exchanges the authorization code for an access token from Uber.
 
 Here is a sample of the authorization flow:
@@ -97,12 +97,12 @@ Keep each user's access token in a secure data store. Reuse the same token to ma
 </aside>
 
 ## Sync vs. Async Calls
-***
+
 Both synchronous and asynchronous calls work with the Uber rides Java SDK. Instantiate your service appropriately with
 `UberRidesServices.createSync(session)` or `UberRidesServices.createAsync(session)`. You can access asynchronous calls from a platform-specific thread through callbacks. 
 
 ## Read-Only Calls
-***
+
 If you just need read-only access to Uber API resources, create a session with the server token you received after [registering your app](https://developer.uber.com/dashboard).
 ```java
 Session session = new Session.Builder().setServerToken(“yourServerToken”).build();
@@ -114,10 +114,11 @@ ProductsResponse products = service.getProducts(37.775f, -122.417f).getBody();
 ```
 
 ## Making Common Calls
-***
+
 In the `samples` folder, you can use the sample Java classes to test standard requests. Alternatively, you can download a sample from the [releases page](https://github.com/uber/rides-java-sdk/releases/tag/v0.1.0) to try them out.
 
 ### Before you begin
+
 * Before you run a sample, edit the relevant `secrets.properties` file and add your app credentials.
 * To run the command line sample, navigate to `samples/cmdline-sample` and run `$ ../../gradlew clean build run`. Or if you are using one of the downloaded samples, run `$ ./gradlew clean build run` from the root directory. This stores user credentials in your home directory under `.uber_credentials`.
 * Be sure to import these SDK services into your Java class to be able to make most calls:
@@ -150,6 +151,7 @@ import com.uber.sdk.rides.client.model.ProductsResponse;
 For full documentation, visit our [Developer Site](https://developer.uber.com/v1/endpoints/).
 
 ### Get available products
+
 ```java
 // Get a list of products.
 ProductsResponse products = service.getProducts(37.775f, -122.417f).getBody();
@@ -159,6 +161,7 @@ System.out.println(product.getProductId() + ": " + product.getDisplayName());
 ```
 
 ### Request a ride
+
 ```java
 //Request a real-world Uber ride.
 Location startLocation = new Location(37.77f, -122.41f);
@@ -180,6 +183,7 @@ UberRidesService service = UberRidesServices.createSync(session);
 The default `Environment` of a `Session` is set to `PRODUCTION`. See our [documentation](https://developer.uber.com/v1/sandbox/) to learn more about the sandbox environment.
 
 ### Update a ride in the sandbox
+
 If you request a ride in the sandbox, you step through the different states of the ride.
 ```java
 SandboxRideRequestParameters rideParameters = new SandboxRideRequestParameters.Builder().setStatus(“accepted”).build();
@@ -192,9 +196,9 @@ The `updateSandboxRide` method is not valid in the `PRODUCTION` `Environment`, w
 </aside>
 
 ## Getting Help
-***
+
 Uber developers actively monitor the [uber tag](http://stackoverflow.com/questions/tagged/uber-api) on StackOverflow. If you need help installing or using the library, ask a question there. Make sure to tag your question with `uber-api` and `java`!
 
 ## Contributing
-***
+
 We :heart: contributions. If you find a bug in the library or would like new features added, go ahead and open issues or pull requests against this repo.  Write a test for your bug fix or to show that your feature works as expected.
