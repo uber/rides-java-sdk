@@ -129,7 +129,7 @@ public class RetrofitUberRidesClient {
                 }
                 
                 if (session.getLocale() != null) {
-                    requestFacade.addHeader("Accept-Language", session.getLocale().toLanguageTag());
+                    requestFacade.addHeader("Accept-Language", session.getLocale().getLanguage());
                 }
 
                 requestFacade.addHeader("X-Uber-User-Agent", "Java Rides SDK v" + LIB_VERSION);
