@@ -102,11 +102,11 @@ public class Session {
         }
         
         /**
-         * Sets the requested locale through the Accept-Language http header. See https://developer.uber.com/docs/localization for
-         * possible Locales
+         * Sets the requested Locale through the Accept-Language HTTP header. See https://developer.uber.com/docs/localization for
+         * possible locales
          */
-        public Builder setAcceptLanguage(Locale l) {
-            this.locale = l;
+        public Builder setAcceptLanguage(Locale locale) {
+            this.locale = locale;
             return this;
         }
 
@@ -154,7 +154,7 @@ public class Session {
     }
     
     /**
-     * Get the requested language locale for API requests
+     * Get the requested language Locale for API requests.
      */
     @Nullable
     public Locale getLocale() {
