@@ -127,6 +127,10 @@ public class RetrofitUberRidesClient {
                 } else {
                     requestFacade.addHeader("Authorization", "Token " + session.getServerToken());
                 }
+                
+                if (session.getLocale() != null) {
+                    requestFacade.addHeader("Accept-Language", session.getLocale().getLanguage());
+                }
 
                 requestFacade.addHeader("X-Uber-User-Agent", "Java Rides SDK v" + LIB_VERSION);
             }

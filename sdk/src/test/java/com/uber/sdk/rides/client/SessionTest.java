@@ -6,6 +6,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.uber.sdk.rides.auth.OAuth2Credentials;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -54,5 +55,10 @@ public class SessionTest {
         exception.expectMessage("Session must have either an OAuth 2.0 credential or a server token, not both.");
 
         new Session.Builder().setCredential(credential).setServerToken("serverToken").build();
+    }    
+    
+    @Test
+    public void buildSession_withLocalization_shouldSucceed() throws Exception {
+        new Session.Builder().setServerToken("serverToken").setAcceptLanguage(new Locale("sv","SE")).build();
     }
 }

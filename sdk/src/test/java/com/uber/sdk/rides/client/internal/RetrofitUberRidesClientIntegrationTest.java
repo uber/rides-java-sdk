@@ -37,6 +37,7 @@ import com.squareup.okhttp.mockwebserver.RecordedRequest;
 import com.squareup.okhttp.mockwebserver.SocketPolicy;
 import com.uber.sdk.rides.auth.OAuth2Helper;
 import com.uber.sdk.rides.client.Callback;
+import com.uber.sdk.rides.client.Header;
 import com.uber.sdk.rides.client.Response;
 import com.uber.sdk.rides.client.Session;
 import com.uber.sdk.rides.client.UberRidesAsyncService;
@@ -66,6 +67,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -138,6 +140,28 @@ public class RetrofitUberRidesClientIntegrationTest {
     @After
     public void tearDown() throws IOException {
         server.shutdown();
+    }
+
+    @Test
+    public void onGet_withLanguage() throws Exception {
+        Session localizedSandboxSession = new Session.Builder()
+                .setAcceptLanguage(new Locale("sv","SE"))
+                .setCredential(credential)
+                .setEnvironment(Session.Environment.SANDBOX)
+                .build();
+       UberRidesSyncService localizedUberApiSyncService = RetrofitUberRidesClient.getUberApiService(localizedSandboxSession,
+                new OAuth2Helper(),
+                UberRidesServices.LogLevel.FULL,
+                endpointHost,
+                okHttpClient, RetrofitUberRidesService.class);
+        
+        String body = readFile("src/test/resources/mockresponses/get_localized_products_response");
+
+        server.enqueue(new MockResponse().setBody(body));
+
+        Response<ProductsResponse> response = localizedUberApiSyncService.getProducts(37.613f, -122.477f);
+
+        assertLocalizedProducts(server.takeRequest(), response, null, null);
     }
 
     @Test
@@ -215,6 +239,30 @@ public class RetrofitUberRidesClientIntegrationTest {
                                 hasProperty("capacity", is(4)))));
     }
 
+    private static void assertLocalizedProducts(RecordedRequest request, Response<ProductsResponse> response,
+            ApiException apiException,
+            NetworkException networkException) {
+        assertNotNull(response);
+        assertNull(apiException);
+        assertNull(networkException);
+
+        ProductsResponse productsResponse = response.getBody();
+        assertNotNull(productsResponse);
+        
+        assertEquals("Accept-Language Header not found", "sv", request.getHeader("Accept-Language"));
+
+        assertEquals("Response code does not match", HttpURLConnection.HTTP_OK, response.getStatus());
+        assertEquals("Response reason does not match", "OK", response.getReason());
+
+        List<Product> products = productsResponse.getProducts();
+
+        assertThat("Request body does not match", products,
+                Matchers.<Product>hasItems(
+                        allOf(hasProperty("productId", is("a1111c8c-c720-46c3-8534-2fcdd730040d")),
+                                hasProperty("displayName", is("uberX")),
+                                hasProperty("description", is("Den billigare Ubern")))));
+    }
+    
     @Test
     public void onGet_whenAsyncInvalidProductId_shouldFail() throws Exception {
         String body = readFile("src/test/resources/mockresponses/get_product_error");
