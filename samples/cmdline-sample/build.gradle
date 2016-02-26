@@ -3,7 +3,7 @@ apply plugin: 'application'
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
-mainClassName = "com.uber.sdk.rides.samples.cmdline.GetUserProfile"
+mainClassName = 'com.uber.sdk.rides.samples.cmdline.GetUserProfile'
 
 repositories {
     jcenter()

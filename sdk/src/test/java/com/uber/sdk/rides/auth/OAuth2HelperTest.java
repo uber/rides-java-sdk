@@ -50,7 +50,7 @@ public class OAuth2HelperTest {
 
     private static final String ACCESS_TOKEN = "accessToken";
     private static final String REFRESH_TOKEN = "refreshToken";
-    private static final GenericUrl TOKEN_SERVER_URL = new GenericUrl(OAuth2Credentials.TOKEN_SERVER_URL);
+    private static final GenericUrl TOKEN_SERVER_URL = new GenericUrl("https://login.uber.com/oauth/v2/token");
 
     @Rule public ExpectedException exception = ExpectedException.none();
 

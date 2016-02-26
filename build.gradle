@@ -21,12 +21,14 @@ allprojects {
     apply plugin: 'maven'
     apply plugin: 'net.saliman.cobertura'
 
-    ["githubToken", "ossrhUsername", "ossrhPassword",
-     "signing.keyId", "signing.password", "signing.secretKeyRingFile",].each {checkAndDefaultProperty(it)}
+    ['githubToken', 'ossrhUsername', 'ossrhPassword',
+     'signing.keyId', 'signing.password', 'signing.secretKeyRingFile',].each {
+        checkAndDefaultProperty(it)
+    }
 
-    ext.set("unsnapshottedVersion", version.replaceAll("-SNAPSHOT", ""))
-    ext.set("samples", project(":samples").subprojects.collect {it.path})
-    ext.set("isReleaseVersion", !version.endsWith("SNAPSHOT"))
+    ext.set('unsnapshottedVersion', version.replaceAll('-SNAPSHOT', ''))
+    ext.set('samples', project(':samples').subprojects.collect { it.path })
+    ext.set('isReleaseVersion', !version.endsWith('SNAPSHOT'))
 
     repositories {
         jcenter()
@@ -37,7 +39,7 @@ allprojects {
     }
 
     checkstyle {
-        toolVersion = "6.4.1"
+        toolVersion = "6.11.2"
     }
 
     cobertura {
@@ -58,15 +60,17 @@ allprojects {
 
 def generateReleaseNotes() {
     def changelogSnippet = generateChangelogSnippet()
-    def model = [title: "Uber Rides API Java SDK (Beta) v${unsnapshottedVersion}",
-                 date: DateGroovyMethods.format(new Date(), 'MM/dd/yyyy'),
+    def model = [title  : "Uber Rides API Java SDK (Beta) v${unsnapshottedVersion}",
+                 date   : DateGroovyMethods.format(new Date(), 'MM/dd/yyyy'),
                  snippet: changelogSnippet,
-                 assets: project.samples.collect {[
-                         title: project(it).name,
-                         download: githubDownloadPrefix + "v${unsnapshottedVersion}/"
-                                 + project(it).name + "-v${unsnapshottedVersion}.zip",
-                         description: project(it).description,
-                 ]}]
+                 assets : project.samples.collect {
+                     [
+                             title      : project(it).name,
+                             download   : githubDownloadPrefix + "v${unsnapshottedVersion}/"
+                                     + project(it).name + "-v${unsnapshottedVersion}.zip",
+                             description: project(it).description,
+                     ]
+                 }]
     def engine = new GStringTemplateEngine()
     def template = engine.createTemplate(rootProject.file('releasenotes.gtpl')).make(model)
     return template.toString()
@@ -76,7 +80,7 @@ def generateChangelogSnippet() {
     def changelog = rootProject.file('CHANGELOG.md').text
     def snippet = ""
     def stop = false
-    changelog.eachLine {line, count ->
+    changelog.eachLine { line, count ->
         if (count >= 2) {
             stop = stop || line.startsWith("v");
             if (!stop) {
@@ -89,7 +93,7 @@ def generateChangelogSnippet() {
 
 def checkAndDefaultProperty(prop) {
     if (!project.hasProperty(prop)) {
-        logger.warn("Add " + prop + " to your ~/.gradle/gradle.properties file.")
+        logger.warn('Add ' + prop + ' to your ~/.gradle/gradle.properties file.')
         rootProject.ext.set(prop, prop)
     }
 }
@@ -105,18 +109,18 @@ def checkForChangelogUpdates(task) {
 
 def checkForSecrets(prject) {
     def secretsText = prject.file('src/main/resources/secrets.properties').text
-    def expectedText = "clientId=INSERT_CLIENT_ID_HERE\nclientSecret=INSERT_CLIENT_SECRET_HERE"
+    def expectedText = 'clientId=INSERT_CLIENT_ID_HERE\nclientSecret=INSERT_CLIENT_SECRET_HERE'
     if (secretsText != expectedText) {
-        throw new AssertionError("Secrets may be exposed. Please check " +
+        throw new AssertionError('Secrets may be exposed. Please check ' +
                 prject.file('src/main/resources/secrets.properties').absolutePath)
     }
 }
 
 gradle.taskGraph.afterTask { Task task, TaskState state ->
-    if (task.path.endsWith("release") || task.path.endsWith("githubReleaseZip")
-            || task.path.endsWith("publicrepoDistZip")) {
+    if (task.path.endsWith('release') || task.path.endsWith('githubReleaseZip')
+            || task.path.endsWith('publicrepoDistZip')) {
         checkForChangelogUpdates(task)
-        for (prject in project(":samples").subprojects) {
+        for (prject in project(':samples').subprojects) {
             checkForSecrets(prject)
         }
     }
@@ -124,14 +128,14 @@ gradle.taskGraph.afterTask { Task task, TaskState state ->
 
 // Skip signing archives on Jenkins when -SNAPSHOT is being checked in.
 gradle.taskGraph.beforeTask { Task task ->
-    if (task.path.contains("sign") && !ext.isReleaseVersion) {
+    if (task.path.contains('sign') && !ext.isReleaseVersion) {
         task.enabled = false
     }
 }
 
-afterReleaseBuild.dependsOn ":sdk:uploadArchives"
-updateVersion.dependsOn ":githubRelease"
-githubRelease.dependsOn project(":samples").subprojects.collect {it.path + ":githubReleaseZip"}
+afterReleaseBuild.dependsOn ':sdk:uploadArchives'
+updateVersion.dependsOn ':githubRelease'
+githubRelease.dependsOn project(':samples').subprojects.collect { it.path + ':githubReleaseZip' }
 
 release {
     failOnCommitNeeded = false
@@ -150,7 +154,7 @@ github {
     name = "v${unsnapshottedVersion}"
     body = generateReleaseNotes()
     assets = project.samples.collect {
-        project(it).buildDir.absolutePath + "/distributions/" + project(it).name +
+        project(it).buildDir.absolutePath + '/distributions/' + project(it).name +
                 "-v${unsnapshottedVersion}.zip"
     }
 }
@@ -174,13 +178,13 @@ distributions {
             from(rootDir) {
                 include 'README.md'
                 filter { String line ->
-                    line.replaceAll("@version@", unsnapshottedVersion)
+                    line.replaceAll('@version@', unsnapshottedVersion)
                 }
             }
 
             from('sdk') {
                 filter { String line ->
-                    line.replaceAll("@version@", unsnapshottedVersion)
+                    line.replaceAll('@version@', unsnapshottedVersion)
                 }
                 exclude 'build'
                 exclude '*.iml'

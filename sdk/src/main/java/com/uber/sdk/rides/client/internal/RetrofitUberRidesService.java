@@ -22,6 +22,10 @@
 
 package com.uber.sdk.rides.client.internal;
 
+import com.uber.sdk.rides.client.model.PaymentMethod;
+import com.uber.sdk.rides.client.model.PaymentMethodsResponse;
+import com.uber.sdk.rides.client.model.Place;
+import com.uber.sdk.rides.client.model.PlaceParameters;
 import com.uber.sdk.rides.client.model.PriceEstimatesResponse;
 import com.uber.sdk.rides.client.model.Product;
 import com.uber.sdk.rides.client.model.ProductsResponse;
@@ -30,6 +34,7 @@ import com.uber.sdk.rides.client.model.Ride;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
 import com.uber.sdk.rides.client.model.RideRequestParameters;
+import com.uber.sdk.rides.client.model.RideUpdateParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
 import com.uber.sdk.rides.client.model.SandboxRideRequestParameters;
 import com.uber.sdk.rides.client.model.TimeEstimatesResponse;
@@ -43,6 +48,7 @@ import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.PATCH;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
@@ -73,7 +79,7 @@ public interface RetrofitUberRidesService {
             Callback<Promotion> callback);
 
     /**
-     * Gets a limited amount of data about a user's lifetime activity with Uber.
+     * Gets a limited amount of data about a user's lifetime activity.
      *
      * @param offset Offset the list of returned results by this amount. Default is zero.
      * @param limit Number of items to retrieve. Default is 5, maximum is 50.
@@ -85,7 +91,7 @@ public interface RetrofitUberRidesService {
             Callback<UserActivityPage> callback);
 
     /**
-     * Gets information about the Uber user that has authorized with the application.
+     * Gets information about the user that has authorized with the application.
      *
      * @param callback The request callback.
      */
@@ -102,8 +108,10 @@ public interface RetrofitUberRidesService {
      * @param callback The request callback.
      */
     @GET("/v1/estimates/price")
-    void getPriceEstimates(@Query("start_latitude") float startLatitude, @Query("start_longitude") float startLongitude,
-            @Query("end_latitude") float endLatitude, @Query("end_longitude") float endLongitude,
+    void getPriceEstimates(@Query("start_latitude") float startLatitude,
+            @Query("start_longitude") float startLongitude,
+            @Query("end_latitude") float endLatitude,
+            @Query("end_longitude") float endLongitude,
             Callback<PriceEstimatesResponse> callback);
 
     /**
@@ -123,18 +131,19 @@ public interface RetrofitUberRidesService {
             Callback<TimeEstimatesResponse> callback);
 
     /**
-     * Gets information about the Uber products offered at a given location.
+     * Gets information about the products offered at a given location.
      *
      * @param latitude Latitude component of location.
      * @param longitude Longitude component of location.
      * @param callback The request callback.
      */
     @GET("/v1/products")
-    void getProducts(@Query("latitude") float latitude, @Query("longitude") float longitude,
+    void getProducts(@Query("latitude") float latitude,
+            @Query("longitude") float longitude,
             Callback<ProductsResponse> callback);
 
     /**
-     * Gets information about a specific Uber product.
+     * Gets information about a specific product.
      *
      * @param productId The unique product ID to fetch information about.
      * @param callback The request callback.
@@ -143,7 +152,7 @@ public interface RetrofitUberRidesService {
     void getProduct(@Path("product_id") String productId, Callback<Product> callback);
 
     /**
-     * Cancel an ongoing Request on behalf of a rider.
+     * Cancels an ongoing Ride for a user.
      *
      * @param rideId Unique identifier representing a Request.
      * @param callback The request callback.
@@ -152,13 +161,61 @@ public interface RetrofitUberRidesService {
     void cancelRide(@Path("request_id") String rideId, Callback<Void> callback);
 
     /**
-     * Requests a ride on behalf of an Uber user given their desired product, start, and end locations.
+     * Requests a ride on behalf of a user given their desired product, start, and end locations.
      *
      * @param rideRequestParameters The ride request parameters.
      * @param callback The request callback.
      */
     @POST("/v1/requests")
     void requestRide(@Body RideRequestParameters rideRequestParameters, Callback<Ride> callback);
+
+    /**
+     * Gets the current ride a user is on.
+     *
+     * @param callback The request callback.
+     */
+    @GET("/v1/requests/current")
+    void getCurrentRide(Callback<Ride> callback);
+
+    /**
+     * Cancels the current ride of a user.
+     *
+     * @param callback The request callback.
+     */
+    @DELETE("/v1/requests/current")
+    void cancelCurrentRide(Callback<Void> callback);
+
+    /**
+     * Update an ongoing request's destination.
+     *
+     * @param rideUpdateParameters The ride request parameters.
+     * @param callback The request callback.
+     */
+    @PATCH("/v1/requests/{request_id}")
+    void updateRide(@Nonnull @Path("request_id") String rideId,
+            @Body RideUpdateParameters rideUpdateParameters,
+            Callback<Void> callback);
+
+    /**
+     * Gets information about a user's Place.
+     *
+     * @param placeId The identifier of a Place.
+     * @param callback The request callback.
+     */
+    @GET("/v1/places/{place_id}")
+    void getPlace(@Nonnull @Path("place_id") String placeId, Callback<Place> callback);
+
+    /**
+     * Sets information about a user's Place.
+     *
+     * @param placeId The identifier of a Place.
+     * @param placeParameters The place parameters.
+     * @param callback The request callback.
+     */
+    @PUT("/v1/places/{place_id}")
+    void setPlace(@Nonnull @Path("place_id") String placeId,
+            @Nonnull @Body PlaceParameters placeParameters,
+            Callback<Place> callback);
 
     /**
      * Gets details about a specific ride.
@@ -192,11 +249,22 @@ public interface RetrofitUberRidesService {
     /**
      * Get a map with a visual representation of a ride for tracking purposes.
      *
+     * Maps are only available after a ride has been accepted by a driver and is in the 'accepted' state. Attempting
+     * to get a map before that will result in a 404 error.
+     *
      * @param rideId Unique identifier representing a ride.
      * @param callback The request callback.
      */
     @GET("/v1/requests/{request_id}/map")
     void getRideMap(@Nonnull @Path("request_id") String rideId , Callback<RideMap> callback);
+
+    /**
+     * Gets the {@link PaymentMethod PaymentMethods} of user and their last used method ID.
+     *
+     * @param callback The request callback.
+     */
+    @GET("/v1/payment-methods")
+    void getPaymentMethods(Callback<PaymentMethodsResponse> callback);
 
     /**
      * Updates the product in the {@link Environment#SANDBOX sandbox environement} to simulate the

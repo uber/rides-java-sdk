@@ -1,139 +1,126 @@
-# Uber Rides Java SDK (beta)
+# Uber Rides Java SDK (Beta)
+This SDK helps your Java App make HTTP requests to the Uber Rides API.
 
-Official Java SDK (beta) to support the Uber Rides API.
+## Setup
 
-## Before you begin
+### Installing
 
-This is a beta Java SDK not intended to be run on Android. An official Android SDK will be released soon.
+#### Before you begin
+Register your app in the [Uber developer dashboard](https://developer.uber.com/dashboard). Notice that the app gets a client ID, secret, and server token required for authenticating with the API. 
 
-## Installation
+Note: This Java SDK is not suitable for Android development. We will release an official Android SDK soon.
 
-To use the Uber Rides Java SDK, add the compile dependency with the latest version of the Uber SDK.
-
-### Gradle
-In the `build.gradle` file:
+#### Gradle
+If using Gradle, add this to your project’s `build.gradle` file:
 ```gradle
 dependencies {
-    compile 'com.uber.sdk:rides:0.1.0'
+    compile 'com.uber.sdk:rides:0.2.0'
 }
 ```
-### Maven
-In the `pom.xml` file:
+
+#### Maven
+If using Maven, add this to your project's `pom.xml` file:
 ```xml
 <dependency>
-	<groupId>com.uber.sdk</groupId>
-	<artifactId>rides</artifactId>
-	<version>0.1.0</version>
+  <groupId>com.uber.sdk</groupId>
+  <artifactId>rides</artifactId>
+  <version>0.2.0</version>
 </dependency>
 ```
 
-## Sync v.s. Async
+### Authenticating and creating a session
+To make calls, you need to create an authenticated session with the API. While operations on behalf of users require a user-authorized token using OAuth 2, general requests can use server-token authentication.    
 
-The Uber Rides Java SDK supports both Synchronous and Asynchronous use. Asynchronous calls are returned on a platform appropriate thread and can be accessed through callbacks. Instantiate your Service as appropriate with
-`UberRidesServices.createSync(session)` or `UberRidesServices.createAsync(session)`
-
-## Read-Only Use
-
-If you just need read-only access to Uber API resources, create a Session with the server token you received after [registering your app](https://developer.uber.com/dashboard).
+#### Create a session using a server token
 ```java
-Session session = new Session.Builder().setServerToken(“yourServerToken”).build();
+// Get the server token for your app from the developer dashboard.
+Session session = new Session.Builder()
+    .setServerToken("YOUR_SERVER_TOKEN")
+    .setEnvironment(Environment.PRODUCTION)
+    .build();
 ```
-Use this Session to create an UberRidesService and fetch API resources:
-```java
-UberRidesSyncService service = UberRidesServices.createSync(session);
-ProductsResponse products = service.getProducts(37.775f, -122.417f).getBody();
-```
-## Authorization
+#### Create a session using the OAuth 2 flow
+In an OAuth session, the app first asks the user to authorize and then exchanges the authorization code for an access token from Uber.
+Note: Make sure the redirect URI matches the callback URI in the developer dashboard for the app. 
 
-If you need to access protected resources or modify resources (like getting a user’s ride history or requesting a ride), you will need the user to grant access to your application through the OAuth 2.0 Authorization Code flow.
-
-The Authorization Code flow is a two-step authorization process. The first step is having the user authorize your app and the second involves requesting an OAuth 2.0 access token from Uber.
-
-The Authorization Code flow is mandatory if you want to request rides on behalf of users or access their profile and history information.
-
-Start by creating an OAuth2Credentials object that has your clientd, clientSecret, scopes, and a redirectUri that is used to capture the user’s authorization code.
-
+**Step 1**. Create an OAuth2Credentials object with your client ID, client secret, scopes, and a redirect callback URI to capture the user’s authorization code.
 ```java
 OAuth2Credentials credentials = new OAuth2Credentials.Builder()
-        .setClientSecrets(clientId, clientSecret)
-        .setScopes(yourScopes)
-        .setRedirectUri(redirectUri)
-        .build();
+    .setClientSecrets(clientId, clientSecret)
+    .setScopes(yourScopes)
+    .setRedirectUri(redirectUri)
+    .build();
 ```
-The `redirectUri` must match the value you provided when you registered your application
-
-Then, navigate the user to the authorization URL created from the OAuth2Credentials object.
+**Step 2**. Navigate the user to the authorization URL from the OAuth2Credentials object. 
 ```java
 String authorizationUrl = credentials.getAuthorizationUrl();
-// Instruct user to open the URL contained within authorizationUrl
-```
-Once the user logs in and confirms the OAuth2 dialog, they will be redirected to your server which will be listening for authorization code. Exchange that authorization code to retrieve an access token (contained within credential).
+```  
+**Step 3**. Once the user approves the request, you get an authorization code. Create a credential object to store the authorization code and the user ID.
 ```java
-// Retrieve authorization code from server at redirectUri
-// Authenticate the user with the authorization code.
 Credential credential = credentials.authenticate(authorizationCode, userId);
 ```
-Last, use the credential object to create a session, which can then be used to create a service client instance.
-
+**Step 4**. Create a session object using the credential object.
 ```java
-Session session = new Session.Builder().setCredential(credential).build();
-UberRidesService service = UberRidesServices.createSync(session);
+Session session = new Session.Builder()
+    .setCredential(credential)
+    .setEnvironment(Environment.PRODUCTION)
+    .build();
 ```
+**Step 5**. Instantiate a service using a session to start making calls.
+```java
+UberRidesSyncService service = UberRidesServices.createSync(session);
+```
+Note: Keep each user's access token in a secure data store. Reuse the same token to make API calls on behalf of your user without repeating the authorization flow each time they visit your app. The SDK handles the token refresh automatically when it makes API requests with an `UberRidesService`.
 
-Keep each user's access token in a secure data store. Reuse the same token to make API calls on behalf of your user without repeating the authorization flow each time the user visits your app. The SDK will handle the token refresh for you automatically when it makes API requests with an `UberRidesService`.
+## Sync vs. Async Calls
+Both synchronous and asynchronous calls work with the Uber rides Java SDK. Instantiate your service appropriately with `UberRidesServices.createSync(session)` or `UberRidesServices.createAsync(session)`. Asynchronous calls are returned on a platform appropriate thread accessible through callbacks. 
 
-## Samples
-
-There are sample Java classes in the `samples` folder. Alternatively, you can also download a sample from the [releases page](https://github.com/uber/rides-java-sdk/releases/tag/v0.1.0).
-
-Before you can run a sample, you need to edit the appropriate `secrets.properties` file and add your app credentials.
-
-To run the command line sample, navigate to `samples/cmdline-sample` and run `$ ../../gradlew clean build run`. Or, if you are using one of the downloaded samples, run `$ ./gradlew clean build run` from the root directory.
-
-This will store user credentials in your home directory under `.uber_credentials`.
+## Samples for Common Calls
+Use the Java classes in the [samples](https://github.com/uber/rides-java-sdk/tree/master/samples/cmdline-sample) folder to test standard requests. Alternatively, you can download a sample from the [releases page](https://github.com/uber/rides-java-sdk/releases/tag/v0.1.0) to try them out.
 
 For full documentation, visit our [Developer Site](https://developer.uber.com/v1/endpoints/).
 
-#### Get Available Products
+### Get available products
 ```java
-ProductsResponse productsResponse = service.get_products(37.77f, -122.41f).getBody();
-List<Product> products = productsResponse.getProducts();
+// Get a list of products for a specific location in GPS coordinates, example: 37.79f, -122.39f.
+ProductsResponse productsResponse = service.getProducts(37.79f, -122.39f).getBody();
+List <Product> products = productsResponse.getProducts();
 String productId = products.get(0).getProductId();
 ```
-#### Request a Ride
+
+### Request a ride
 ```java
-Location startLocation = new Location(37.77f, -122.41f);
-Location endLocation = new Location(37.49f, -122.41f);
-RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder().setStartLocation(startLocation)
+// Request an Uber ride by giving the GPS coordinates for pickup and drop-off.
+RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder().setPickupCoordinates(37.77f, -122.41f)
        .setProductId(productId)
-       .setEndLocation(endLocation)
+       .setDropoffCoordinates(37.49f, -122.41f)
        .build();
 Ride ride = service.requestRide(rideRequestParameters).getBody();
 String rideId = ride.getRideId();
 ```
-This will make a real-world request and send an Uber driver to the start location specified.
-
-To develop and test against request endpoints in a sandbox environment, make sure to instantiate your `UberRidesService` with a `Session` whose `Environment` whose is set to `SANDBOX`.
+**Warning**: This real-world request can send an Uber driver to the specified start location. To develop
+and test against endpoints in a sandbox environment, instantiate your `UberRidesService` with a `Session` whose `Environment` is set to `SANDBOX`.
 ```java
 Session session = new Session.Builder().setCredential(credential).setEnvironment(Environment.SANDBOX).build();
-UberRidesService service = UberRidesServices.createSync(session);
+UberRidesSyncService service = UberRidesServices.createSync(session);
 ```
-The default `Environment` of a `Session` is set to `PRODUCTION`. See our [documentation](https://developer.uber.com/v1/sandbox/) to read more about using the Sandbox Environment.
+See our [documentation](https://developer.uber.com/v1/sandbox/) to learn more about the sandbox environment.
 
-#### Update Sandbox Ride
-
-If you are requesting sandbox rides, you will need to step through the different states of a ride.
+### Update a ride in the sandbox
+If you request a ride in the sandbox, you can step through the different states of the ride.
 ```java
 SandboxRideRequestParameters rideParameters = new SandboxRideRequestParameters.Builder().setStatus(“accepted”).build();
 Response<Void> response = client.updateSandboxRide(rideId, rideParameters);
 ```
-If the update is successful, `response.getStatus()` will be 204.
+A successful update returns a 204 for `response.getStatus()`.
 
-The `updateSandboxRide` method is not valid in the `PRODUCTION` `Environment`, where the ride status will change automatically.  If it is used in a `PRODUCTION` `Environment`, the call will throw an `IllegalStateException`.
-## Getting help
+Note: The `updateSandboxRide` method is not valid in the `PRODUCTION` `Environment`, where the ride status changes automatically. In a `PRODUCTION` `Environment`, the call throws an `IllegalStateException`.
 
-Uber developers actively monitor the [uber tag](http://stackoverflow.com/questions/tagged/uber-api) on StackOverflow. If you need help installing or using the library, you can ask a question there.  Make sure to tag your question with `uber-api` and `java`!
+## Getting Help
+Uber developers actively monitor the [uber-api tag](http://stackoverflow.com/questions/tagged/uber-api) on StackOverflow. If you need help installing or using the library, ask a question there. Make sure to tag your question with `uber-api` and `java`!
 
 ## Contributing
-
-We :heart: contributions. If you've found a bug in the library or would like new features added, go ahead and open issues or pull requests against this repo.  Write a test to show your bug was fixed or the feature works as expected.
+We :heart: contributions. If you find a bug in the library or would like to add new features, go ahead and open
+issues or pull requests against this repo. Before you do so, please sign the
+[Uber CLA](https://docs.google.com/a/uber.com/forms/d/1pAwS_-dA1KhPlfxzYLBqK6rsSWwRwH95OCCZrcsY5rk/viewform).
+Also, be sure to write a test for your bug fix or feature to show that it works as expected.

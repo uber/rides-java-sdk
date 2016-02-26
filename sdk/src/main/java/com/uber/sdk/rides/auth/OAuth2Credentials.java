@@ -49,13 +49,15 @@ import java.util.TreeSet;
 
 import javax.annotation.Nullable;
 
+import static com.uber.sdk.rides.auth.OAuth2Credentials.LoginRegion.WORLD;
+
 /**
  * Utility for creating and managing OAuth 2.0 Credentials.
  */
 public class OAuth2Credentials {
 
-    public static final String AUTHORIZATION_SERVER_URL = "https://login.uber.com/oauth/v2/authorize";
-    public static final String TOKEN_SERVER_URL = "https://login.uber.com/oauth/v2/token";
+    public static final String AUTHORIZATION_PATH = "/oauth/v2/authorize";
+    public static final String TOKEN_PATH = "/oauth/v2/token";
 
     /**
      * An Uber API scope. See
@@ -65,18 +67,36 @@ public class OAuth2Credentials {
     public enum Scope {
         PROFILE,
         REQUEST,
-        HISTORY;
+        HISTORY,
+        PLACES,
+        REQUEST_RECEIPT,
+        ALL_TRIPS;
     }
 
+    /**
+     * LoginRegion to be used for authorization.
+     */
+    public enum LoginRegion {
+        WORLD("https://login.uber.com"),
+        CHINA("https://login.uber.com.cn");
+
+        public String domain;
+
+        LoginRegion(String domain) {
+            this.domain = domain;
+        }
+    }
+
+    private AuthorizationCodeFlow authorizationCodeFlow;
     private Collection<String> scopes;
     private String redirectUri;
-    private AuthorizationCodeFlow authorizationCodeFlow;
 
     /**
      * Builder for OAuth2Credentials.
      */
     public static class Builder {
 
+        private LoginRegion loginRegion;
         private Set<Scope> scopes;
         private Set<String> customScopes;
         private String clientId;
@@ -85,6 +105,14 @@ public class OAuth2Credentials {
         private HttpTransport httpTransport;
         private AuthorizationCodeFlow authorizationCodeFlow;
         private AbstractDataStoreFactory credentialDataStoreFactory;
+
+        /**
+         * Sets the authorization server domain.
+         */
+        public Builder setLoginRegion(LoginRegion loginRegion) {
+            this.loginRegion = loginRegion;
+            return this;
+        }
 
         /**
          * Sets the scopes to request for authentication for.
@@ -186,6 +214,10 @@ public class OAuth2Credentials {
                 credentialDataStoreFactory = MemoryDataStoreFactory.getDefaultInstance();
             }
 
+            if (loginRegion == null) {
+                loginRegion = WORLD;
+            }
+
             if (authorizationCodeFlow == null) {
                 try {
                     AuthorizationCodeFlow.Builder builder =
@@ -193,10 +225,10 @@ public class OAuth2Credentials {
                                     BearerToken.authorizationHeaderAccessMethod(),
                                     httpTransport,
                                     new JacksonFactory(),
-                                    new GenericUrl(TOKEN_SERVER_URL),
+                                    new GenericUrl(loginRegion.domain + TOKEN_PATH),
                                     new ClientParametersAuthentication(clientId, clientSecret),
                                     clientId,
-                                    AUTHORIZATION_SERVER_URL);
+                                    loginRegion.domain + AUTHORIZATION_PATH);
                     if (oAuth2Credentials.scopes != null && !oAuth2Credentials.scopes.isEmpty()) {
                         builder.setScopes(oAuth2Credentials.scopes);
                     }
@@ -267,6 +299,18 @@ public class OAuth2Credentials {
             return authorizationCodeFlow.loadCredential(userId);
         } catch (IOException e) {
             throw new AuthException("Unable to load credential.", e);
+        }
+    }
+
+    /**
+     * Clears the credential for the user in the underlying (@link DateStore}.
+     * @throws AuthException If the credential could not be cleared.
+     */
+    public void clearCredential(String userId) throws AuthException {
+        try {
+            authorizationCodeFlow.getCredentialDataStore().delete(userId);
+        } catch (IOException e) {
+            throw new AuthException("Unable to clear credential.", e);
         }
     }
 

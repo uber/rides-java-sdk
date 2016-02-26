@@ -40,6 +40,11 @@ import com.uber.sdk.rides.client.error.ClientError;
 import com.uber.sdk.rides.client.error.NetworkException;
 import com.uber.sdk.rides.client.error.SurgeError;
 import com.uber.sdk.rides.client.error.UberError;
+import com.uber.sdk.rides.client.model.PaymentMethod;
+import com.uber.sdk.rides.client.model.PaymentMethodsResponse;
+import com.uber.sdk.rides.client.model.Place;
+import com.uber.sdk.rides.client.model.Place.Places;
+import com.uber.sdk.rides.client.model.PlaceParameters;
 import com.uber.sdk.rides.client.model.PriceEstimatesResponse;
 import com.uber.sdk.rides.client.model.Product;
 import com.uber.sdk.rides.client.model.ProductsResponse;
@@ -48,6 +53,7 @@ import com.uber.sdk.rides.client.model.Ride;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
 import com.uber.sdk.rides.client.model.RideRequestParameters;
+import com.uber.sdk.rides.client.model.RideUpdateParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
 import com.uber.sdk.rides.client.model.SandboxRideRequestParameters;
 import com.uber.sdk.rides.client.model.TimeEstimatesResponse;
@@ -238,6 +244,113 @@ public class RetrofitAdapter<T extends RetrofitUberRidesService> implements Uber
     }
 
     @Override
+    public void updateRide(@Nonnull String rideId,
+            @Nonnull RideUpdateParameters rideUpdateParameters,
+            Callback<Void> callback) {
+        service.updateRide(rideId, rideUpdateParameters, new InternalCallback<>(callback));
+    }
+
+    @Override
+    public Response<Void> updateRide(@Nonnull String rideId,
+            @Nonnull RideUpdateParameters rideUpdateParameters) throws ApiException, NetworkException {
+        final SettableFuture<ResponseOrException<Void>> future = SettableFuture.create();
+
+        updateRide(rideId, rideUpdateParameters, new SettableFutureCallback<>(future));
+
+        return transformFuture(future);
+    }
+
+    @Override
+    public void getCurrentRide(Callback<Ride> callback) {
+        service.getCurrentRide(new InternalCallback<>(callback));
+    }
+
+    @Override
+    public Response<Ride> getCurrentRide() throws ApiException, NetworkException {
+        final SettableFuture<ResponseOrException<Ride>> future = SettableFuture.create();
+
+        getCurrentRide(new SettableFutureCallback<>(future));
+
+        return transformFuture(future);
+    }
+
+    @Override
+    public void cancelCurrentRide(Callback<Void> callback) {
+        service.cancelCurrentRide(new InternalCallback<>(callback));
+    }
+
+    @Override
+    public Response<Void> cancelCurrentRide() throws ApiException, NetworkException{
+        final SettableFuture<ResponseOrException<Void>> future = SettableFuture.create();
+
+        cancelCurrentRide(new SettableFutureCallback<>(future));
+
+        return transformFuture(future);
+    }
+
+    @Override
+    public void getPlace(@Nonnull String placeId, Callback<Place> callback) {
+        service.getPlace(placeId, new InternalCallback<>(callback));
+    }
+
+    @Override
+    public Response<Place> getPlace(@Nonnull String placeId) throws ApiException, NetworkException {
+        final SettableFuture<ResponseOrException<Place>> future = SettableFuture.create();
+
+        getPlace(placeId, new SettableFutureCallback<>(future));
+
+        return transformFuture(future);
+    }
+
+    @Override
+    public void getPlace(@Nonnull Places place, Callback<Place> callback) {
+        service.getPlace(place.toString(), new InternalCallback<>(callback));
+    }
+
+    @Override
+    public Response<Place> getPlace(@Nonnull Places place) throws ApiException, NetworkException {
+        final SettableFuture<ResponseOrException<Place>> future = SettableFuture.create();
+
+        getPlace(place, new SettableFutureCallback<>(future));
+
+        return transformFuture(future);
+    }
+
+    @Override
+    public void setPlace(@Nonnull String placeId, @Nonnull String address, Callback<Place> callback) {
+        PlaceParameters placeParameters = new PlaceParameters.Builder().setAddress(address).build();
+
+        service.setPlace(placeId, placeParameters, new InternalCallback<>(callback));
+    }
+
+    @Override
+    public Response<Place> setPlace(@Nonnull String placeId, @Nonnull String address) throws ApiException,
+            NetworkException {
+        final SettableFuture<ResponseOrException<Place>> future = SettableFuture.create();
+
+        setPlace(placeId, address, new SettableFutureCallback<>(future));
+
+        return transformFuture(future);
+    }
+
+    @Override
+    public void setPlace(@Nonnull Places place, @Nonnull String address, Callback<Place> callback) {
+        PlaceParameters placeParameters = new PlaceParameters.Builder().setAddress(address).build();
+
+        service.setPlace(place.toString(), placeParameters, new InternalCallback<>(callback));
+    }
+
+    @Override
+    public Response<Place> setPlace(@Nonnull Places place, @Nonnull String address) throws ApiException,
+            NetworkException {
+        final SettableFuture<ResponseOrException<Place>> future = SettableFuture.create();
+
+        setPlace(place, address, new SettableFutureCallback<>(future));
+
+        return transformFuture(future);
+    }
+
+    @Override
     public void getRideDetails(@Nonnull String rideId, Callback<Ride> callback) {
         service.getRideDetails(rideId, new InternalCallback<>(callback));
     }
@@ -280,6 +393,19 @@ public class RetrofitAdapter<T extends RetrofitUberRidesService> implements Uber
         return transformFuture(future);
     }
 
+    @Override
+    public void getPaymentMethods(Callback<PaymentMethodsResponse> callback) {
+        service.getPaymentMethods(new InternalCallback<>(callback));
+    }
+
+    @Override
+    public Response<PaymentMethodsResponse> getPaymentMethods() throws ApiException, NetworkException {
+        final SettableFuture<ResponseOrException<PaymentMethodsResponse>> future = SettableFuture.create();
+
+        getPaymentMethods(new SettableFutureCallback<>(future));
+
+        return transformFuture(future);
+    }
 
     @Override
     public void updateSandboxProduct(String productId,
@@ -491,11 +617,11 @@ public class RetrofitAdapter<T extends RetrofitUberRidesService> implements Uber
         @Nullable private Response<T> response;
         @Nullable private Throwable exception;
 
-        public ResponseOrException(Response<T> response) {
+        public ResponseOrException(@Nullable Response<T> response) {
             this.response = response;
         }
 
-        public ResponseOrException(Throwable exception) {
+        public ResponseOrException(@Nullable Throwable exception) {
             this.exception = exception;
         }
     }

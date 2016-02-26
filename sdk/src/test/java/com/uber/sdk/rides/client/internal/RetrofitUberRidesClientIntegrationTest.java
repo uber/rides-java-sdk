@@ -37,7 +37,6 @@ import com.squareup.okhttp.mockwebserver.RecordedRequest;
 import com.squareup.okhttp.mockwebserver.SocketPolicy;
 import com.uber.sdk.rides.auth.OAuth2Helper;
 import com.uber.sdk.rides.client.Callback;
-import com.uber.sdk.rides.client.Header;
 import com.uber.sdk.rides.client.Response;
 import com.uber.sdk.rides.client.Session;
 import com.uber.sdk.rides.client.UberRidesAsyncService;
@@ -47,10 +46,10 @@ import com.uber.sdk.rides.client.error.ApiException;
 import com.uber.sdk.rides.client.error.ClientError;
 import com.uber.sdk.rides.client.error.NetworkException;
 import com.uber.sdk.rides.client.error.UberError;
-import com.uber.sdk.rides.client.model.Location;
 import com.uber.sdk.rides.client.model.Product;
 import com.uber.sdk.rides.client.model.ProductsResponse;
 import com.uber.sdk.rides.client.model.Ride;
+import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
 import com.uber.sdk.rides.client.model.UserProfile;
@@ -70,6 +69,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static com.uber.sdk.rides.client.Session.Environment.PRODUCTION;
+import static com.uber.sdk.rides.client.Session.Environment.SANDBOX;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -123,7 +124,7 @@ public class RetrofitUberRidesClientIntegrationTest {
 
         sandboxSession = new Session.Builder()
                 .setCredential(credential)
-                .setEnvironment(Session.Environment.SANDBOX)
+                .setEnvironment(SANDBOX)
                 .build();
 
         okHttpClient = new OkHttpClient();
@@ -140,28 +141,6 @@ public class RetrofitUberRidesClientIntegrationTest {
     @After
     public void tearDown() throws IOException {
         server.shutdown();
-    }
-
-    @Test
-    public void onGet_withLanguage() throws Exception {
-        Session localizedSandboxSession = new Session.Builder()
-                .setAcceptLanguage(new Locale("sv","SE"))
-                .setCredential(credential)
-                .setEnvironment(Session.Environment.SANDBOX)
-                .build();
-       UberRidesSyncService localizedUberApiSyncService = RetrofitUberRidesClient.getUberApiService(localizedSandboxSession,
-                new OAuth2Helper(),
-                UberRidesServices.LogLevel.FULL,
-                endpointHost,
-                okHttpClient, RetrofitUberRidesService.class);
-        
-        String body = readFile("src/test/resources/mockresponses/get_localized_products_response");
-
-        server.enqueue(new MockResponse().setBody(body));
-
-        Response<ProductsResponse> response = localizedUberApiSyncService.getProducts(37.613f, -122.477f);
-
-        assertLocalizedProducts(server.takeRequest(), response, null, null);
     }
 
     @Test
@@ -239,30 +218,6 @@ public class RetrofitUberRidesClientIntegrationTest {
                                 hasProperty("capacity", is(4)))));
     }
 
-    private static void assertLocalizedProducts(RecordedRequest request, Response<ProductsResponse> response,
-            ApiException apiException,
-            NetworkException networkException) {
-        assertNotNull(response);
-        assertNull(apiException);
-        assertNull(networkException);
-
-        ProductsResponse productsResponse = response.getBody();
-        assertNotNull(productsResponse);
-        
-        assertEquals("Accept-Language Header not found", "sv", request.getHeader("Accept-Language"));
-
-        assertEquals("Response code does not match", HttpURLConnection.HTTP_OK, response.getStatus());
-        assertEquals("Response reason does not match", "OK", response.getReason());
-
-        List<Product> products = productsResponse.getProducts();
-
-        assertThat("Request body does not match", products,
-                Matchers.<Product>hasItems(
-                        allOf(hasProperty("productId", is("a1111c8c-c720-46c3-8534-2fcdd730040d")),
-                                hasProperty("displayName", is("uberX")),
-                                hasProperty("description", is("Den billigare Ubern")))));
-    }
-    
     @Test
     public void onGet_whenAsyncInvalidProductId_shouldFail() throws Exception {
         String body = readFile("src/test/resources/mockresponses/get_product_error");
@@ -320,6 +275,52 @@ public class RetrofitUberRidesClientIntegrationTest {
     }
 
     @Test
+    public void onGet_withLanguage() throws Exception {
+        Session localizedSandboxSession = new Session.Builder()
+                .setAcceptLanguage(new Locale("sv", "SE"))
+                .setCredential(credential)
+                .setEnvironment(Session.Environment.SANDBOX)
+                .build();
+
+        UberRidesSyncService localizedUberApiSyncService = RetrofitUberRidesClient.getUberApiService(
+                localizedSandboxSession,
+                new OAuth2Helper(),
+                UberRidesServices.LogLevel.FULL,
+                endpointHost,
+                okHttpClient, RetrofitUberRidesService.class);
+
+        String body = readFile("src/test/resources/mockresponses/get_localized_products_response");
+
+        server.enqueue(new MockResponse().setBody(body));
+        Response < ProductsResponse > response = localizedUberApiSyncService.getProducts(37.613f, -122.477f);
+
+        assertLocalizedProducts(server.takeRequest(), response, null, null);
+    }
+
+    private static void assertLocalizedProducts(RecordedRequest request, Response<ProductsResponse> response,
+            ApiException apiException,
+            NetworkException networkException) {
+        assertNotNull(response);
+        assertNull(apiException);
+        assertNull(networkException);
+
+        ProductsResponse productsResponse = response.getBody();
+        assertNotNull(productsResponse);
+
+        assertEquals("Accept-Language Header not found", "sv", request.getHeader("Accept-Language"));
+        assertEquals("Response code does not match", HttpURLConnection.HTTP_OK, response.getStatus());
+        assertEquals("Response reason does not match", "OK", response.getReason());
+
+        List<Product> products = productsResponse.getProducts();
+
+        assertThat("Request body does not match", products,
+                Matchers.<Product>hasItems(
+                        allOf(hasProperty("productId", is("a1111c8c-c720-46c3-8534-2fcdd730040d")),
+                                hasProperty("displayName", is("uberX")),
+                                hasProperty("description", is("Den billigare Ubern")))));
+    }
+
+    @Test
     public void onPut_whenAsyncHappyPath_shouldSucceed() throws Exception {
         server.enqueue(new MockResponse().setStatus("HTTP/1.1 " + HttpURLConnection.HTTP_NO_CONTENT + " NO CONTENT"));
 
@@ -355,7 +356,8 @@ public class RetrofitUberRidesClientIntegrationTest {
         assertSandboxProduct(server.takeRequest(), response, null, null);
     }
 
-    private static void assertSandboxProduct(RecordedRequest request, Response<Void> response,
+    private static void assertSandboxProduct(
+            RecordedRequest request, Response<Void> response,
                                              ApiException apiException,
                                              NetworkException networkException) {
         assertNotNull(response);
@@ -423,8 +425,8 @@ public class RetrofitUberRidesClientIntegrationTest {
     }
 
     private static void assertSandboxProductError(RecordedRequest request, Response<Void> response,
-                                                  ApiException apiException,
-                                                  NetworkException networkException) {
+            ApiException apiException,
+            NetworkException networkException) {
         assertNull(response);
         assertNull(networkException);
 
@@ -444,11 +446,11 @@ public class RetrofitUberRidesClientIntegrationTest {
                 .setStatus("HTTP/1.1 " + HttpURLConnection.HTTP_ACCEPTED + " Accepted")
                 .setBody(body));
 
-        Location startLocation = new Location(START_LAT, START_LONG);
-        Location endLocation = new Location(END_LAT, END_LONG);
-        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder().setStartLocation(startLocation)
+
+        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder()
+                .setPickupCoordinates(START_LAT, START_LONG)
+                .setDropoffCoordinates(END_LAT, END_LONG)
                 .setProductId("d4abaae7-f4d6-4152-91cc-77523e8165a4")
-                .setEndLocation(endLocation)
                 .build();
 
         SettableFuture<SettableResponse<Ride>> future = SettableFuture.create();
@@ -467,11 +469,10 @@ public class RetrofitUberRidesClientIntegrationTest {
                 .setStatus("HTTP/1.1 " + HttpURLConnection.HTTP_ACCEPTED + " Accepted")
                 .setBody(body));
 
-        Location startLocation = new Location(START_LAT, START_LONG);
-        Location endLocation = new Location(END_LAT, END_LONG);
-        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder().setStartLocation(startLocation)
+        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder()
+                .setPickupCoordinates(START_LAT, START_LONG)
+                .setDropoffCoordinates(END_LAT, END_LONG)
                 .setProductId("d4abaae7-f4d6-4152-91cc-77523e8165a4")
-                .setEndLocation(endLocation)
                 .build();
 
         Response<Ride> response = uberApiSyncService.requestRide(rideRequestParameters);
@@ -516,12 +517,10 @@ public class RetrofitUberRidesClientIntegrationTest {
                 .setStatus("HTTP/1.1 " + HttpURLConnection.HTTP_NOT_FOUND + " Not Found")
                 .setBody(body));
 
-        Location startLocation = new Location(START_LAT, START_LONG);
-        Location endLocation = new Location(END_LAT, END_LONG);
-        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder().setStartLocation(
-                startLocation)
+        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder()
+                .setPickupCoordinates(START_LAT, START_LONG)
+                .setDropoffCoordinates(END_LAT, END_LONG)
                 .setProductId("thisIsNotAProductId")
-                .setEndLocation(endLocation)
                 .build();
 
         SettableFuture<SettableResponse<Ride>> future = SettableFuture.create();
@@ -541,12 +540,10 @@ public class RetrofitUberRidesClientIntegrationTest {
                 .setStatus("HTTP/1.1 " + HttpURLConnection.HTTP_NOT_FOUND + " Not Found")
                 .setBody(body));
 
-        Location startLocation = new Location(START_LAT, START_LONG);
-        Location endLocation = new Location(END_LAT, END_LONG);
-        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder().setStartLocation(
-                startLocation)
+        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder()
+                .setPickupCoordinates(START_LAT, START_LONG)
+                .setDropoffCoordinates(END_LAT, END_LONG)
                 .setProductId("thisIsNotAProductId")
-                .setEndLocation(endLocation)
                 .build();
 
         ApiException exception = null;
@@ -680,7 +677,7 @@ public class RetrofitUberRidesClientIntegrationTest {
 
     @Test
     public void onCall_whenAsyncServerToken_shouldSendServerToken() throws Exception {
-        Session session = new Session.Builder().setServerToken("serverToken").build();
+        Session session = new Session.Builder().setEnvironment(PRODUCTION).setServerToken("serverToken").build();
 
         uberApiAsyncService = RetrofitUberRidesClient.getUberApiService(session,
                 new OAuth2Helper(),
@@ -703,7 +700,7 @@ public class RetrofitUberRidesClientIntegrationTest {
 
     @Test
     public void onCall_whenSyncServerToken_shouldSendServerToken() throws Exception {
-        Session session = new Session.Builder().setServerToken("serverToken").build();
+        Session session = new Session.Builder().setEnvironment(PRODUCTION).setServerToken("serverToken").build();
 
         uberApiSyncService = RetrofitUberRidesClient.getUberApiService(session,
                 new OAuth2Helper(),
@@ -719,7 +716,8 @@ public class RetrofitUberRidesClientIntegrationTest {
         assertProductsWithServerToken(server.takeRequest(), response, response.getBody(), null, null);
     }
 
-    private void assertProductsWithServerToken(RecordedRequest request, Response response,
+    private void assertProductsWithServerToken(
+            RecordedRequest request, Response response,
             ProductsResponse productsResponse, ApiException apiException,
             NetworkException networkException) {
         assertNotNull(productsResponse);
@@ -794,7 +792,7 @@ public class RetrofitUberRidesClientIntegrationTest {
     }
 
     @Test
-    public void onCall_whenSyncUnexpectedException_shouldThrowException() throws Exception{
+    public void onCall_whenSyncUnexpectedException_shouldThrowException() throws Exception {
         exception.expect(RuntimeException.class);
 
         server.enqueue(new MockResponse().setBody("Not JSON"));
@@ -803,7 +801,7 @@ public class RetrofitUberRidesClientIntegrationTest {
     }
 
     @Test
-    public void onCall_whenAsyncUnexpectedException_shouldThrowException() throws Exception{
+    public void onCall_whenAsyncUnexpectedException_shouldThrowException() throws Exception {
         server.enqueue(new MockResponse().setBody("Not JSON"));
 
         SettableFuture<SettableResponse<UserProfile>> future = SettableFuture.create();
@@ -834,6 +832,76 @@ public class RetrofitUberRidesClientIntegrationTest {
         uberApiSyncService.getUserProfile();
 
         assertHeaders(server.takeRequest());
+    }
+
+    @Test
+    public void onCall_whenAsyncRedirect_shouldAutomaticallyRedirectAndPreserveHeaders() throws Exception {
+        String redirectedResponseBody = readFile("src/test/resources/mockresponses/estimate_ride_redirected");
+        MockWebServer redirectServer = new MockWebServer();
+        redirectServer.enqueue(new MockResponse().setBody(redirectedResponseBody));
+
+        String redirectResponseBody = readFile("src/test/resources/mockresponses/estimate_ride_redirect");
+        server.enqueue(new MockResponse()
+                .setBody(redirectResponseBody)
+                .setStatus("HTTP/1.1 " + HttpURLConnection.HTTP_MOVED_TEMP + " Found")
+                .setHeader("Location", redirectServer.getUrl("/v1/requests/estimate")));
+
+        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder()
+                .setPickupCoordinates(START_LAT, START_LONG)
+                .setProductId("2832a1f5-cfc0-48bb-ab76-7ea7a62060e7")
+                .setDropoffCoordinates(END_LAT, END_LONG).build();
+
+        uberApiAsyncService = RetrofitUberRidesClient.getUberApiService(sandboxSession,
+                new OAuth2Helper(),
+                UberRidesServices.LogLevel.FULL,
+                endpointHost,
+                null,
+                RetrofitUberRidesService.class);
+
+        uberApiAsyncService.estimateRide(rideRequestParameters,
+                new SettableFutureCallback<>(SettableFuture.<SettableResponse<RideEstimate>>create()));
+
+        RecordedRequest firstRequest = server.takeRequest(1, TimeUnit.SECONDS);
+        assertHeaders(firstRequest);
+        RecordedRequest redirectedRequest = redirectServer.takeRequest(1, TimeUnit.SECONDS);
+        assertHeaders(redirectedRequest);
+        assertEquals("Redirected Request Line does not match",
+                "POST /v1/requests/estimate HTTP/1.1",
+                redirectedRequest.getRequestLine());
+    }
+
+    @Test
+    public void onCall_whenSyncRedirect_shouldAutomaticallyRedirectAndPreserveHeaders() throws Exception {
+        String redirectedResponseBody = readFile("src/test/resources/mockresponses/estimate_ride_redirected");
+        MockWebServer redirectServer = new MockWebServer();
+        redirectServer.enqueue(new MockResponse().setBody(redirectedResponseBody));
+
+        String redirectResponseBody = readFile("src/test/resources/mockresponses/estimate_ride_redirect");
+        server.enqueue(new MockResponse()
+                .setBody(redirectResponseBody)
+                .setStatus("HTTP/1.1 " + HttpURLConnection.HTTP_MOVED_TEMP + " Found")
+                .setHeader("Location", redirectServer.getUrl("/v1/requests/estimate")));
+
+        RideRequestParameters rideRequestParameters = new RideRequestParameters.Builder()
+                .setPickupCoordinates(START_LAT, START_LONG)
+                .setProductId("2832a1f5-cfc0-48bb-ab76-7ea7a62060e7")
+                .setDropoffCoordinates(END_LAT, END_LONG).build();
+
+        uberApiSyncService = RetrofitUberRidesClient.getUberApiService(sandboxSession,
+                new OAuth2Helper(),
+                UberRidesServices.LogLevel.FULL,
+                endpointHost,
+                null, RetrofitUberRidesService.class);
+
+        uberApiSyncService.estimateRide(rideRequestParameters);
+
+        RecordedRequest firstRequest = server.takeRequest();
+        assertHeaders(firstRequest);
+        RecordedRequest redirectedRequest = redirectServer.takeRequest();
+        assertHeaders(redirectedRequest);
+        assertEquals("Redirected Request Line does not match",
+                "POST /v1/requests/estimate HTTP/1.1",
+                redirectedRequest.getRequestLine());
     }
 
     private static void assertHeaders(RecordedRequest request) {

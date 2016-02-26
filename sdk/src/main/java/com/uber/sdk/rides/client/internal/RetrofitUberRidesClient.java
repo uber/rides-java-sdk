@@ -27,9 +27,13 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.google.common.net.HttpHeaders;
 import com.google.common.reflect.Reflection;
 import com.google.gson.GsonBuilder;
+import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import com.uber.sdk.rides.auth.OAuth2Helper;
 import com.uber.sdk.rides.client.Session;
 import com.uber.sdk.rides.client.Session.Environment;
@@ -57,7 +61,7 @@ import retrofit.converter.GsonConverter;
  */
 public class RetrofitUberRidesClient {
 
-    @VisibleForTesting static final String LIB_VERSION = "0.1.0";
+    @VisibleForTesting static final String LIB_VERSION = "0.2.0";
 
     /**
      * Gets a new Uber API service client.
@@ -71,7 +75,7 @@ public class RetrofitUberRidesClient {
     public static <T extends UberRidesService> T getUberApiService(Session session,
             OAuth2Helper oAuth2Helper, UberRidesServices.LogLevel logLevel) {
         return (T) getUberApiService(session, oAuth2Helper, logLevel,
-                session.getEnvironment().endpointHost, null, RetrofitUberRidesService.class);
+                session.getEndpointHost(), null, RetrofitUberRidesService.class);
     }
 
     /**
@@ -80,14 +84,14 @@ public class RetrofitUberRidesClient {
      * @param session The Uber API session
      * @param oAuth2Helper The OAuth 2.0 Helper
      * @param logLevel The log level.
-     * @param endpoint The endpoint for the API client.
+     * @param endpointHost The endpoint host for the API client.
      * @param httpClient The HTTP client
      * @return An Uber API service client.
      */
     @VisibleForTesting
     @SuppressWarnings("unchecked") // Class casting is ensured.
     static <T extends RetrofitUberRidesService, U extends UberRidesService> U getUberApiService(Session session,
-            OAuth2Helper oAuth2Helper, UberRidesServices.LogLevel logLevel, String endpoint,
+            OAuth2Helper oAuth2Helper, UberRidesServices.LogLevel logLevel, String endpointHost,
             @Nullable OkHttpClient httpClient, Class<? extends T> internalApiServiceClass) {
 
         RestAdapter.LogLevel retrofitLogLevel = UberRidesServices.LogLevel.FULL.equals(logLevel) ?
@@ -95,7 +99,7 @@ public class RetrofitUberRidesClient {
 
         RestAdapter restAdapter;
         try {
-            restAdapter = buildRestAdapter(session, endpoint, oAuth2Helper, retrofitLogLevel, httpClient);
+            restAdapter = buildRestAdapter(session, endpointHost, oAuth2Helper, retrofitLogLevel, httpClient);
         } catch (IOException e) {
             throw new IllegalStateException("Could not build REST adapter.", e);
         }
@@ -103,7 +107,7 @@ public class RetrofitUberRidesClient {
         T internalService = Reflection.newProxy(internalApiServiceClass,
                 new InvocationHandler<>(session.getEnvironment(), internalApiServiceClass,
                         restAdapter.create(internalApiServiceClass)));
-
+        
         return (U) new RetrofitAdapter(internalService);
     }
 
@@ -127,7 +131,7 @@ public class RetrofitUberRidesClient {
                 } else {
                     requestFacade.addHeader("Authorization", "Token " + session.getServerToken());
                 }
-                
+
                 if (session.getLocale() != null) {
                     requestFacade.addHeader("Accept-Language", session.getLocale().getLanguage());
                 }
@@ -141,6 +145,21 @@ public class RetrofitUberRidesClient {
             httpClient.setConnectTimeout(1, TimeUnit.MINUTES);
             httpClient.setReadTimeout(1, TimeUnit.MINUTES);
             httpClient.setFollowRedirects(false);
+            httpClient.interceptors().add(new Interceptor() {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
+                    Request oldRequest = chain.request();
+                    Response response = chain.proceed(oldRequest);
+                    if (response.isRedirect()) {
+                        String redirectUrl = response.header(HttpHeaders.LOCATION);
+                        Request newRequest = oldRequest.newBuilder()
+                                .url(redirectUrl)
+                                .build();
+                        return chain.proceed(newRequest);
+                    }
+                    return response;
+                }
+            });
         }
 
         return new RestAdapter.Builder()
@@ -171,7 +190,9 @@ public class RetrofitUberRidesClient {
          * @param uberApiService The API service client.
          */
         @VisibleForTesting
-        InvocationHandler(Environment environment, Class<? extends T> uberApiServiceClass, T uberApiService) {
+        InvocationHandler(Environment environment,
+                Class<? extends T> uberApiServiceClass,
+                T uberApiService) {
             this.environment = environment;
             this.uberApiServiceClass = uberApiServiceClass;
             this.uberApiService = uberApiService;

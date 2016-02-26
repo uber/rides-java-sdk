@@ -46,9 +46,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.uber.sdk.rides.auth.OAuth2Credentials.LoginRegion.CHINA;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -142,6 +146,23 @@ public class OAuth2CredentialsTest {
 
         assertEquals("https://login.uber.com/oauth/v2/authorize?client_id=CLIENT_ID" +
                         "&response_type=code&scope=profile&redirect_uri=https%3A%2F%2Flocalhost%3A8181%2FOAuth2Callback",
+                oAuth2Credentials.getAuthorizationUrl());
+    }
+
+    @Test
+    public void getAuthorizationUrl_whenUsingServerForChina() throws Exception {
+        OAuth2Credentials oAuth2Credentials = new OAuth2Credentials.Builder()
+                .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
+                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE, OAuth2Credentials.Scope.REQUEST,
+                        OAuth2Credentials.Scope.HISTORY))
+                .setLoginRegion(CHINA)
+                .build();
+
+        assertEquals("https://login.uber.com.cn/oauth/v2/token",
+                oAuth2Credentials.getAuthorizationCodeFlow().getTokenServerEncodedUrl());
+
+        assertEquals("https://login.uber.com.cn/oauth/v2/authorize?client_id=CLIENT_ID"
+                        + "&response_type=code&scope=history%20profile%20request",
                 oAuth2Credentials.getAuthorizationUrl());
     }
 
@@ -280,12 +301,33 @@ public class OAuth2CredentialsTest {
     }
 
     @Test
+    public void clearCredential() throws Exception {
+        OAuth2Credentials oAuth2Credentials = new OAuth2Credentials.Builder()
+                .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
+                .setRedirectUri("http://redirect")
+                .setHttpTransport(mockHttpTransport)
+                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE, OAuth2Credentials.Scope.REQUEST))
+                .build();
+
+        oAuth2Credentials.authenticate("authorizationCode", "userId");
+
+        Credential credential = oAuth2Credentials.loadCredential("userId");
+
+        assertNotNull(credential);
+
+        oAuth2Credentials.clearCredential("userId");
+
+        credential = oAuth2Credentials.loadCredential("userId");
+        assertNull(credential);
+    }
+
+    @Test
     public void useCustomDataStore() throws Exception {
         Credential credential = new Credential.Builder(BearerToken.authorizationHeaderAccessMethod())
                 .setTransport(new MockHttpTransport())
                 .setJsonFactory(new MockJsonFactory())
                 .setClientAuthentication(Mockito.mock(HttpExecuteInterceptor.class))
-                .setTokenServerUrl(new GenericUrl(OAuth2Credentials.TOKEN_SERVER_URL))
+                .setTokenServerUrl(new GenericUrl(TOKEN_REQUEST_URL))
                 .build();
 
         credential.setAccessToken("accessToken2");

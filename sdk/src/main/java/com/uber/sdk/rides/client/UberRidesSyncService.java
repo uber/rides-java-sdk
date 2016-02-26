@@ -24,6 +24,10 @@ package com.uber.sdk.rides.client;
 
 import com.uber.sdk.rides.client.error.ApiException;
 import com.uber.sdk.rides.client.error.NetworkException;
+import com.uber.sdk.rides.client.model.PaymentMethod;
+import com.uber.sdk.rides.client.model.PaymentMethodsResponse;
+import com.uber.sdk.rides.client.model.Place;
+import com.uber.sdk.rides.client.model.Place.Places;
 import com.uber.sdk.rides.client.model.PriceEstimatesResponse;
 import com.uber.sdk.rides.client.model.Product;
 import com.uber.sdk.rides.client.model.ProductsResponse;
@@ -32,6 +36,7 @@ import com.uber.sdk.rides.client.model.Ride;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
 import com.uber.sdk.rides.client.model.RideRequestParameters;
+import com.uber.sdk.rides.client.model.RideUpdateParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
 import com.uber.sdk.rides.client.model.SandboxRideRequestParameters;
 import com.uber.sdk.rides.client.model.TimeEstimatesResponse;
@@ -72,7 +77,7 @@ public interface UberRidesSyncService extends UberRidesService {
             float endLongitude) throws ApiException, NetworkException;
 
     /**
-     * Gets a limited amount of data about a user's lifetime activity with Uber.
+     * Gets a limited amount of data about a user's lifetime activity.
      *
      * @param offset Offset the list of returned results by this amount. Default is zero.
      * @param limit Number of items to retrieve. Default is 5, maximum is 50.
@@ -81,7 +86,7 @@ public interface UberRidesSyncService extends UberRidesService {
             @Nullable Integer limit) throws ApiException, NetworkException;
 
     /**
-     * Gets information about the Uber user that has authorized with the application.
+     * Gets information about the user that has authorized with the application.
      */
     Response<UserProfile> getUserProfile() throws ApiException, NetworkException;
 
@@ -93,8 +98,10 @@ public interface UberRidesSyncService extends UberRidesService {
      * @param endLatitude Latitude component of end location.
      * @param endLongitude Longitude component of end location.
      */
-    Response<PriceEstimatesResponse> getPriceEstimates(float startLatitude, float startLongitude,
-            float endLatitude, float endLongitude) throws ApiException, NetworkException;
+    Response<PriceEstimatesResponse> getPriceEstimates(float startLatitude,
+            float startLongitude,
+            float endLatitude,
+            float endLongitude) throws ApiException, NetworkException;
 
     /**
      * Gets ETAs for all products offered at a given location, with the responses expressed as
@@ -111,7 +118,7 @@ public interface UberRidesSyncService extends UberRidesService {
 
 
     /**
-     * Gets information about the Uber products offered at a given location.
+     * Gets information about the products offered at a given location.
      *
      * @param latitude Latitude component of location.
      * @param longitude Longitude component of location.
@@ -119,7 +126,7 @@ public interface UberRidesSyncService extends UberRidesService {
     Response<ProductsResponse> getProducts(float latitude, float longitude) throws ApiException, NetworkException;
 
     /**
-     * Gets information about a specific Uber product.
+     * Gets information about a specific product.
      *
      * @param productId The unique product ID to fetch information about.
      */
@@ -129,21 +136,68 @@ public interface UberRidesSyncService extends UberRidesService {
     /**
      * Cancel an ongoing ride request on behalf of a rider.
      *
-     * @param rideId Unique identifier representing a ride request.
+     * @param rideId The unique identifier of a ride.
      */
     Response<Void> cancelRide(@Nonnull String rideId) throws ApiException, NetworkException;
 
     /**
-     * Requests a ride on behalf of an Uber user given their desired product, start, and end locations.
+     * Requests a ride on behalf of a user given their desired product, start, and end locations.
      *
      * @param rideRequestParameters The ride request parameters.
      */
     Response<Ride> requestRide(RideRequestParameters rideRequestParameters) throws ApiException, NetworkException;
 
     /**
+     * Update an ongoing request's destination.
+     *
+     * @param rideId The unique identifier of a ride.
+     * @param rideUpdateParameters The ride update parameters.
+     */
+    Response<Void> updateRide(@Nonnull String rideId, @Nonnull RideUpdateParameters rideUpdateParameters)
+            throws ApiException, NetworkException;
+
+    /**
+     * Gets the current ride a user is on.
+     */
+    Response<Ride> getCurrentRide() throws ApiException, NetworkException;
+
+    /**
+     * Cancels the current ride of a user.
+     */
+    Response<Void> cancelCurrentRide() throws ApiException, NetworkException;
+
+    /**
+     * Gets information about a user's Place.
+     *
+     * @param placeId The identifier of a Place.
+     */
+    Response<Place> getPlace(@Nonnull String placeId) throws ApiException, NetworkException;
+
+    /**
+     * Gets information about a user's Place.
+     *
+     * @param place One of the defined user Places.
+     */
+    Response<Place> getPlace(@Nonnull Places place) throws ApiException, NetworkException;
+
+    /**
+     * Sets information about a user's {@link Place}.
+     *
+     * @param placeId The identifier of a Place.
+     */
+    Response<Place> setPlace(@Nonnull String placeId, @Nonnull String address) throws ApiException, NetworkException;
+
+    /**
+     * Sets information about a user's {@link Place}.
+     *
+     * @param place One of the defined user {@link Places}.
+     */
+    Response<Place> setPlace(@Nonnull Places place, @Nonnull String address) throws ApiException, NetworkException;
+
+    /**
      * Gets details about a specific ride.
      *
-     * @param rideId The unique identifier for a ride.
+     * @param rideId The unique identifier of a ride.
      */
     Response<Ride> getRideDetails(@Nonnull String rideId) throws ApiException, NetworkException;
 
@@ -162,8 +216,8 @@ public interface UberRidesSyncService extends UberRidesService {
      *
      * @param rideRequestParameters The ride request parameters.
      */
-    Response<RideEstimate> estimateRide(RideRequestParameters rideRequestParameters)
-            throws ApiException, NetworkException;
+    Response<RideEstimate> estimateRide(RideRequestParameters rideRequestParameters) throws ApiException,
+            NetworkException;
 
     /**
      * Get a map with a visual representation of a ride for tracking purposes.
@@ -173,6 +227,11 @@ public interface UberRidesSyncService extends UberRidesService {
     Response<RideMap> getRideMap(@Nonnull String rideId) throws ApiException, NetworkException;
 
     /**
+     * Gets the {@link PaymentMethod PaymentMethods} of user and their last used method ID.
+     */
+    Response<PaymentMethodsResponse> getPaymentMethods() throws ApiException, NetworkException;
+
+    /**
      * Updates the product in the {@link Environment#SANDBOX sandbox environement}
      * to simulate the possible responses the Request endpoint will return when requesting a particular product,
      * such as surge pricing and driver availability.
@@ -180,8 +239,8 @@ public interface UberRidesSyncService extends UberRidesService {
      * @param productId The unique product ID to update.
      * @param sandboxProductRequestParameters The sandbox product request parameters.
      */
-    Response<Void> updateSandboxProduct(String productId, SandboxProductRequestParameters sandboxProductRequestParameters)
-            throws ApiException, NetworkException;
+    Response<Void> updateSandboxProduct(String productId,
+            SandboxProductRequestParameters sandboxProductRequestParameters) throws ApiException, NetworkException;
 
 
     /**

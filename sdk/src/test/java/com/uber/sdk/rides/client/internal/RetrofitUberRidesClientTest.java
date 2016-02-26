@@ -42,6 +42,7 @@ import retrofit.RestAdapter;
 import retrofit.http.PUT;
 import retrofit.http.Path;
 
+import static com.uber.sdk.rides.client.Session.Environment.PRODUCTION;
 import static org.mockito.Mockito.mock;
 
 public class RetrofitUberRidesClientTest {
@@ -59,7 +60,7 @@ public class RetrofitUberRidesClientTest {
     public void onSandboxCall_whenAsyncInProductionEnvironment_shouldThrowException() throws Exception {
         Session session = new Session.Builder()
                 .setCredential(credential)
-                .setEnvironment(Session.Environment.PRODUCTION)
+                .setEnvironment(PRODUCTION)
                 .build();
 
         UberRidesAsyncService uberApiAsyncService = RetrofitUberRidesClient.getUberApiService(session,
@@ -79,7 +80,7 @@ public class RetrofitUberRidesClientTest {
     public void onSandboxCall_whenSyncInProductionEnvironment_shouldThrowException() throws Exception {
         Session session = new Session.Builder()
                 .setCredential(credential)
-                .setEnvironment(Session.Environment.PRODUCTION)
+                .setEnvironment(PRODUCTION)
                 .build();
 
         UberRidesSyncService uberApiSyncService = RetrofitUberRidesClient.getUberApiService(session,
@@ -95,7 +96,7 @@ public class RetrofitUberRidesClientTest {
 
     @Test
     public void onCreateService_whenDuplicateMethodNames_shouldThrowException() throws Exception {
-        Session session = new Session.Builder().setCredential(credential).build();
+        Session session = new Session.Builder().setEnvironment(PRODUCTION).setCredential(credential).build();
 
         RestAdapter restAdapter = mock(RestAdapter.class);
 

@@ -22,6 +22,8 @@
 
 package com.uber.sdk.rides.client.model;
 
+import com.uber.sdk.rides.client.model.Place.Places;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -32,25 +34,46 @@ import javax.annotation.Nullable;
  */
 public class RideRequestParameters {
 
-    private String product_id;
-    private float start_latitude;
-    private float start_longitude;
+    @Nullable private String product_id;
+    @Nullable private Float start_latitude;
+    @Nullable private Float start_longitude;
+    @Nullable private String start_nickname;
+    @Nullable private String start_address;
+    @Nullable private String start_place_id;
     @Nullable private Float end_latitude;
     @Nullable private Float end_longitude;
+    @Nullable private String end_nickname;
+    @Nullable private String end_address;
+    @Nullable private String end_place_id;
     @Nullable private String surge_confirmation_id;
+    @Nullable private String payment_method_id;
 
-    private RideRequestParameters(@Nonnull String productId,
-            float startLatitude,
-            float startLongitude,
+    private RideRequestParameters(@Nullable String productId,
+            @Nullable Float startLatitude,
+            @Nullable Float startLongitude,
+            @Nullable String startNickname,
+            @Nullable String startAddress,
+            @Nullable String startPlaceId,
             @Nullable Float endLatitude,
             @Nullable Float endLongitude,
-            @Nullable String surgeConfirmationId) {
+            @Nullable String endNickname,
+            @Nullable String endAddress,
+            @Nullable String endPlaceId,
+            @Nullable String surgeConfirmationId,
+            @Nullable String paymentMethodId) {
         this.product_id = productId;
         this.start_latitude = startLatitude;
         this.start_longitude = startLongitude;
+        this.start_nickname = startNickname;
+        this.start_address = startAddress;
+        this.start_place_id = startPlaceId;
         this.end_latitude = endLatitude;
         this.end_longitude = endLongitude;
+        this.end_nickname = endNickname;
+        this.end_address = endAddress;
+        this.end_place_id = endPlaceId;
         this.surge_confirmation_id = surgeConfirmationId;
+        this.payment_method_id = paymentMethodId;
     }
 
     /**
@@ -58,15 +81,23 @@ public class RideRequestParameters {
      */
     public static class Builder {
 
-        private String productId;
-        private Float startLatitude;
-        private Float startLongitude;
+        @Nullable private String productId;
+        @Nullable private Float startLatitude;
+        @Nullable private Float startLongitude;
+        @Nullable private String startNickname;
+        @Nullable private String startAddress;
+        @Nullable private String startPlaceId;
         @Nullable private Float endLatitude;
         @Nullable private Float endLongitude;
-        private String surgeConfirmationId;
+        @Nullable private String endNickname;
+        @Nullable private String endAddress;
+        @Nullable private String endPlaceId;
+        @Nullable private String surgeConfirmationId;
+        @Nullable private String paymentMethodId;
 
         /**
-         * Sets the unique ID of the product being requested. Required.
+         * Sets the unique ID of the product being requested. If none supplied, the cheapest product for the
+         * location is used.
          */
         public Builder setProductId(@Nonnull String productId) {
             this.productId = productId;
@@ -74,20 +105,107 @@ public class RideRequestParameters {
         }
 
         /**
-         * Sets the beginning or "pickup" location. Required.
+         * Sets the pickup location's coordinates.
+         *
+         * @param latitude the pickup location's latitude.
+         * @param longitude the pickup location's longitude .
+         * @param longitude
          */
-        public Builder setStartLocation(@Nonnull Location location) {
-            this.startLatitude = location.getLatitude();
-            this.startLongitude = location.getLongitude();
+        public Builder setPickupCoordinates(@Nullable Float latitude, @Nullable Float longitude) {
+            this.startLatitude = latitude;
+            this.startLongitude = longitude;
             return this;
         }
 
         /**
-         * Sets the final or destination location. Optional.
+         * Sets the pickup location's nickname.
+         *
+         * @param nickname the pickup location's nickname.
          */
-        public Builder setEndLocation(@Nonnull Location location) {
-            this.endLatitude = location.getLatitude();
-            this.endLongitude = location.getLongitude();
+        public Builder setPickupNickname(@Nullable String nickname) {
+            this.startNickname = nickname;
+            return this;
+        }
+
+        /**
+         * Sets the pickup location's address.
+         *
+         * @param address the pickup location's nickname.
+         */
+        public Builder setPickupAddress(@Nullable String address) {
+            this.startAddress = address;
+            return this;
+        }
+
+        /**
+         * Sets the pickup location via place identifier.
+         *
+         * @param placeId the pickup location's nickname.
+         */
+        public Builder setPickupPlaceId(@Nullable String placeId) {
+            this.startPlaceId = placeId;
+            return this;
+        }
+
+        /**
+         * Sets the pickup location via place identifier.
+         *
+         * @param place the pickup location's nickname.
+         */
+        public Builder setPickupPlace(@Nullable Places place) {
+            this.startPlaceId = place == null ? null : place.toString();
+            return this;
+        }
+
+        /**
+         * Sets the dropoff location's coordinates.
+         *
+         * @param latitude the dropoff location's latitude.
+         * @param longitude the dropoff location's longitude.
+         */
+        public Builder setDropoffCoordinates(@Nullable Float latitude, @Nullable Float longitude) {
+            this.endLatitude = latitude;
+            this.endLongitude = longitude;
+            return this;
+        }
+
+        /**
+         * Sets the pickup location's nickname.
+         *
+         * @param nickname the pickup location's nickname.
+         */
+        public Builder setDropoffNickname(@Nullable String nickname) {
+            this.endNickname = nickname;
+            return this;
+        }
+
+        /**
+         * Sets the pickup location's address.
+         *
+         * @param address the pickup location's nickname.
+         */
+        public Builder setDropoffAddress(@Nullable String address) {
+            this.endAddress = address;
+            return this;
+        }
+
+        /**
+         * Sets the pickup location via place identifier.
+         *
+         * @param placeId the pickup location's nickname.
+         */
+        public Builder setDropoffPlaceId(@Nullable String placeId) {
+            this.endPlaceId = placeId;
+            return this;
+        }
+
+        /**
+         * Sets the pickup location via place identifier.
+         *
+         * @param place the pickup location's nickname.
+         */
+        public Builder setDropoffPlace(@Nullable Places place) {
+            this.endPlaceId = place == null ? null : place.toString();
             return this;
         }
 
@@ -96,20 +214,43 @@ public class RideRequestParameters {
          * Required when returned from a 409 Conflict response on previous POST attempt. Optional
          * otherwise.
          */
-        public Builder setSurgeConfirmationId(String surgeConfirmationId) {
+        public Builder setSurgeConfirmationId(@Nullable String surgeConfirmationId) {
             this.surgeConfirmationId = surgeConfirmationId;
             return this;
         }
 
+        /**
+         * Sets the payment method to be used for this request.
+         *
+         * @param paymentMethodId the unique identifier of the payment method.
+         */
+        public Builder setPaymentMethodId(@Nullable String paymentMethodId) {
+            this.paymentMethodId = paymentMethodId;
+            return this;
+        }
+
         private void validate() {
-            if (productId == null) {
-                throw new IllegalArgumentException("Product ID must be set.");
+            if (startPlaceId != null) {
+                if (startLatitude != null || startLongitude != null) {
+                    throw new IllegalArgumentException("Exactly one of pickup place or pickup coordinates is required.");
+                }
+            } else {
+                if (startLatitude == null && startLongitude == null) {
+                    throw new IllegalArgumentException("Exactly one of pickup place or pickup coordinates is required.");
+                } else if (startLatitude == null || startLongitude == null) {
+                    throw new IllegalArgumentException("Need both pickup latitude and pickup longitude");
+                }
             }
 
-            if (startLatitude == null || startLongitude == null) {
-                throw new IllegalArgumentException("Start latitude and longitude must be set.");
+            if (endPlaceId != null && (endLatitude != null || endLongitude != null)) {
+                throw new IllegalArgumentException("Cannot have both dropoff place and dropoff coordinates");
+            } else {
+                if ((endLatitude != null && endLongitude == null) || (endLatitude == null && endLongitude != null)) {
+                    throw new IllegalArgumentException("Need both dropoff latitude and dropoff longitude");
+                }
             }
         }
+
 
         /**
          * Builds a {@link RideRequestParameters}.
@@ -120,66 +261,105 @@ public class RideRequestParameters {
             return new RideRequestParameters(productId,
                     startLatitude,
                     startLongitude,
+                    startNickname,
+                    startAddress,
+                    startPlaceId,
                     endLatitude,
                     endLongitude,
-                    surgeConfirmationId);
+                    endNickname,
+                    endAddress,
+                    endPlaceId,
+                    surgeConfirmationId,
+                    paymentMethodId);
         }
     }
 
     /**
      * Gets the product Id for this Ride Request
      */
-    @Nonnull
+    @Nullable
     public String getProductId() {
         return product_id;
     }
 
     /**
-     * Gets the start location's Latitude for this Ride Request
+     * Gets the pickup location's Latitude for this Ride Request.
      */
-    @Nonnull
-    public float getStartLatitude() {
+    @Nullable
+    public Float getPickupLatitude() {
         return start_latitude;
     }
 
     /**
-     * Gets the start location's Longitude for this Ride Request
+     * Gets the pickup location's Longitude for this Ride Request.
      */
-    @Nonnull
-    public float getStartLongitude() {
+    @Nullable
+    public Float getPickupLongitude() {
         return start_longitude;
     }
 
     /**
-     * Gets the start location for this Ride Request
+     * Gets the pickup location's nickname for this Ride Request.
      */
-    @Nonnull
-    public Location getStartLocation() {
-        return new Location(start_latitude, start_longitude);
+    @Nullable
+    public String getPickupNickname() {
+        return start_nickname;
     }
 
     /**
-     * Gets the end location's Latitude for this Ride Request
+     * Gets the pickup location's address for this Ride Request.
      */
     @Nullable
-    public Float getEndLatitude() {
+    public String getPickupAddress() {
+        return start_address;
+    }
+
+    /**
+     * Gets the pickup place identifier for this Ride Request.
+     */
+    @Nullable
+    public String getPickupPlaceId() {
+        return start_place_id;
+    }
+
+    /**
+     * Gets the dropoff location's Latitude for this Ride Request.
+     */
+    @Nullable
+    public Float getDropoffLatitude() {
         return end_latitude;
     }
 
     /**
-     * Gets the end location's Longitude for this Ride Request
+     * Gets the dropoff location's Longitude for this Ride Request.
      */
     @Nullable
-    public Float getEndLongitude() {
+    public Float getDropoffLongitude() {
         return end_longitude;
     }
 
     /**
-     * Gets the end location for this Ride Request
+     * Gets the dropoff location's nickname for this Ride Request.
      */
     @Nullable
-    public Location getEndLocation() {
-        return new Location(end_latitude, end_longitude);
+    public String getDropoffNickname() {
+        return end_nickname;
+    }
+
+    /**
+     * Gets the dropoff location's address for this Ride Request.
+     */
+    @Nullable
+    public String getDropoffAddress() {
+        return end_address;
+    }
+
+    /**
+     * Gets the dropoff place identifier for this Ride Request.
+     */
+    @Nullable
+    public String getDropoffPlaceId() {
+        return end_place_id;
     }
 
     /**
@@ -196,5 +376,13 @@ public class RideRequestParameters {
      */
     public void setSurgeConfirmationId(@Nullable String surgeConfirmationId) {
         this.surge_confirmation_id = surgeConfirmationId;
+    }
+
+    /**
+     * Gets the payment method identifier to be used for this Ride Request.
+     */
+    @Nullable
+    public String getPaymentMethodId() {
+        return payment_method_id;
     }
 }

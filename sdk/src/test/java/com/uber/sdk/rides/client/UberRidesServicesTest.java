@@ -42,6 +42,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import static com.uber.sdk.rides.client.Session.Environment.PRODUCTION;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -56,6 +57,7 @@ public class UberRidesServicesTest {
     @Rule public ExpectedException exception = ExpectedException.none();
 
     private Credential credential;
+    private Session session;
 
     @Before
     public void setUp() throws Exception {
@@ -69,33 +71,27 @@ public class UberRidesServicesTest {
         credential.setAccessToken("accessToken");
         credential.setRefreshToken("refreshToken");
         credential.setExpiresInSeconds(3600L);
+
+        session = new Session.Builder().setEnvironment(PRODUCTION).setCredential(credential).build();
     }
 
     @Test
     public void buildUberApiSyncService_whenSessionIsSupplied_shouldSucceed() throws Exception {
-        Session session = new Session.Builder().setCredential(credential).build();
-
         UberRidesServices.Builder.sync().setSession(session).build();
     }
 
     @Test
     public void buildUberApiAsyncService_whenSessionIsSupplied_shouldSucceed() throws Exception {
-        Session session = new Session.Builder().setCredential(credential).build();
-
         UberRidesServices.Builder.async().setSession(session).build();
     }
 
     @Test
     public void buildUberApiSyncServiceWithStatic_whenSessionIsSupplied_shouldSucceed() throws Exception {
-        Session session = new Session.Builder().setCredential(credential).build();
-
         UberRidesSyncService uberApiSyncService = UberRidesServices.createSync(session);
     }
 
     @Test
     public void buildUberApiAsyncServiceWithStatic_whenSessionIsSupplied_shouldSucceed() throws Exception {
-        Session session = new Session.Builder().setCredential(credential).build();
-
         UberRidesAsyncService uberApiAsyncService = UberRidesServices.createAsync(session);
     }
 
@@ -133,8 +129,6 @@ public class UberRidesServicesTest {
 
     @Test
     public void buildUberApiSyncService_whenNoLogLevel_shouldDefaultToNone() {
-        Session session = new Session.Builder().setCredential(credential).build();
-
         UberRidesServices uberRidesServices = UberRidesServices.Builder.sync().setSession(session).buildUberApiServices();
 
         assertEquals(UberRidesServices.LogLevel.NONE, uberRidesServices.getLogLevel());
@@ -142,8 +136,6 @@ public class UberRidesServicesTest {
 
     @Test
     public void buildUberApiAsyncService_whenNoLogLevel_shouldDefaultToNone() {
-        Session session = new Session.Builder().setCredential(credential).build();
-
         UberRidesServices uberRidesServices = UberRidesServices.Builder.async().setSession(session).buildUberApiServices();
 
         assertEquals(UberRidesServices.LogLevel.NONE, uberRidesServices.getLogLevel());
@@ -151,8 +143,6 @@ public class UberRidesServicesTest {
 
     @Test
     public void buildUberApiSyncService_whenNullLogLevel_shouldDefaultToNone() {
-        Session session = new Session.Builder().setCredential(credential).build();
-
         UberRidesServices uberRidesServices = UberRidesServices.Builder.sync()
                 .setSession(session)
                 .setLogLevel(null)
@@ -163,8 +153,6 @@ public class UberRidesServicesTest {
 
     @Test
     public void buildUberApiAsyncService_whenNullLogLevel_shouldDefaultToNone() {
-        Session session = new Session.Builder().setCredential(credential).build();
-
         UberRidesServices uberRidesServices = UberRidesServices.Builder.async()
                 .setSession(session)
                 .setLogLevel(null)
