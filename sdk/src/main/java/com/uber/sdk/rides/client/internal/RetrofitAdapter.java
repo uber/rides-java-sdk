@@ -40,7 +40,6 @@ import com.uber.sdk.rides.client.error.ClientError;
 import com.uber.sdk.rides.client.error.NetworkException;
 import com.uber.sdk.rides.client.error.SurgeError;
 import com.uber.sdk.rides.client.error.UberError;
-import com.uber.sdk.rides.client.model.PaymentMethod;
 import com.uber.sdk.rides.client.model.PaymentMethodsResponse;
 import com.uber.sdk.rides.client.model.Place;
 import com.uber.sdk.rides.client.model.Place.Places;
@@ -52,6 +51,7 @@ import com.uber.sdk.rides.client.model.Promotion;
 import com.uber.sdk.rides.client.model.Ride;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
+import com.uber.sdk.rides.client.model.RideReceipt;
 import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.RideUpdateParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
@@ -360,6 +360,20 @@ public class RetrofitAdapter<T extends RetrofitUberRidesService> implements Uber
         final SettableFuture<ResponseOrException<Ride>> future = SettableFuture.create();
 
         getRideDetails(rideId, new SettableFutureCallback<>(future));
+
+        return transformFuture(future);
+    }
+
+    @Override
+    public void getRideReceipt(@Nonnull String rideId, Callback<RideReceipt> callback) {
+        service.getRideReceipt(rideId, new InternalCallback<RideReceipt>(callback));
+    }
+
+    @Override
+    public Response<RideReceipt> getRideReceipt(@Nonnull String rideId) throws ApiException, NetworkException {
+        final SettableFuture<ResponseOrException<RideReceipt>> future = SettableFuture.create();
+
+        getRideReceipt(rideId, new SettableFutureCallback<>(future));
 
         return transformFuture(future);
     }
