@@ -33,6 +33,7 @@ import com.uber.sdk.rides.client.model.Promotion;
 import com.uber.sdk.rides.client.model.Ride;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
+import com.uber.sdk.rides.client.model.RideReceipt;
 import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.RideUpdateParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
@@ -225,6 +226,16 @@ public interface RetrofitUberRidesService {
      */
     @GET("/v1/requests/{request_id}")
     void getRideDetails(@Nonnull @Path("request_id") String rideId, Callback<Ride> callback);
+
+    /**
+     * Get receipt information for a completed request.<br/>
+     * Access to this endpoint is restricted and requires whitelisting.
+     *
+     * @param rideId The unique identifier for a ride.
+     * @param callback The request callback.
+     */
+    @GET("/v1/requests/{request_id}/receipt")
+    void getRideReceipt(@Nonnull @Path("request_id") String rideId, Callback<RideReceipt> callback);
 
     /**
      * <p>
