@@ -14,7 +14,7 @@ Note: This Java SDK is not suitable for Android development. We will release an 
 If using Gradle, add this to your project’s `build.gradle` file:
 ```gradle
 dependencies {
-    compile 'com.uber.sdk:rides:0.2.0'
+    compile 'com.uber.sdk:rides:0.3.0'
 }
 ```
 
@@ -24,7 +24,7 @@ If using Maven, add this to your project's `pom.xml` file:
 <dependency>
   <groupId>com.uber.sdk</groupId>
   <artifactId>rides</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 

@@ -228,7 +228,7 @@ public interface RetrofitUberRidesService {
     void getRideDetails(@Nonnull @Path("request_id") String rideId, Callback<Ride> callback);
 
     /**
-     * Get receipt information for a completed request.<br/>
+     * Get receipt information for a completed request.
      * Access to this endpoint is restricted and requires whitelisting.
      *
      * @param rideId The unique identifier for a ride.

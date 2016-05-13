@@ -61,7 +61,7 @@ import retrofit.converter.GsonConverter;
  */
 public class RetrofitUberRidesClient {
 
-    @VisibleForTesting static final String LIB_VERSION = "0.2.0";
+    @VisibleForTesting static final String LIB_VERSION = "0.3.0";
 
     /**
      * Gets a new Uber API service client.

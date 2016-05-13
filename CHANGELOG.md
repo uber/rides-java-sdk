@@ -1,3 +1,8 @@
+v0.3.0 - 5/9/2016
+------------------
+  - Merged #7
+  - Merged #10
+
 v0.2.0 - 2/25/2016
 ------------------
   - Updated to cover new endpoints and scopes.

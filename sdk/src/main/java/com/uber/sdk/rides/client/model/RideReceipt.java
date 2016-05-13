@@ -1,4 +1,3 @@
-
 package com.uber.sdk.rides.client.model;
 
 import java.util.List;
@@ -71,7 +70,7 @@ public class RideReceipt {
     }
 
     /**
-     * Gets the total amount charged to the users payment method.<br/>
+     * Gets the total amount charged to the users payment method.
      * This is the the subtotal (split if applicable) with taxes included.
      */
     public String getTotalCharged() {
@@ -79,7 +78,7 @@ public class RideReceipt {
     }
 
     /**
-     * Gets the total amount still owed after attempting to charge the user.<br/>
+     * Gets the total amount still owed after attempting to charge the user.
      * May be {@code null} if amount was paid in full.
      */
     @Nullable
