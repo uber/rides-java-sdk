@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,9 @@
 package com.uber.sdk.rides.samples.servlet;
 
 import com.google.api.client.util.store.MemoryDataStoreFactory;
+import com.uber.sdk.core.auth.Scope;
 import com.uber.sdk.rides.auth.OAuth2Credentials;
+import com.uber.sdk.rides.client.SessionConfiguration;
 
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
@@ -31,6 +33,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -70,7 +73,18 @@ public class Server {
      *
      * Throws an {@throws IOException} when no client ID or secret found in secrets.properties
      */
-     static OAuth2Credentials createOAuth2Credentials() throws IOException {
+     static OAuth2Credentials createOAuth2Credentials(SessionConfiguration config) throws IOException {
+
+
+        return new OAuth2Credentials.Builder()
+                .setCredentialDataStoreFactory(MemoryDataStoreFactory.getDefaultInstance())
+                .setRedirectUri(config.getRedirectUri())
+                .setScopes(config.getScopes())
+                .setClientSecrets(config.getClientId(), config.getClientSecret())
+                .build();
+    }
+
+    static SessionConfiguration createSessionConfiguration() throws IOException {
         // Load the client ID and secret from a secrets properties file.
         Properties secrets = loadSecretProperties();
 
@@ -81,11 +95,11 @@ public class Server {
             throw new IllegalArgumentException(
                     "Please enter your client ID and secret in the resoures/secrets.properties file.");
         }
-
-        return new OAuth2Credentials.Builder()
-                .setCredentialDataStoreFactory(MemoryDataStoreFactory.getDefaultInstance())
+        return new SessionConfiguration.Builder()
+                .setClientId(clientId)
+                .setClientSecret(clientSecret)
                 .setRedirectUri(REDIRECT_URI)
-                .setClientSecrets(clientId, clientSecret)
+                .setScopes(Collections.singletonList(Scope.PROFILE))
                 .build();
     }
 

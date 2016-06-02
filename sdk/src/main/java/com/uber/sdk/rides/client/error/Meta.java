@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,26 @@
 
 package com.uber.sdk.rides.client.error;
 
+import javax.annotation.Nullable;
+
 /**
- * Represents an error returned in the response.
+ * Meta information about an {@link ApiError}.  See specific endpoint
+ * <a href="https://developer.uber.com/docs">documentation</a> for what can be contained here.
  */
-public interface UberError {
+public class Meta {
+
+    @Nullable
+    private final SurgeConfirmation surge_confirmation;
+
+    public Meta(@Nullable SurgeConfirmation surgeConfirmation) {
+        this.surge_confirmation = surgeConfirmation;
+    }
+
+    /**
+     * @return The {@link SurgeConfirmation} from the meta data if it was present.
+     */
+    @Nullable
+    public SurgeConfirmation getSurgeConfirmation() {
+        return surge_confirmation;
+    }
 }

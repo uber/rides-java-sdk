@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.google.api.client.testing.json.MockJsonFactory;
 import com.google.api.client.util.store.AbstractDataStoreFactory;
 import com.google.api.client.util.store.DataStore;
+import com.uber.sdk.core.auth.Scope;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,13 +47,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.uber.sdk.rides.auth.OAuth2Credentials.LoginRegion.CHINA;
+import static com.uber.sdk.rides.client.SessionConfiguration.EndpointRegion.CHINA;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -78,8 +78,8 @@ public class OAuth2CredentialsTest {
     public void getAuthorizationUrl() throws Exception {
         OAuth2Credentials oAuth2Credentials = new OAuth2Credentials.Builder()
                 .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
-                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE, OAuth2Credentials.Scope.REQUEST,
-                        OAuth2Credentials.Scope.HISTORY))
+                .setScopes(Arrays.asList(Scope.PROFILE, Scope.REQUEST,
+                        Scope.HISTORY))
                 .build();
 
         assertEquals("https://login.uber.com/oauth/v2/authorize?client_id=CLIENT_ID"
@@ -101,7 +101,7 @@ public class OAuth2CredentialsTest {
     public void getAuthorizationUrl_whenThereIsAnEmptyScopeList() throws Exception {
         OAuth2Credentials oAuth2Credentials = new OAuth2Credentials.Builder()
                 .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
-                .setScopes(new ArrayList<OAuth2Credentials.Scope>())
+                .setScopes(new ArrayList<Scope>())
                 .build();
 
         assertEquals("https://login.uber.com/oauth/v2/authorize?client_id=CLIENT_ID&response_type=code",
@@ -112,7 +112,7 @@ public class OAuth2CredentialsTest {
     public void getAuthorizationUrl_whenThereAreCustomScopes() throws Exception {
         OAuth2Credentials oAuth2Credentials = new OAuth2Credentials.Builder()
                 .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
-                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE))
+                .setScopes(Arrays.asList(Scope.PROFILE))
                 .setCustomScopes(Arrays.asList("custom"))
                 .build();
 
@@ -127,7 +127,7 @@ public class OAuth2CredentialsTest {
     public void getAuthorizationUrl_whenThereAreDuplicateCustomScopes() throws Exception {
         OAuth2Credentials oAuth2Credentials = new OAuth2Credentials.Builder()
                 .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
-                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE))
+                .setScopes(Arrays.asList(Scope.PROFILE))
                 .setCustomScopes(Arrays.asList("profile"))
                 .build();
 
@@ -140,7 +140,7 @@ public class OAuth2CredentialsTest {
         OAuth2Credentials oAuth2Credentials = new OAuth2Credentials.Builder()
                 .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
                 .setRedirectUri("https://localhost:8181/OAuth2Callback")
-                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE))
+                .setScopes(Arrays.asList(Scope.PROFILE))
                 .setCustomScopes(Arrays.asList("profile"))
                 .build();
 
@@ -153,8 +153,8 @@ public class OAuth2CredentialsTest {
     public void getAuthorizationUrl_whenUsingServerForChina() throws Exception {
         OAuth2Credentials oAuth2Credentials = new OAuth2Credentials.Builder()
                 .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
-                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE, OAuth2Credentials.Scope.REQUEST,
-                        OAuth2Credentials.Scope.HISTORY))
+                .setScopes(Arrays.asList(Scope.PROFILE, Scope.REQUEST,
+                        Scope.HISTORY))
                 .setLoginRegion(CHINA)
                 .build();
 
@@ -217,7 +217,7 @@ public class OAuth2CredentialsTest {
                 .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
                 .setRedirectUri("http://redirect")
                 .setHttpTransport(mockHttpTransport)
-                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE, OAuth2Credentials.Scope.REQUEST))
+                .setScopes(Arrays.asList(Scope.PROFILE, Scope.REQUEST))
                 .build();
 
         Credential credential = oAuth2Credentials.authenticate(authorizationCode, "userId");
@@ -285,7 +285,7 @@ public class OAuth2CredentialsTest {
                 .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
                 .setRedirectUri("http://redirect")
                 .setHttpTransport(mockHttpTransport)
-                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE, OAuth2Credentials.Scope.REQUEST))
+                .setScopes(Arrays.asList(Scope.PROFILE, Scope.REQUEST))
                 .build();
 
         oAuth2Credentials.authenticate("authorizationCode", "userId");
@@ -306,7 +306,7 @@ public class OAuth2CredentialsTest {
                 .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
                 .setRedirectUri("http://redirect")
                 .setHttpTransport(mockHttpTransport)
-                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE, OAuth2Credentials.Scope.REQUEST))
+                .setScopes(Arrays.asList(Scope.PROFILE, Scope.REQUEST))
                 .build();
 
         oAuth2Credentials.authenticate("authorizationCode", "userId");
@@ -343,7 +343,7 @@ public class OAuth2CredentialsTest {
                 .setRedirectUri("http://redirect")
                 .setHttpTransport(mockHttpTransport)
                 .setCredentialDataStoreFactory(mockDataStoreFactory)
-                .setScopes(Arrays.asList(OAuth2Credentials.Scope.PROFILE, OAuth2Credentials.Scope.REQUEST))
+                .setScopes(Arrays.asList(Scope.PROFILE, Scope.REQUEST))
                 .build();
 
         Credential storedCredential = oAuth2Credentials.authenticate("authorizationCode", "userId");
@@ -396,7 +396,7 @@ public class OAuth2CredentialsTest {
         private String httpResponseContent = "{\n" +
                 "  \"access_token\" : \"accessToken\",\n" +
                 "  \"token_type\" : \"Bearer\",\n" +
-                "  \"expires_in\" : " + OAuth2Helper.DEFAULT_REFRESH_WINDOW + ",\n" +
+                "  \"expires_in\" : " + 300L + ",\n" +
                 "  \"refresh_token\" : \"refreshToken\"\n" +
                 "}";
 

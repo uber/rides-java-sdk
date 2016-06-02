@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,15 +27,21 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.util.store.AbstractDataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.uber.sdk.rides.auth.OAuth2Credentials;
-import com.uber.sdk.rides.client.Session;
-import com.uber.sdk.rides.client.UberRidesServices;
-import com.uber.sdk.rides.client.UberRidesSyncService;
+import com.uber.sdk.rides.client.CredentialsSession;
+import com.uber.sdk.rides.client.SessionConfiguration;
+import com.uber.sdk.rides.client.UberRidesApi;
+import com.uber.sdk.rides.client.error.ApiError;
+import com.uber.sdk.rides.client.error.ClientError;
+import com.uber.sdk.rides.client.error.ErrorParser;
 import com.uber.sdk.rides.client.model.UserProfile;
+import com.uber.sdk.rides.client.services.RidesService;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.util.Properties;
+
+import retrofit2.Response;
 
 /**
  * Demonstrates how to authenticate the user and load their profile via the command line.
@@ -48,21 +54,30 @@ public final class GetUserProfile {
 
     public static void main(String[] args) throws Exception {
         // Create or load a credential for the user.
-        Credential credential = authenticate(System.getProperty("user.name"));
-
-        // Create session for the user
-        Session session = new Session.Builder()
-                .setCredential(credential)
-                .setEnvironment(Session.Environment.SANDBOX)
-                .build();
+        SessionConfiguration config = createSessionConfiguration();
+        Credential credential = authenticate(System.getProperty("user.name"), config);
+        //Create an authenticator for Credential to use in our Session
+        CredentialsSession session = new CredentialsSession(config, credential);
 
         // Create the Uber API service object once the User is authenticated
-        UberRidesSyncService uberRidesService = UberRidesServices.createSync(session);
+        UberRidesApi uberRidesApi = UberRidesApi.with(session).build();
 
+        RidesService service = uberRidesApi.createService();
         // Fetch the user's profile.
         System.out.println("Calling API to get the user's profile");
-        UserProfile userProfile = uberRidesService.getUserProfile().getBody();
+        Response<UserProfile> response = service.getUserProfile().execute();
 
+        ApiError apiError = ErrorParser.parseError(response);
+        if (apiError != null) {
+            // Handle error.
+            ClientError clientError = apiError.getClientErrors().get(0);
+            System.out.printf("Unable to fetch profile. %s", clientError.getTitle());
+            System.exit(0);
+            return;
+        }
+
+        // Success!
+        UserProfile userProfile = response.body();
         System.out.printf("Logged in as %s%n", userProfile.getEmail());
         System.exit(0);
     }
@@ -72,9 +87,8 @@ public final class GetUserProfile {
      * should exist on your server so that the client ID and secret are not shared with the end
      * user.
      */
-    private static Credential authenticate(String userId) throws Exception {
-
-        OAuth2Credentials oAuth2Credentials = createOAuth2Credentials();
+    private static Credential authenticate(String userId, SessionConfiguration config) throws Exception {
+        OAuth2Credentials oAuth2Credentials = createOAuth2Credentials(config);
 
         // First try to load an existing Credential. If that credential is null, authenticate the user.
         Credential credential = oAuth2Credentials.loadCredential(userId);
@@ -106,7 +120,28 @@ public final class GetUserProfile {
     /**
      * Creates an {@link OAuth2Credentials} object that can be used by any of the servlets.
      */
-    public static OAuth2Credentials createOAuth2Credentials() throws Exception {
+    public static OAuth2Credentials createOAuth2Credentials(SessionConfiguration sessionConfiguration) throws Exception {
+
+
+
+
+        // Store the users OAuth2 credentials in their home directory.
+        File credentialDirectory =
+                new File(System.getProperty("user.home") + File.separator + ".uber_credentials");
+        credentialDirectory.setReadable(true, true);
+        credentialDirectory.setWritable(true, true);
+        // If you'd like to store them in memory or in a DB, any DataStoreFactory can be used.
+        AbstractDataStoreFactory dataStoreFactory = new FileDataStoreFactory(credentialDirectory);
+
+        // Build an OAuth2Credentials object with your secrets.
+        return new OAuth2Credentials.Builder()
+                .setCredentialDataStoreFactory(dataStoreFactory)
+                .setRedirectUri(sessionConfiguration.getRedirectUri())
+                .setClientSecrets(sessionConfiguration.getClientId(), sessionConfiguration.getClientSecret())
+                .build();
+    }
+
+    public static SessionConfiguration createSessionConfiguration() throws Exception {
         // Load the client ID and secret from {@code resources/secrets.properties}. Ideally, your
         // secrets would not be kept local. Instead, have your server accept the redirect and return
         // you the accessToken for a userId.
@@ -120,24 +155,16 @@ public final class GetUserProfile {
                     "Please enter your client ID and secret in the resources/secrets.properties file.");
         }
 
-        // Store the users OAuth2 credentials in their home directory.
-        File credentialDirectory =
-                new File(System.getProperty("user.home") + File.separator + ".uber_credentials");
-        credentialDirectory.setReadable(true, true);
-        credentialDirectory.setWritable(true, true);
-        // If you'd like to store them in memory or in a DB, any DataStoreFactory can be used.
-        AbstractDataStoreFactory dataStoreFactory = new FileDataStoreFactory(credentialDirectory);
-
         // Start a local server to listen for the OAuth2 redirect.
         localServerReceiver = new LocalServerReceiver.Builder().setPort(8181).build();
         String redirectUri = localServerReceiver.getRedirectUri();
 
-        // Build an OAuth2Credentials object with your secrets.
-        return new OAuth2Credentials.Builder()
-                .setCredentialDataStoreFactory(dataStoreFactory)
+        return new SessionConfiguration.Builder()
+                .setClientId(clientId)
+                .setClientSecret(clientSecret)
                 .setRedirectUri(redirectUri)
-                .setClientSecrets(clientId, clientSecret)
                 .build();
+
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,11 @@ package com.uber.sdk.rides.samples.servlet;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.uber.sdk.rides.auth.OAuth2Credentials;
-import com.uber.sdk.rides.client.Session;
-import com.uber.sdk.rides.client.UberRidesServices;
-import com.uber.sdk.rides.client.UberRidesSyncService;
+import com.uber.sdk.rides.client.CredentialsSession;
+import com.uber.sdk.rides.client.SessionConfiguration;
+import com.uber.sdk.rides.client.UberRidesApi;
 import com.uber.sdk.rides.client.model.UserProfile;
+import com.uber.sdk.rides.client.services.RidesService;
 
 import java.io.IOException;
 import java.util.Random;
@@ -45,7 +46,7 @@ public class SampleServlet extends HttpServlet {
 
     private OAuth2Credentials oAuth2Credentials;
     private Credential credential;
-    private UberRidesSyncService uberRidesService;
+    private RidesService uberRidesService;
 
     /**
      * Clear the in memory credential and Uber API service once a call has ended.
@@ -64,8 +65,9 @@ public class SampleServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        SessionConfiguration config = Server.createSessionConfiguration();
         if (oAuth2Credentials == null) {
-            oAuth2Credentials = Server.createOAuth2Credentials();
+            oAuth2Credentials = Server.createOAuth2Credentials(config);
         }
 
         // Load the user from their user ID (derived from the request).
@@ -76,15 +78,14 @@ public class SampleServlet extends HttpServlet {
         credential = oAuth2Credentials.loadCredential(httpSession.getAttribute(Server.USER_SESSION_ID).toString());
 
         if (credential != null && credential.getAccessToken() != null) {
-            if (uberRidesService == null) {
-                // Create the session
-                Session session = new Session.Builder()
-                        .setCredential(credential)
-                        .setEnvironment(Session.Environment.PRODUCTION)
-                        .build();
 
-                // Set up the Uber API Service once the user is authenticated.
-                uberRidesService = UberRidesServices.createSync(session);
+            if (uberRidesService == null) {
+
+                CredentialsSession session = new CredentialsSession(config, credential);
+
+//                Set up the Uber API Service once the user is authenticated.
+                UberRidesApi api = UberRidesApi.with(session).build();
+                uberRidesService = api.createService();
             }
 
             super.service(req, resp);
@@ -96,7 +97,7 @@ public class SampleServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Fetch the user's profile.
-        UserProfile userProfile = uberRidesService.getUserProfile().getBody();
+        UserProfile userProfile = uberRidesService.getUserProfile().execute().body();
 
         response.setContentType("text/html");
         response.setStatus(HttpServletResponse.SC_OK);

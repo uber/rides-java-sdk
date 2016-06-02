@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,13 +35,13 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.AbstractDataStoreFactory;
 import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.MemoryDataStoreFactory;
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.net.UrlEscapers;
+import com.uber.sdk.core.auth.Scope;
+import com.uber.sdk.rides.client.SessionConfiguration;
+import com.uber.sdk.rides.client.utils.Preconditions;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,7 +49,7 @@ import java.util.TreeSet;
 
 import javax.annotation.Nullable;
 
-import static com.uber.sdk.rides.auth.OAuth2Credentials.LoginRegion.WORLD;
+import static com.uber.sdk.rides.client.SessionConfiguration.EndpointRegion.WORLD;
 
 /**
  * Utility for creating and managing OAuth 2.0 Credentials.
@@ -59,33 +59,6 @@ public class OAuth2Credentials {
     public static final String AUTHORIZATION_PATH = "/oauth/v2/authorize";
     public static final String TOKEN_PATH = "/oauth/v2/token";
 
-    /**
-     * An Uber API scope. See
-     * <a href="https://developer.uber.com/v1/api-reference/#scopes">Scopes</a> for more
-     * information.
-     */
-    public enum Scope {
-        PROFILE,
-        REQUEST,
-        HISTORY,
-        PLACES,
-        REQUEST_RECEIPT,
-        ALL_TRIPS;
-    }
-
-    /**
-     * LoginRegion to be used for authorization.
-     */
-    public enum LoginRegion {
-        WORLD("https://login.uber.com"),
-        CHINA("https://login.uber.com.cn");
-
-        public String domain;
-
-        LoginRegion(String domain) {
-            this.domain = domain;
-        }
-    }
 
     private AuthorizationCodeFlow authorizationCodeFlow;
     private Collection<String> scopes;
@@ -96,7 +69,7 @@ public class OAuth2Credentials {
      */
     public static class Builder {
 
-        private LoginRegion loginRegion;
+        private SessionConfiguration.EndpointRegion loginRegion;
         private Set<Scope> scopes;
         private Set<String> customScopes;
         private String clientId;
@@ -107,9 +80,28 @@ public class OAuth2Credentials {
         private AbstractDataStoreFactory credentialDataStoreFactory;
 
         /**
+         * Set the {@link SessionConfiguration} information
+         */
+        public Builder setSessionConfiguration(SessionConfiguration configuration) {
+            this.loginRegion = configuration.getEndpointRegion();
+            if (scopes != null) {
+                this.scopes = new HashSet<>(configuration.getScopes());
+            }
+
+            if (customScopes != null) {
+                this.customScopes = new HashSet<>(configuration.getCustomScopes());
+            }
+
+            this.clientId = configuration.getClientId();
+            this.clientSecret = configuration.getClientSecret();
+            this.redirectUri = configuration.getRedirectUri();
+            return this;
+        }
+
+        /**
          * Sets the authorization server domain.
          */
-        public Builder setLoginRegion(LoginRegion loginRegion) {
+        public Builder setLoginRegion(SessionConfiguration.EndpointRegion loginRegion) {
             this.loginRegion = loginRegion;
             return this;
         }
@@ -175,8 +167,10 @@ public class OAuth2Credentials {
         }
 
         private void validate() {
-            Preconditions.checkState(
-                    !Strings.isNullOrEmpty(clientId) && !Strings.isNullOrEmpty(clientSecret),
+            Preconditions.checkState(clientId != null
+                    && !clientId.isEmpty()
+                    && clientSecret != null
+                    && !clientSecret.isEmpty(),
                     "Client ID and secret must be set.");
         }
 
@@ -189,14 +183,11 @@ public class OAuth2Credentials {
             oAuth2Credentials.redirectUri = redirectUri;
 
             Set<String> allScopes = new TreeSet<>();
-            if (scopes != null && !scopes.isEmpty()) {
-                allScopes.addAll(Lists.transform(Lists.newArrayList(scopes), new Function<Scope, String>() {
-                    @Nullable
-                    @Override
-                    public String apply(@Nullable Scope input) {
-                        return input != null ? input.name().toLowerCase() : null;
-                    }
-                }));
+
+            if (scopes != null) {
+                for (Scope scope : scopes) {
+                    allScopes.add(scope.name().toLowerCase());
+                }
             }
 
             if (customScopes != null) {
@@ -225,10 +216,10 @@ public class OAuth2Credentials {
                                     BearerToken.authorizationHeaderAccessMethod(),
                                     httpTransport,
                                     new JacksonFactory(),
-                                    new GenericUrl(loginRegion.domain + TOKEN_PATH),
+                                    new GenericUrl(getLoginDomain(loginRegion) + TOKEN_PATH),
                                     new ClientParametersAuthentication(clientId, clientSecret),
                                     clientId,
-                                    loginRegion.domain + AUTHORIZATION_PATH);
+                                    getLoginDomain(loginRegion) + AUTHORIZATION_PATH);
                     if (oAuth2Credentials.scopes != null && !oAuth2Credentials.scopes.isEmpty()) {
                         builder.setScopes(oAuth2Credentials.scopes);
                     }
@@ -241,6 +232,10 @@ public class OAuth2Credentials {
             oAuth2Credentials.authorizationCodeFlow = authorizationCodeFlow;
             return oAuth2Credentials;
         }
+
+        private String getLoginDomain(SessionConfiguration.EndpointRegion endpointRegion) {
+            return "https://login." + endpointRegion.domain;
+        }
     }
 
     private OAuth2Credentials() {}
@@ -249,11 +244,11 @@ public class OAuth2Credentials {
      * Gets the authorization URL to retrieve the authorization code.
      */
     @Nullable
-    public String getAuthorizationUrl() {
+    public String getAuthorizationUrl() throws UnsupportedEncodingException {
         String authorizationCodeRequestUrl =
                 authorizationCodeFlow.newAuthorizationUrl().setScopes(scopes).build();
         if (redirectUri != null) {
-            authorizationCodeRequestUrl += "&redirect_uri=" + UrlEscapers.urlFormParameterEscaper().escape(redirectUri);
+            authorizationCodeRequestUrl += "&redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8");
         }
         return authorizationCodeRequestUrl;
     }

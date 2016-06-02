@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,34 +20,41 @@
  * THE SOFTWARE.
  */
 
-package com.uber.sdk.rides.client.error;
+package com.uber.sdk.core.auth;
 
-/**
- * An error caused by attempting to make a request without having
- * confirmed relevant surge pricing
- */
-public class SurgeError extends ClientError {
+import com.uber.sdk.rides.client.SessionConfiguration;
 
-    private String href;
-    private String surgeConfirmationId;
+import java.io.IOException;
 
-    public SurgeError(String code, String message, String href, String surgeConfirmationId) {
-        super(code, message);
-        this.href = href;
-        this.surgeConfirmationId = surgeConfirmationId;
-    }
+import okhttp3.Request;
+import okhttp3.Response;
+
+public interface Authenticator {
 
     /**
-     * A link to send the user to for accepting surge pricing.
+     * Indicates whether this authenticator can be refreshed.
+     *
+     * @return
      */
-    public String getHref() {
-        return href;
-    }
+    boolean isRefreshable();
 
     /**
-     * The confirmation ID to be added to ride requests once the user has confirmed the pricing.
+     * Add authentication header required to the request.
+     *
+     * @param builder
      */
-    public String getSurgeConfirmationId() {
-        return surgeConfirmationId;
-    }
+    void signRequest(Request.Builder builder);
+
+    /**
+     * Refresh authentication token that is used to {@link #signRequest(Request.Builder)}
+     *
+     * @param response
+     * @throws IOException
+     */
+    Request refresh(Response response) throws IOException;
+
+    /**
+     * Get {@link SessionConfiguration} used for providing signining information for requests
+     */
+    SessionConfiguration getSessionConfiguration();
 }

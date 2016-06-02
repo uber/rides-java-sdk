@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,41 @@
  * THE SOFTWARE.
  */
 
-package com.uber.sdk.rides.client.error;
+package com.uber.sdk.rides.client.internal;
 
-import java.io.IOException;
+import com.squareup.moshi.FromJson;
 
 import javax.annotation.Nullable;
 
 /**
- * An error caused by some network issue, the server was not able to be connected to.
+ * Adapter used to adapt primitives coming back explicitly as null to 0;
  */
-public class NetworkException extends IOException {
+public class PrimitiveAdapter {
 
-    private final String url;
+    @FromJson
+    public int intFromJson(@Nullable Integer value) {
+        if (value == null) {
+            return 0;
+        }
 
-    public NetworkException(String message, Throwable exception, @Nullable String url) {
-        super(message, exception);
-        this.url = url;
+        return value;
     }
 
-    /**
-     * The request URL which created this error.
-     */
-    @Nullable
-    public String getUrl() {
-        return url;
+    @FromJson
+    public float floatFromJson(@Nullable Float value) {
+        if (value == null) {
+            return 0;
+        }
+
+        return value;
+    }
+
+    @FromJson
+    public long longFromJson(@Nullable Long value) {
+        if (value == null) {
+            return 0;
+        }
+
+        return value;
     }
 }

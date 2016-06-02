@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,9 @@
  * THE SOFTWARE.
  */
 
-package com.uber.sdk.rides.client.internal;
+package com.uber.sdk.rides.client.services;
 
+import com.uber.sdk.rides.client.SessionConfiguration;
 import com.uber.sdk.rides.client.model.PaymentMethod;
 import com.uber.sdk.rides.client.model.PaymentMethodsResponse;
 import com.uber.sdk.rides.client.model.Place;
@@ -33,7 +34,6 @@ import com.uber.sdk.rides.client.model.Promotion;
 import com.uber.sdk.rides.client.model.Ride;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
-import com.uber.sdk.rides.client.model.RideReceipt;
 import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.RideUpdateParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
@@ -45,22 +45,18 @@ import com.uber.sdk.rides.client.model.UserProfile;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import retrofit.Callback;
-import retrofit.http.Body;
-import retrofit.http.DELETE;
-import retrofit.http.GET;
-import retrofit.http.PATCH;
-import retrofit.http.POST;
-import retrofit.http.PUT;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.GET;
+import retrofit2.http.PATCH;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
-import static com.uber.sdk.rides.client.Session.Environment;
+public interface RidesService {
 
-/**
- * Represents the RPC methods of the Uber API.
- */
-public interface RetrofitUberRidesService {
 
     /**
      * Gets information about the promotion that will be available to a new user based on their
@@ -70,34 +66,34 @@ public interface RetrofitUberRidesService {
      * @param startLongitude Longitude component of start location.
      * @param endLatitude Latitude component of end location.
      * @param endLongitude Longitude component of end location.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @GET("/v1/promotions")
-    void getPromotions(@Query("start_latitude") float startLatitude,
-            @Query("start_longitude") float startLongitude,
-            @Query("end_latitude") float endLatitude,
-            @Query("end_longitude") float endLongitude,
-            Callback<Promotion> callback);
+    Call<Promotion> getPromotions(@Query("start_latitude") float startLatitude,
+                                  @Query("start_longitude") float startLongitude,
+                                  @Query("end_latitude") float endLatitude,
+                                  @Query("end_longitude") float endLongitude);
 
     /**
      * Gets a limited amount of data about a user's lifetime activity.
      *
      * @param offset Offset the list of returned results by this amount. Default is zero.
      * @param limit Number of items to retrieve. Default is 5, maximum is 50.
-     * @param callback The request callback.
-     */
+     *
+     * @return the request {@link Call}
+     * */
     @GET("/v1.2/history")
-    void getUserActivity(@Nullable @Query("offset") Integer offset,
-            @Nullable @Query("limit") Integer limit,
-            Callback<UserActivityPage> callback);
+    Call<UserActivityPage> getUserActivity(@Nullable @Query("offset") Integer offset,
+                         @Nullable @Query("limit") Integer limit);
 
     /**
      * Gets information about the user that has authorized with the application.
      *
-     * @param callback The request callback.
+     * @return the request {@link Call}
      */
     @GET("/v1/me")
-    void getUserProfile(Callback<UserProfile> callback);
+    Call<UserProfile> getUserProfile();
 
     /**
      * Gets an estimated price range for each product offered at a given location.
@@ -106,14 +102,14 @@ public interface RetrofitUberRidesService {
      * @param startLongitude Longitude component of start location.
      * @param endLatitude Latitude component of end location.
      * @param endLongitude Longitude component of end location.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @GET("/v1/estimates/price")
-    void getPriceEstimates(@Query("start_latitude") float startLatitude,
-            @Query("start_longitude") float startLongitude,
-            @Query("end_latitude") float endLatitude,
-            @Query("end_longitude") float endLongitude,
-            Callback<PriceEstimatesResponse> callback);
+    Call<PriceEstimatesResponse> getPriceEstimates(@Query("start_latitude") float startLatitude,
+                           @Query("start_longitude") float startLongitude,
+                           @Query("end_latitude") float endLatitude,
+                           @Query("end_longitude") float endLongitude);
 
     /**
      * Gets ETAs for all products offered at a given location, with the responses expressed as
@@ -123,119 +119,114 @@ public interface RetrofitUberRidesService {
      * @param startLongitude Longitude component of start location.
      * @param productId Unique identifier representing a specific product for a given latitude &amp;
      *                  longitude.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @GET("/v1/estimates/time")
-    void getPickupTimeEstimate(@Query("start_latitude") float startLatitude,
-            @Query("start_longitude") float startLongitude,
-            @Nullable @Query("product_id") String productId,
-            Callback<TimeEstimatesResponse> callback);
+    Call<TimeEstimatesResponse>  getPickupTimeEstimate(@Query("start_latitude") float startLatitude,
+                               @Query("start_longitude") float startLongitude,
+                               @Nullable @Query("product_id") String productId);
 
     /**
      * Gets information about the products offered at a given location.
      *
      * @param latitude Latitude component of location.
      * @param longitude Longitude component of location.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @GET("/v1/products")
-    void getProducts(@Query("latitude") float latitude,
-            @Query("longitude") float longitude,
-            Callback<ProductsResponse> callback);
+    Call<ProductsResponse> getProducts(@Query("latitude") float latitude,
+                     @Query("longitude") float longitude);
 
     /**
      * Gets information about a specific product.
      *
      * @param productId The unique product ID to fetch information about.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @GET("/v1/products/{product_id}")
-    void getProduct(@Path("product_id") String productId, Callback<Product> callback);
+    Call<Product> getProduct(@Path("product_id") String productId);
 
     /**
      * Cancels an ongoing Ride for a user.
      *
      * @param rideId Unique identifier representing a Request.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @DELETE("/v1/requests/{request_id}")
-    void cancelRide(@Path("request_id") String rideId, Callback<Void> callback);
+    Call<Void> cancelRide(@Path("request_id") String rideId);
 
     /**
      * Requests a ride on behalf of a user given their desired product, start, and end locations.
      *
      * @param rideRequestParameters The ride request parameters.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @POST("/v1/requests")
-    void requestRide(@Body RideRequestParameters rideRequestParameters, Callback<Ride> callback);
+    Call<Ride> requestRide(@Body RideRequestParameters rideRequestParameters);
 
     /**
      * Gets the current ride a user is on.
      *
-     * @param callback The request callback.
+     * @return the request {@link Call}
      */
     @GET("/v1/requests/current")
-    void getCurrentRide(Callback<Ride> callback);
+    Call<Ride> getCurrentRide();
 
     /**
      * Cancels the current ride of a user.
      *
-     * @param callback The request callback.
+     * @return the request {@link Call}
      */
     @DELETE("/v1/requests/current")
-    void cancelCurrentRide(Callback<Void> callback);
+    Call<Void> cancelCurrentRide();
 
     /**
      * Update an ongoing request's destination.
      *
      * @param rideUpdateParameters The ride request parameters.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @PATCH("/v1/requests/{request_id}")
-    void updateRide(@Nonnull @Path("request_id") String rideId,
-            @Body RideUpdateParameters rideUpdateParameters,
-            Callback<Void> callback);
+    Call<Void> updateRide(@Nonnull @Path("request_id") String rideId,
+                    @Body RideUpdateParameters rideUpdateParameters);
 
     /**
      * Gets information about a user's Place.
      *
      * @param placeId The identifier of a Place.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @GET("/v1/places/{place_id}")
-    void getPlace(@Nonnull @Path("place_id") String placeId, Callback<Place> callback);
+    Call<Place> getPlace(@Nonnull @Path("place_id") String placeId);
 
     /**
      * Sets information about a user's Place.
      *
      * @param placeId The identifier of a Place.
      * @param placeParameters The place parameters.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @PUT("/v1/places/{place_id}")
-    void setPlace(@Nonnull @Path("place_id") String placeId,
-            @Nonnull @Body PlaceParameters placeParameters,
-            Callback<Place> callback);
+    Call<Place> setPlace(@Nonnull @Path("place_id") String placeId,
+                  @Nonnull @Body PlaceParameters placeParameters);
 
     /**
      * Gets details about a specific ride.
      *
      * @param rideId The unique identifier for a ride.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @GET("/v1/requests/{request_id}")
-    void getRideDetails(@Nonnull @Path("request_id") String rideId, Callback<Ride> callback);
-
-    /**
-     * Get receipt information for a completed request.
-     * Access to this endpoint is restricted and requires whitelisting.
-     *
-     * @param rideId The unique identifier for a ride.
-     * @param callback The request callback.
-     */
-    @GET("/v1/requests/{request_id}/receipt")
-    void getRideReceipt(@Nonnull @Path("request_id") String rideId, Callback<RideReceipt> callback);
+    Call<Ride> getRideDetails(@Nonnull @Path("request_id") String rideId);
 
     /**
      * <p>
@@ -251,11 +242,11 @@ public interface RetrofitUberRidesService {
      * </p>
      *
      * @param rideRequestParameters The ride request parameters.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @POST("/v1/requests/estimate")
-    void estimateRide(@Body RideRequestParameters rideRequestParameters,
-            Callback<RideEstimate> callback);
+    Call<RideEstimate> estimateRide(@Body RideRequestParameters rideRequestParameters);
 
     /**
      * Get a map with a visual representation of a ride for tracking purposes.
@@ -264,45 +255,48 @@ public interface RetrofitUberRidesService {
      * to get a map before that will result in a 404 error.
      *
      * @param rideId Unique identifier representing a ride.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
     @GET("/v1/requests/{request_id}/map")
-    void getRideMap(@Nonnull @Path("request_id") String rideId , Callback<RideMap> callback);
+    Call<RideMap> getRideMap(@Nonnull @Path("request_id") String rideId);
 
     /**
      * Gets the {@link PaymentMethod PaymentMethods} of user and their last used method ID.
      *
-     * @param callback The request callback.
+     * @return the request {@link Call}
      */
     @GET("/v1/payment-methods")
-    void getPaymentMethods(Callback<PaymentMethodsResponse> callback);
+    Call<PaymentMethodsResponse> getPaymentMethods();
 
     /**
-     * Updates the product in the {@link Environment#SANDBOX sandbox environement} to simulate the
+     * Updates the product in the {@link SessionConfiguration.Environment#SANDBOX sandbox environement} to simulate the
      * possible responses the Request endpoint will return when requesting a particular product,
      * such as surge pricing and driver availability.
      *
+     * Will fail when called in {@link SessionConfiguration.Environment#PRODUCTION}.
+     *
      * @param productId The unique product ID to update.
      * @param sandboxProductRequestParameters The sandbox product request parameters.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
-    @RetrofitUberRidesClient.SandboxOnly
     @PUT("/v1/sandbox/products/{product_id}")
-    void updateSandboxProduct(@Path("product_id") String productId,
-            @Body SandboxProductRequestParameters sandboxProductRequestParameters,
-            Callback<Void> callback);
+    Call<Void> updateSandboxProduct(@Path("product_id") String productId,
+                                    @Body SandboxProductRequestParameters sandboxProductRequestParameters);
 
     /**
-     * Updates the ride in the {@link Environment#SANDBOX sandbox environement} to simulate the
+     * Updates the ride in the {@link SessionConfiguration.Environment#SANDBOX sandbox environement} to simulate the
      * possible states of a the Request.
+     *
+     * Will fail when called in {@link SessionConfiguration.Environment#PRODUCTION}.
      *
      * @param rideId Unique identifier representing a Request.
      * @param sandboxRideRequestParameters The sandbox ride request parameters.
-     * @param callback The request callback.
+     *
+     * @return the request {@link Call}
      */
-    @RetrofitUberRidesClient.SandboxOnly
     @PUT("/v1/sandbox/requests/{request_id}")
-    void updateSandboxRide(@Path("request_id") String rideId,
-            @Body SandboxRideRequestParameters sandboxRideRequestParameters,
-            Callback<Void> callback);
+    Call<Void> updateSandboxRide(@Path("request_id") String rideId,
+                                 @Body SandboxRideRequestParameters sandboxRideRequestParameters);
 }

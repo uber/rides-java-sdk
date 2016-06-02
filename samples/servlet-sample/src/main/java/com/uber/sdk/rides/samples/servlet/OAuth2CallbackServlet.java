@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ package com.uber.sdk.rides.samples.servlet;
 
 import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
 import com.uber.sdk.rides.auth.OAuth2Credentials;
+import com.uber.sdk.rides.client.SessionConfiguration;
 
 import java.io.IOException;
 import java.util.Random;
@@ -44,7 +45,8 @@ public class OAuth2CallbackServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (oAuth2Credentials == null) {
-            oAuth2Credentials = Server.createOAuth2Credentials();
+            SessionConfiguration config = Server.createSessionConfiguration();
+            oAuth2Credentials = Server.createOAuth2Credentials(config);
         }
 
         HttpSession httpSession = req.getSession(true);

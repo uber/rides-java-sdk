@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,36 +20,23 @@
  * THE SOFTWARE.
  */
 
-package com.uber.sdk.rides.client;
+package com.uber.sdk.rides.client.internal;
 
-import com.uber.sdk.rides.client.error.ApiException;
-import com.uber.sdk.rides.client.error.NetworkException;
+public class PrimitiveModel {
 
-/**
- * Communicates responses from a server.  Only one method will be called in response
- * to a given request.
- */
-public interface Callback<T> {
+    private int someint;
+    private float somefloat;
+    private long somelong;
 
-    /**
-     * Successful HTTP response.
-     * @param t The model returned by the request.
-     * @param response The HTTP response to the request.
-     */
-    void success(T t, Response<T> response);
+    public int getSomeint() {
+        return someint;
+    }
 
-    /**
-     * Unsuccessful HTTP response due to network failure.
-     */
-    void failure(NetworkException exception);
+    public float getSomefloat() {
+        return somefloat;
+    }
 
-    /**
-     * Unsuccessful HTTP response due to a non-2XX status code.
-     */
-    void failure(ApiException exception);
-
-    /**
-     * An unexpected exception due that should be rethrown in your application.
-     */
-    void failure(Throwable exception);
+    public long getSomelong() {
+        return somelong;
+    }
 }

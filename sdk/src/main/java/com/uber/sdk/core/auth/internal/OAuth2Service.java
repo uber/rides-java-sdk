@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,36 +20,18 @@
  * THE SOFTWARE.
  */
 
-package com.uber.sdk.rides.client;
+package com.uber.sdk.core.auth.internal;
 
-import javax.annotation.Nonnull;
+import com.uber.sdk.core.auth.AccessToken;
 
-/**
- * An HTTP Header
- */
-public class Header {
+import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.POST;
 
-    private final String name;
-    private final String value;
-
-    public Header(@Nonnull String name, @Nonnull String value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    /**
-     * Gets the name of the Header
-     */
-    @Nonnull
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Gets the value of the Header
-     */
-    @Nonnull
-    public String getValue() {
-        return value;
-    }
+public interface OAuth2Service {
+    @FormUrlEncoded
+    @POST("token")
+    Call<AccessToken> refresh(@Field("refresh_token") String refreshToken,
+                              @Field("client_id") String clientId);
 }

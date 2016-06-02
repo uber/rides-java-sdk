@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Uber Technologies, Inc.
+ * Copyright (c) 2016 Uber Technologies, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,42 +22,48 @@
 
 package com.uber.sdk.rides.client.error;
 
-import com.google.common.collect.ImmutableList;
-import com.uber.sdk.rides.client.Response;
-
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Represents an error returned by the API.
+ * Represents an error response from the Uber API.
  */
-public class ApiException extends RuntimeException {
+public final class ApiError {
 
-    private final Response response;
-    private final List<UberError> errors;
+    @Nullable
+    private final Meta meta;
+    @Nonnull
+    private final List<ClientError> errors;
 
-    public ApiException(String message, @Nullable Throwable exception,
-            @Nonnull Response response, @Nonnull List<UberError> errors) {
-        super(message, exception);
-        this.response = response;
-        this.errors = ImmutableList.copyOf(errors);
+    public ApiError(@Nullable Meta meta, @Nonnull List<ClientError> clientErrors) {
+        this.meta = meta;
+        this.errors = clientErrors;
+    }
+
+    ApiError(@Nonnull CompatibilityApiError oldApiError, int statusCode) {
+        this(oldApiError.code, statusCode, oldApiError.message);
+    }
+
+    ApiError(@Nullable String code, int statusCode, @Nullable String message) {
+        this(null, Collections.singletonList(new ClientError(code, statusCode, message)));
     }
 
     /**
-     * Gets the response from the server
+     * @return the {@link Meta} information about the error.
      */
-    @Nonnull
-    public Response getResponse() {
-        return response;
+    @Nullable
+    public Meta getMeta() {
+        return meta;
     }
 
     /**
-     * A list of errors detailing what caused this ApiException.
+     * @return a list of {@link ClientError}s that occurred.
      */
     @Nonnull
-    public List<UberError> getErrors() {
+    public List<ClientError> getClientErrors() {
         return errors;
     }
 }
