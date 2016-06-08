@@ -14,7 +14,7 @@ Note: Using Android? Be sure to checkout the [Uber Android SDK](github.com/uber/
 If using Gradle, add this to your project’s `build.gradle` file:
 ```gradle
 dependencies {
-    compile 'com.uber.sdk:rides:0.5.0'
+    compile 'com.uber.sdk:rides:0.5.1'
 }
 ```
 
@@ -24,7 +24,7 @@ If using Maven, add this to your project's `pom.xml` file:
 <dependency>
   <groupId>com.uber.sdk</groupId>
   <artifactId>rides</artifactId>
-  <version>0.5.0</version>
+  <version>0.5.1</version>
 </dependency>
 ```
 

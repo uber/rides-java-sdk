@@ -34,7 +34,7 @@ public class ApiInterceptor implements Interceptor {
     static final String HEADER_ACCESS_TOKEN = "Authorization";
 
 
-    static final String LIB_VERSION = "0.5.0";
+    static final String LIB_VERSION = "0.5.1";
     static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
     static final String HEADER_USER_AGENT = "X-Uber-User-Agent";
 

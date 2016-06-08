@@ -32,6 +32,7 @@ import okhttp3.Route;
 
 public class RefreshAuthenticator implements okhttp3.Authenticator {
 
+    static final String HEADER_INVALID_SCOPES = "X-Uber-Missing-Scopes";
     static final int MAX_RETRIES = 3;
     public final Authenticator authenticator;
 
@@ -41,11 +42,22 @@ public class RefreshAuthenticator implements okhttp3.Authenticator {
 
     @Override
     public Request authenticate(Route route, Response response) throws IOException {
-        if (authenticator.isRefreshable() && canRetry(response)) {
+        if (authenticator.isRefreshable() && canRefresh(response) && canRetry(response)) {
             return authenticator.refresh(response);
         }
 
         return null;
+    }
+
+    /**
+     * The Uber API returns invalid scopes as 401's and will migrate to 403's in the future.
+     * This is a temporary measure and will be updated in the future.
+     *
+     * @param response to check for {@link RefreshAuthenticator#HEADER_INVALID_SCOPES} header.
+     * @return true if a true 401 and can refresh, otherwise false
+     */
+    boolean canRefresh(Response response) {
+        return response.header(HEADER_INVALID_SCOPES) == null;
     }
 
 
