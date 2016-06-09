@@ -155,8 +155,22 @@ gradle.taskGraph.beforeTask { Task task ->
     }
 }
 
+task updateChangelog() << {
+    def newVersion = findProperty("version").replaceAll('-SNAPSHOT', '')
+    def changelog = rootProject.file('CHANGELOG.md')
+    def changelogText = changelog.text
+    if (!changelogText.startsWith("v${newVersion} -")) {
+        def updatedChangelog = "v${newVersion} - TBD\n"
+        def dashesCount = updatedChangelog.length()-1
+        updatedChangelog += "-"*dashesCount + "\n\n"
+
+        changelog.write(updatedChangelog + changelogText)
+    }
+}
+
 afterReleaseBuild.dependsOn ':sdk:uploadArchives'
 updateVersion.dependsOn ':githubRelease'
+commitNewVersion.dependsOn ':updateChangelog'
 githubRelease.dependsOn project(':samples').subprojects.collect { it.path + ':githubReleaseZip' }
 
 release {
@@ -195,6 +209,7 @@ distributions {
                 include 'releasenotes.gtpl'
                 include 'settings.gradle'
                 include 'gradle/'
+                include '.travis.yml'
             }
 
             from(rootDir) {

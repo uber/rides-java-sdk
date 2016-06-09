@@ -1,5 +1,8 @@
-v0.5.1 - 6/7/2016
+v0.5.2 - TBD
 ------------
+
+v0.5.1 - 6/7/2016
+-----------------
 ### Fixed
  - [Issue #14](https://github.com/uber/rides-java-sdk/issues/14) Adjust RefreshAuthenticator to ignore Invalid scope
 

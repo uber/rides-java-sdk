@@ -1,4 +1,4 @@
-# Uber Rides Java SDK (Beta)
+# Uber Rides Java SDK (Beta) [![Build Status](https://travis-ci.org/uber/rides-java-sdk.svg?branch=master)](https://travis-ci.org/uber/rides-java-sdk)
 This SDK helps your Java App make HTTP requests to the Uber Rides API.
 
 ## Setup
@@ -6,7 +6,7 @@ This SDK helps your Java App make HTTP requests to the Uber Rides API.
 ### Installing
 
 #### Before you begin
-Register your app in the [Uber developer dashboard](https://developer.uber.com/dashboard). Notice that the app gets a client ID, secret, and server token required for authenticating with the API. 
+Register your app in the [Uber developer dashboard](https://developer.uber.com/dashboard). Notice that the app gets a client ID, secret, and server token required for authenticating with the API.
 
 Note: Using Android? Be sure to checkout the [Uber Android SDK](github.com/uber/rides-android-sdk) in addition, which has native authentication mechanisms.
 
@@ -44,7 +44,7 @@ ServerTokenSession session = new ServerTokenSession(config));
 ```
 #### Create a session using the OAuth 2 flow
 In an OAuth session, the app first asks the user to authorize and then exchanges the authorization code for an access token from Uber.
-Note: Make sure the redirect URI matches the callback URI in the developer dashboard for the app. 
+Note: Make sure the redirect URI matches the callback URI in the developer dashboard for the app.
 
 **Step 1**. Create an OAuth2Credentials object with your client ID, client secret, scopes, and a redirect callback URI to capture the user’s authorization code.
 ```java
@@ -54,13 +54,13 @@ SessionConfiguration config = new SessionConfiguration.Builder()
     .setScopes(yourScopes)
     .setRedirectUri(redirectUri)
     .build();
-    
+
 OAuth2Credentials credentials = new OAuth2Credentials.Builder()
     .setSessionConfiguration(config)
     .build();
-    
+
 ```
-**Step 2**. Navigate the user to the authorization URL from the OAuth2Credentials object. 
+**Step 2**. Navigate the user to the authorization URL from the OAuth2Credentials object.
 ```java
 String authorizationUrl = credentials.getAuthorizationUrl();
 ```  
