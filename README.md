@@ -1,22 +1,28 @@
 # Uber Rides Java SDK (Beta) [![Build Status](https://travis-ci.org/uber/rides-java-sdk.svg?branch=master)](https://travis-ci.org/uber/rides-java-sdk)
 This SDK helps your Java App make HTTP requests to the Uber Rides API.
 
+## Prerequisites
+- Dependency manager: Gradle or Maven
+- Register your app in the [Uber developer dashboard](https://developer.uber.com/dashboard). Notice that the app gets a client ID, secret, and server token required for authenticating with the API.
+
 ## Setup
 
 ### Installing
-
-#### Before you begin
-Register your app in the [Uber developer dashboard](https://developer.uber.com/dashboard). Notice that the app gets a client ID, secret, and server token required for authenticating with the API.
 
 Note: Using Android? Be sure to checkout the [Uber Android SDK](github.com/uber/rides-android-sdk) in addition, which has native authentication mechanisms.
 
 #### Gradle
 If using Gradle, add this to your project’s `build.gradle` file:
 ```gradle
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile 'com.uber.sdk:rides:0.5.1'
 }
 ```
+> Learn more about  [Gradle](http://gradle.org/getting-started-gradle-java/) and the [Eclipse integration](http://gradle.org/eclipse/).
 
 #### Maven
 If using Maven, add this to your project's `pom.xml` file:
@@ -40,7 +46,7 @@ SessionConfiguration config = new SessionConfiguration.Builder()
     .setServerToken("YOUR_SERVER_TOKEN")
     .build();
 
-ServerTokenSession session = new ServerTokenSession(config));
+ServerTokenSession session = new ServerTokenSession(config);
 ```
 #### Create a session using the OAuth 2 flow
 In an OAuth session, the app first asks the user to authorize and then exchanges the authorization code for an access token from Uber.
@@ -70,11 +76,12 @@ Credential credential = credentials.authenticate(authorizationCode, userId);
 ```
 **Step 4**. Create a session object using the credential object.
 ```java
-CredentialsSession session = new CredentialsSession(config, credential)
+CredentialsSession session = new CredentialsSession(config, credential);
 ```
-**Step 5**. Instantiate a service using a session to start making calls.
+#### Instantiate a service using a session
+With your session object, OAuth or server_token, you can instantiate the RidesService:
 ```java
-RidesService service = UberRidesApi.with(session).createService();
+RidesService service = UberRidesApi.with(session).build().createService();
 ```
 Note: Keep each user's access token in a secure data store. Reuse the same token to make API calls on behalf of your user without repeating the authorization flow each time they visit your app. The SDK handles the token refresh automatically when it makes API requests with an `UberRidesService`.
 
@@ -124,8 +131,8 @@ For full documentation, visit our [Developer Site](https://developer.uber.com/v1
 ### Get available products
 ```java
 // Get a list of products for a specific location in GPS coordinates, example: 37.79f, -122.39f.
-Response<List<Product>> response = service.getProducts(37.79f, -122.39f).execute();
-List<Product> products = response.body();
+Response<ProductsResponse> response = service.getProducts(37.79f, -122.39f).execute();
+ List<Product> products = response.body().getProducts();
 String productId = products.get(0).getProductId();
 ```
 
@@ -160,6 +167,9 @@ Response<Void> response = service.updateSandboxRide(rideId, rideParameters).exec
 A successful update returns a 204 for `response.code()`.
 
 Note: The `updateSandboxRide` method is not valid in the `PRODUCTION` `Environment`, where the ride status changes automatically. In a `PRODUCTION` `Environment`, the call will fail.
+
+## Methods provided by the SDK
+Check out the [method overview](methods.md) for the details.
 
 ## Getting Help
 Uber developers actively monitor the [uber-api tag](http://stackoverflow.com/questions/tagged/uber-api) on StackOverflow. If you need help installing or using the library, ask a question there. Make sure to tag your question with `uber-api` and `java`!

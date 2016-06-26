@@ -34,7 +34,7 @@ import static com.uber.sdk.core.auth.Scope.ScopeType.PRIVILEGED;
 
 /**
  * An Uber API scope. See
- * <a href="https://developer.uber.com/v1/api-reference/#scopes">Scopes</a> for more
+ * <a href="https://developer.uber.com/docs/rides/scopes">Scopes</a> for more
  * information.
  */
 public enum Scope {
