@@ -1,0 +1,11 @@
+{
+  "status": "processing",
+  "product_id": "a1111c8c-c720-46c3-8534-2fcdd730040d",
+  "request_id": "6a964a88-5ed9-49a0-9be9-dd09ed8c9d7a",
+  "driver": null,
+  "eta": null,
+  "location": null,
+  "vehicle": null,
+  "surge_multiplier": 1.0,
+  "shared": false
+}

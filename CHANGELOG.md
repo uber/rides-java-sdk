@@ -1,5 +1,7 @@
-v0.5.2 - TBD
+v0.5.2 - 7/11/2016
 ------------
+### Added
+- [Issue #22](https://github.com/uber/rides-java-sdk/issues/22) Support for Uber Pool
 
 v0.5.1 - 6/7/2016
 -----------------

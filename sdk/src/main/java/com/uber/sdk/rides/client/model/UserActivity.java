@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 
 /**
  * A user's activity. See
- * <a href="https://developer.uber.com/v1/endpoints/#user-activity-v1-2">User Activity</a> for more
+ * <a href="https://developer.uber.com/docs/rides/api/v12-history">User Activity</a> for more
  * information.
  */
 public class  UserActivity {
@@ -37,9 +37,13 @@ public class  UserActivity {
     private long request_time;
     private long start_time;
     private long end_time;
+    @Nullable
     private String product_id;
+    @Nullable
     private City start_city;
-    private float fare;
+    @Nullable
+    private Float fare;
+    @Nullable
     private String currency_code;
 
     /**
@@ -88,6 +92,7 @@ public class  UserActivity {
      * Unique identifier representing a specific product for a given latitude &amp; longitude. For
      * example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
      */
+    @Nullable
     public String getProductId() {
         return product_id;
     }
@@ -124,6 +129,7 @@ public class  UserActivity {
      */
     public static class City {
 
+        @Nullable
         private String display_name;
         private float latitude;
         private float longitude;
@@ -131,6 +137,7 @@ public class  UserActivity {
         /**
          * The display name of the city.
          */
+        @Nullable
         public String getDisplayName() {
             return display_name;
         }

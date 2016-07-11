@@ -22,14 +22,13 @@
 
 package com.uber.sdk.rides.client.model;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * A receipt for a completed request.
  * See
- * <a href="https://developer.uber.com/docs/v1-requests-receipt">Ride Request Receipt</a>
+ * <a href="https://developer.uber.com/docs/rides/api/v1-requests-receipt">Ride Request Receipt</a>
  * for more information.
  */
 public class RideReceipt {
@@ -43,6 +42,7 @@ public class RideReceipt {
     private String total_charged;
     @Nullable
     private Float total_owed;
+    @Nullable
     private String currency_code;
     private String duration;
     private String distance;
@@ -111,6 +111,7 @@ public class RideReceipt {
     /**
      * Gets the ISO 4217 currency code.
      */
+    @Nullable
     public String getCurrencyCode() {
         return currency_code;
     }

@@ -22,16 +22,19 @@
 
 package com.uber.sdk.rides.client.model;
 
+import javax.annotation.Nullable;
+
 /**
  * An estimated time for a product on the Uber platform. See
- * <a href="https://developer.uber.com/v1/endpoints/#time-estimates">Price Estimates</a>
+ * <a href="https://developer.uber.com/docs/rides/api/v1-estimates-time">Time Estimates</a>
  * for more information.
  */
 public class TimeEstimate {
 
     private String product_id;
     private String display_name;
-    private int estimate;
+    @Nullable
+    private Integer estimate;
 
     /**
      * Unique identifier representing a specific product for a given latitude &amp; longitude. For
@@ -51,7 +54,8 @@ public class TimeEstimate {
     /**
      * ETA for the product (in seconds). Always show estimate in minutes.
      */
-    public int getEstimate() {
+    @Nullable
+    public Integer getEstimate() {
         return estimate;
     }
 }

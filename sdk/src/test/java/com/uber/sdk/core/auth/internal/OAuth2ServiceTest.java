@@ -22,14 +22,11 @@
 
 package com.uber.sdk.core.auth.internal;
 
-import com.github.tomakehurst.wiremock.common.ConsoleNotifier;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.squareup.moshi.Moshi;
+import com.uber.sdk.WireMockTest;
 import com.uber.sdk.core.auth.AccessToken;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 import okhttp3.OkHttpClient;
@@ -42,21 +39,14 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class OAuth2ServiceTest {
+public class OAuth2ServiceTest extends WireMockTest {
+
     private static final String REFRESH_TOKEN = "RANDOM1234REFRESHTOKEN";
     private static final String CLIENT_ID = "MYCLIENTID123";
     private static final String REQUEST_BODY = "refresh_token=" + REFRESH_TOKEN + "&client_id=" + CLIENT_ID;
-
-    private static WireMockConfiguration WIRE_MOCK_CONFIG = wireMockConfig()
-            .notifier(new ConsoleNotifier(true))
-            .dynamicPort();
-
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(WIRE_MOCK_CONFIG);
 
     private OAuth2Service oAuth2Service;
 

@@ -22,15 +22,18 @@
 
 package com.uber.sdk.rides.client.model;
 
+import javax.annotation.Nullable;
+
 /**
  * A user's Payment Method. See
- * <a href="https://developer.uber.com/docs/v1-payment-methods-details">Payment Methods</a>
+ * <a href="https://developer.uber.com/docs/rides/api/v1-payment-methods">Payment Methods</a>
  * for more information.
  */
 public class PaymentMethod {
 
     private String payment_method_id;
     private String type;
+    @Nullable
     private String description;
 
     /**
@@ -52,6 +55,7 @@ public class PaymentMethod {
     /**
      * Gets the description of a Payment Method.
      */
+    @Nullable
     public String getDescription() {
         return description;
     }

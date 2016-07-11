@@ -34,33 +34,52 @@ import javax.annotation.Nullable;
  */
 public class RideRequestParameters {
 
-    @Nullable private String product_id;
-    @Nullable private Float start_latitude;
-    @Nullable private Float start_longitude;
-    @Nullable private String start_nickname;
-    @Nullable private String start_address;
-    @Nullable private String start_place_id;
-    @Nullable private Float end_latitude;
-    @Nullable private Float end_longitude;
-    @Nullable private String end_nickname;
-    @Nullable private String end_address;
-    @Nullable private String end_place_id;
-    @Nullable private String surge_confirmation_id;
-    @Nullable private String payment_method_id;
+    @Nullable
+    private String product_id;
+    @Nullable
+    private Float start_latitude;
+    @Nullable
+    private Float start_longitude;
+    @Nullable
+    private String start_nickname;
+    @Nullable
+    private String start_address;
+    @Nullable
+    private String start_place_id;
+    @Nullable
+    private Float end_latitude;
+    @Nullable
+    private Float end_longitude;
+    @Nullable
+    private String end_nickname;
+    @Nullable
+    private String end_address;
+    @Nullable
+    private String end_place_id;
+    @Nullable
+    private String surge_confirmation_id;
+    @Nullable
+    private String payment_method_id;
+    @Nullable
+    private Integer seat_count;
+    @Nullable
+    private String fare_id;
 
     private RideRequestParameters(@Nullable String productId,
-            @Nullable Float startLatitude,
-            @Nullable Float startLongitude,
-            @Nullable String startNickname,
-            @Nullable String startAddress,
-            @Nullable String startPlaceId,
-            @Nullable Float endLatitude,
-            @Nullable Float endLongitude,
-            @Nullable String endNickname,
-            @Nullable String endAddress,
-            @Nullable String endPlaceId,
-            @Nullable String surgeConfirmationId,
-            @Nullable String paymentMethodId) {
+                                  @Nullable Float startLatitude,
+                                  @Nullable Float startLongitude,
+                                  @Nullable String startNickname,
+                                  @Nullable String startAddress,
+                                  @Nullable String startPlaceId,
+                                  @Nullable Float endLatitude,
+                                  @Nullable Float endLongitude,
+                                  @Nullable String endNickname,
+                                  @Nullable String endAddress,
+                                  @Nullable String endPlaceId,
+                                  @Nullable String surgeConfirmationId,
+                                  @Nullable String paymentMethodId,
+                                  @Nullable Integer seatCount,
+                                  @Nullable String fareId) {
         this.product_id = productId;
         this.start_latitude = startLatitude;
         this.start_longitude = startLongitude;
@@ -74,6 +93,8 @@ public class RideRequestParameters {
         this.end_place_id = endPlaceId;
         this.surge_confirmation_id = surgeConfirmationId;
         this.payment_method_id = paymentMethodId;
+        this.seat_count = seatCount;
+        this.fare_id = fareId;
     }
 
     /**
@@ -81,19 +102,72 @@ public class RideRequestParameters {
      */
     public static class Builder {
 
-        @Nullable private String productId;
-        @Nullable private Float startLatitude;
-        @Nullable private Float startLongitude;
-        @Nullable private String startNickname;
-        @Nullable private String startAddress;
-        @Nullable private String startPlaceId;
-        @Nullable private Float endLatitude;
-        @Nullable private Float endLongitude;
-        @Nullable private String endNickname;
-        @Nullable private String endAddress;
-        @Nullable private String endPlaceId;
-        @Nullable private String surgeConfirmationId;
-        @Nullable private String paymentMethodId;
+        @Nullable
+        private String productId;
+        @Nullable
+        private Float startLatitude;
+        @Nullable
+        private Float startLongitude;
+        @Nullable
+        private String startNickname;
+        @Nullable
+        private String startAddress;
+        @Nullable
+        private String startPlaceId;
+        @Nullable
+        private Float endLatitude;
+        @Nullable
+        private Float endLongitude;
+        @Nullable
+        private String endNickname;
+        @Nullable
+        private String endAddress;
+        @Nullable
+        private String endPlaceId;
+        @Nullable
+        private String surgeConfirmationId;
+        @Nullable
+        private String paymentMethodId;
+        @Nullable
+        private Integer seatCount;
+        @Nullable
+        private String fareId;
+
+        public Builder() {
+        }
+
+        public Builder(
+                @Nullable String productId,
+                @Nullable Float startLatitude,
+                @Nullable Float startLongitude,
+                @Nullable String startNickname,
+                @Nullable String startAddress,
+                @Nullable String startPlaceId,
+                @Nullable Float endLatitude,
+                @Nullable Float endLongitude,
+                @Nullable String endNickname,
+                @Nullable String endAddress,
+                @Nullable String endPlaceId,
+                @Nullable String surgeConfirmationId,
+                @Nullable String paymentMethodId,
+                @Nullable Integer seatCount,
+                @Nullable String fareId) {
+            this.productId = productId;
+            this.startLatitude = startLatitude;
+            this.startLongitude = startLongitude;
+            this.startNickname = startNickname;
+            this.startAddress = startAddress;
+            this.startPlaceId = startPlaceId;
+            this.endLatitude = endLatitude;
+            this.endLongitude = endLongitude;
+            this.endNickname = endNickname;
+            this.endAddress = endAddress;
+            this.endPlaceId = endPlaceId;
+            this.surgeConfirmationId = surgeConfirmationId;
+            this.paymentMethodId = paymentMethodId;
+            this.seatCount = seatCount;
+            this.fareId = fareId;
+        }
 
         /**
          * Sets the unique ID of the product being requested. If none supplied, the cheapest product for the
@@ -229,6 +303,26 @@ public class RideRequestParameters {
             return this;
         }
 
+        /**
+         * Sets the number of seats required for this request.
+         *
+         * @param seatCount
+         */
+        public Builder setSeatCount(@Nullable Integer seatCount) {
+            this.seatCount = seatCount;
+            return this;
+        }
+
+        /**
+         * Sets the fare Id requested for this ride.
+         *
+         * @param fareId
+         */
+        public Builder setFareId(@Nullable String fareId) {
+            this.fareId = fareId;
+            return this;
+        }
+
         private void validate() {
             if (startPlaceId != null) {
                 if (startLatitude != null || startLongitude != null) {
@@ -270,8 +364,17 @@ public class RideRequestParameters {
                     endAddress,
                     endPlaceId,
                     surgeConfirmationId,
-                    paymentMethodId);
+                    paymentMethodId,
+                    seatCount,
+                    fareId);
         }
+    }
+
+    @Nonnull
+    public Builder newBuilder() {
+        return new Builder(product_id, start_latitude, start_longitude, start_nickname, start_address, start_place_id,
+                end_latitude, end_longitude, end_nickname, end_address, end_place_id, surge_confirmation_id,
+                payment_method_id, seat_count, fare_id);
     }
 
     /**
@@ -384,5 +487,22 @@ public class RideRequestParameters {
     @Nullable
     public String getPaymentMethodId() {
         return payment_method_id;
+    }
+
+    /**
+     * Gets the number of seats required for this Ride Request.
+     */
+    @Nullable
+    public Integer getSeatCount() {
+        return seat_count;
+    }
+
+    /**
+     * Gets the fare ID to be used for this Ride Request, shared ride (Uber Pool) will return this
+     * otherwise it will be null.
+     */
+    @Nullable
+    public String getFareId() {
+        return fare_id;
     }
 }

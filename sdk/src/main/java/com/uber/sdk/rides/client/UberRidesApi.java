@@ -24,16 +24,14 @@ package com.uber.sdk.rides.client;
 
 import com.squareup.moshi.Moshi;
 import com.uber.sdk.rides.client.internal.ApiInterceptor;
-import com.uber.sdk.rides.client.internal.PrimitiveAdapter;
 import com.uber.sdk.rides.client.internal.RefreshAuthenticator;
 import com.uber.sdk.rides.client.services.RidesService;
-
-import javax.annotation.Nonnull;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
+
+import javax.annotation.Nonnull;
 
 public class UberRidesApi {
 
@@ -128,7 +126,7 @@ public class UberRidesApi {
         }
 
         Retrofit createRetrofit(OkHttpClient client, Session session) {
-            Moshi moshi = new Moshi.Builder().add(new PrimitiveAdapter()).build();
+            Moshi moshi = new Moshi.Builder().build();
 
             return new Retrofit.Builder()
                     .addConverterFactory(MoshiConverterFactory.create(moshi))

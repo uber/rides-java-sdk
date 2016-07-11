@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 
 /**
  * An estimate for a ride. See
- * <a href="https://developer.uber.com/v1/endpoints/#request-estimate">Request Estimate</a>
+ * <a href="https://developer.uber.com/docs/rides/api/v1-requests-estimate">Request Estimate</a>
  * for more information.
  */
 public class RideEstimate {
@@ -34,14 +34,15 @@ public class RideEstimate {
     private Price price;
     @Nullable
     private Trip trip;
-    private int pickup_estimate;
+    @Nullable
+    private Integer pickup_estimate;
 
     /**
      * Details of the estimated fare.
      */
     public static class Price {
-
-        private int minimum;
+        @Nullable
+        private Integer minimum;
         @Nullable
         private String surge_confirmation_href;
         @Nullable
@@ -56,11 +57,14 @@ public class RideEstimate {
         private String display;
         @Nullable
         private String currency_code;
+        @Nullable
+        private String fare_id;
 
         /**
          * The minimum price of the ride.
          */
-        public int getMinimum() {
+        @Nullable
+        public Integer getMinimum() {
             return minimum;
         }
 
@@ -120,6 +124,15 @@ public class RideEstimate {
         @Nullable
         public String getCurrencyCode() {
             return currency_code;
+        }
+
+        /**
+         * The fare ID assigned for this estimate. Must send this back when requesting a ride to ensure ride requested
+         * is based on this fare.
+         */
+        @Nullable
+        public String getFareId() {
+            return fare_id;
         }
     }
 

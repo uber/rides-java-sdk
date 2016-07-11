@@ -22,22 +22,29 @@
 
 package com.uber.sdk.rides.client.model;
 
+import javax.annotation.Nullable;
+
 /**
  * An estimated price for a product on the Uber platform. See
- * <a href="https://developer.uber.com/v1/endpoints/#price-estimates">Price Estimates</a>
+ * <a href="https://developer.uber.com/docs/rides/api/v1-estimates-price">Price Estimates</a>
  * for more information.
  */
 public class PriceEstimate {
 
     private String product_id;
+    @Nullable
     private String currency_code;
     private String display_name;
     private String estimate;
-    private int low_estimate;
-    private int high_estimate;
+    @Nullable
+    private Integer low_estimate;
+    @Nullable
+    private Integer high_estimate;
     private float surge_multiplier;
-    private int duration;
-    private float distance;
+    @Nullable
+    private Integer duration;
+    @Nullable
+    private Float distance;
 
     /**
      * Unique identifier representing a specific product for a given latitude &amp; longitude. For
@@ -50,6 +57,7 @@ public class PriceEstimate {
     /**
      * ISO 4217 currency code.
      */
+    @Nullable
     public String getCurrencyCode() {
         return currency_code;
     }
@@ -72,14 +80,16 @@ public class PriceEstimate {
     /**
      * Lower bound of the estimated price.
      */
-    public int getLowEstimate() {
+    @Nullable
+    public Integer getLowEstimate() {
         return low_estimate;
     }
 
     /**
      * Upper bound of the estimated price.
      */
-    public int getHighEstimate() {
+    @Nullable
+    public Integer getHighEstimate() {
         return high_estimate;
     }
 
@@ -94,14 +104,16 @@ public class PriceEstimate {
     /**
      * Expected activity duration (in seconds). Always show duration in minutes.
      */
-    public int getDuration() {
+    @Nullable
+    public Integer getDuration() {
         return duration;
     }
 
     /**
      * Expected activity distance (in miles).
      */
-    public float getDistance() {
+    @Nullable
+    public Float getDistance() {
         return distance;
     }
 }

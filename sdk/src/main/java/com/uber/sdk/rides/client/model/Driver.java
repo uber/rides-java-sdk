@@ -22,13 +22,17 @@
 
 package com.uber.sdk.rides.client.model;
 
+import javax.annotation.Nullable;
+
 /**
  * The vehicle's driver.
  */
 public class Driver {
 
     private String phone_number;
-    private float rating;
+    @Nullable
+    private Float rating;
+    @Nullable
     private String picture_url;
     private String name;
 
@@ -42,13 +46,15 @@ public class Driver {
     /**
      * The driver's star rating out of 5 stars.
      */
-    public float getRating() {
+    @Nullable
+    public Float getRating() {
         return rating;
     }
 
     /**
      * The URL to the photo of the driver.
      */
+    @Nullable
     public String getPictureUrl() {
         return picture_url;
     }

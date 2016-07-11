@@ -22,6 +22,8 @@
 
 package com.uber.sdk.rides.client.model;
 
+import javax.annotation.Nullable;
+
 /**
  * An ongoing or completed ride. See
  * <a href="https://developer.uber.com/v1/endpoints/#request-details">Requests</a>
@@ -32,10 +34,13 @@ public class Ride {
     private String request_id;
     private String status;
     private Driver driver;
-    private int eta;
+    @Nullable
+    private Integer eta;
     private float surge_multiplier;
     private Location location;
     private Vehicle vehicle;
+    private String product_id;
+    private boolean shared;
 
     /**
      * The unique ID of the ride.
@@ -61,6 +66,7 @@ public class Ride {
     /**
      * The estimated time of vehicle arrival in minutes.
      */
+    @Nullable
     public Integer getEta() {
         return eta;
     }
@@ -85,5 +91,19 @@ public class Ride {
      */
     public Float getSurgeMultiplier() {
         return surge_multiplier;
+    }
+
+    /**
+     * The product ID associated to the Ride.
+     */
+    public String getProductId() {
+        return product_id;
+    }
+
+    /**
+     * Indicates whether the ride is a shared ride or not. UberPool is an example of a shared ride.
+     */
+    public boolean isShared() {
+        return shared;
     }
 }

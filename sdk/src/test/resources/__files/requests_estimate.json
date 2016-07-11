@@ -1,0 +1,44 @@
+{
+  "price": {
+    "surge_confirmation_href": null,
+    "high_estimate": 10,
+    "surge_confirmation_id": null,
+    "minimum": 7,
+    "low_estimate": 7,
+    "fare_breakdown": [
+      {
+        "high_amount": 2.0,
+        "display_amount": "2.00",
+        "display_name": "Base Fare",
+        "low_amount": 2.0
+      },
+      {
+        "high_amount": 2.59,
+        "display_amount": "1.94-2.59",
+        "display_name": "Distance",
+        "low_amount": 1.94
+      },
+      {
+        "high_amount": 1.55,
+        "display_amount": "1.55",
+        "display_name": "Booking Fee",
+        "low_amount": 1.55
+      },
+      {
+        "high_amount": 3.08,
+        "display_amount": "2.31-3.08",
+        "display_name": "Time",
+        "low_amount": 2.31
+      }
+    ],
+    "surge_multiplier": 1.0,
+    "display": "$7-10",
+    "currency_code": "USD"
+  },
+  "trip": {
+    "distance_unit": "mile",
+    "duration_estimate": 720,
+    "distance_estimate": 1.88
+  },
+  "pickup_estimate": 2
+}

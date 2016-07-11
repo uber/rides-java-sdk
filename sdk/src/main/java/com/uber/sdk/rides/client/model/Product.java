@@ -34,6 +34,7 @@ public class Product {
     private String description;
     private int capacity;
     private String image;
+    private boolean shared;
 
     /**
      * A unique identifier representing a specific product for a given latitude &amp; longitude. For
@@ -69,6 +70,10 @@ public class Product {
      */
     public String getImage() {
         return image;
+    }
+
+    public boolean isShared() {
+        return shared;
     }
 }
 

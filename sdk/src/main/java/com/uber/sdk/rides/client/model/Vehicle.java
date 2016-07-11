@@ -22,6 +22,8 @@
 
 package com.uber.sdk.rides.client.model;
 
+import javax.annotation.Nullable;
+
 /**
  * An Uber vehicle.
  */
@@ -29,7 +31,9 @@ public class Vehicle {
 
     private String make;
     private String model;
+    @Nullable
     private String license_plate;
+    @Nullable
     private String picture_url;
 
     /**
@@ -49,6 +53,7 @@ public class Vehicle {
     /**
      * The license plate number of the vehicle.
      */
+    @Nullable
     public String getLicensePlate() {
         return license_plate;
     }
@@ -56,6 +61,7 @@ public class Vehicle {
     /**
      * The URL to the photo of the vehicle.
      */
+    @Nullable
     public String getPictureUrl() {
         return picture_url;
     }

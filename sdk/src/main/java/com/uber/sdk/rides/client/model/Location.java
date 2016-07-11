@@ -31,7 +31,8 @@ public class Location {
 
     private float latitude;
     private float longitude;
-    @Nullable private Integer bearing;
+    @Nullable
+    private Integer bearing;
 
     /**
      * Location must be created with a non-null latitude and longitude.

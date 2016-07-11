@@ -1,0 +1,21 @@
+{
+  "price": {
+    "surge_confirmation_href": null,
+    "high_estimate": 5,
+    "fare_id": "2455e0e040da58e77babe4e32e4c771f89faf87778a95bc5aec2be406865ad30",
+    "surge_confirmation_id": null,
+    "minimum": null,
+    "expires_at": 1466106805,
+    "low_estimate": 4,
+    "fare_breakdown": [],
+    "surge_multiplier": 1.0,
+    "display": "$4.87",
+    "currency_code": "USD"
+  },
+  "trip": {
+    "distance_unit": "mile",
+    "duration_estimate": 720,
+    "distance_estimate": 1.88
+  },
+  "pickup_estimate": 4
+}
