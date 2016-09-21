@@ -31,8 +31,33 @@ import javax.annotation.Nullable;
  */
 public class Ride {
 
+    /**
+     * Represents all possible Ride statuses
+     */
+    public enum Status {
+        PROCESSING("processing"),
+        NO_DRIVERS_AVAILABLE("no_drivers_available"),
+        ACCEPTED("accepted"),
+        ARRIVING("arriving"),
+        IN_PROGRESS("in_progress"),
+        DRIVER_CANCELED("driver_canceled"),
+        RIDER_CANCELED("rider_canceled"),
+        COMPLETED("completed");
+
+        private String value;
+
+        Status(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+    }
+
     private String request_id;
-    private String status;
+    private Status status;
     private Driver driver;
     @Nullable
     private Integer eta;
@@ -52,7 +77,7 @@ public class Ride {
     /**
      * The status of the ride indicating state.
      */
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
