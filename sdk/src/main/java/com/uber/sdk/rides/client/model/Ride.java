@@ -22,6 +22,8 @@
 
 package com.uber.sdk.rides.client.model;
 
+import com.squareup.moshi.Json;
+
 import javax.annotation.Nullable;
 
 /**
@@ -35,24 +37,19 @@ public class Ride {
      * Represents all possible Ride statuses
      */
     public enum Status {
-        PROCESSING("processing"),
-        NO_DRIVERS_AVAILABLE("no_drivers_available"),
-        ACCEPTED("accepted"),
-        ARRIVING("arriving"),
-        IN_PROGRESS("in_progress"),
-        DRIVER_CANCELED("driver_canceled"),
-        RIDER_CANCELED("rider_canceled"),
-        COMPLETED("completed");
+        @Json(name = "processing") PROCESSING("processing"),
+        @Json(name = "no_drivers_available") NO_DRIVERS_AVAILABLE("no_drivers_available"),
+        @Json(name = "accepted") ACCEPTED("accepted"),
+        @Json(name = "arriving") ARRIVING("arriving"),
+        @Json(name = "in_progress") IN_PROGRESS("in_progress"),
+        @Json(name = "driver_canceled") DRIVER_CANCELED("driver_canceled"),
+        @Json(name = "rider_canceled") RIDER_CANCELED("rider_canceled"),
+        @Json(name = "completed") COMPLETED("completed");
 
         private String value;
 
         Status(String value) {
             this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
         }
     }
 
