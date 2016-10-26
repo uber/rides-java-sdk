@@ -135,7 +135,7 @@ public class RidesServiceTest extends WireMockTest {
 
         final Ride ride = service.requestRide(createRideRequest()).execute().body();
 
-        assertThat(ride.getStatus()).isEqualTo("processing");
+        assertThat(ride.getStatus()).isEqualTo(Ride.Status.PROCESSING);
         assertThat(ride.getProductId()).isEqualTo(UBER_X_PRODUCT_ID);
         assertThat(ride.getRideId()).isNotEmpty();
         assertThat(ride.isShared()).isFalse();
@@ -149,7 +149,7 @@ public class RidesServiceTest extends WireMockTest {
                 .willReturn(aResponse().withBodyFile("requests_current_UberPool.json")));
 
         final Ride ride = service.requestRide(createUberPoolRideRequest()).execute().body();
-        assertThat(ride.getStatus()).isEqualTo("processing");
+        assertThat(ride.getStatus()).isEqualTo(Ride.Status.PROCESSING);
 
         assertThat(ride.getProductId()).isEqualTo(UBER_POOL_PRODUCT_ID);
         assertThat(ride.getRideId()).isNotEmpty();
