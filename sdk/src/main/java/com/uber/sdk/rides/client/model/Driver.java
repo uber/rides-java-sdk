@@ -31,6 +31,8 @@ public class Driver {
 
     private String phone_number;
     @Nullable
+    private String sms_number;
+    @Nullable
     private Float rating;
     @Nullable
     private String picture_url;
@@ -41,6 +43,14 @@ public class Driver {
      */
     public String getPhoneNumber() {
         return phone_number;
+    }
+
+    /**
+     * The formatted sms number for contacting the driver.
+     */
+    @Nullable
+    public String getSmsNumber() {
+        return sms_number;
     }
 
     /**
