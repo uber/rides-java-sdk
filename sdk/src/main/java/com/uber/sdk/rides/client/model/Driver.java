@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 public class Driver {
 
     private String phone_number;
+    @Nullable
     private String sms_number;
     @Nullable
     private Float rating;
@@ -47,6 +48,7 @@ public class Driver {
     /**
      * The formatted sms number for contacting the driver.
      */
+    @Nullable
     public String getSmsNumber() {
         return sms_number;
     }
