@@ -1,17 +1,15 @@
 package com.uber.sdk.rides.client.services;
 
-import com.squareup.moshi.Moshi;
 import com.uber.sdk.WireMockTest;
+import com.uber.sdk.rides.client.ServerTokenSession;
+import com.uber.sdk.rides.client.SessionConfiguration;
+import com.uber.sdk.rides.client.UberRidesApi;
 import com.uber.sdk.rides.client.model.Product;
 import com.uber.sdk.rides.client.model.Ride;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideRequestParameters;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import org.junit.Before;
 import org.junit.Test;
-import retrofit2.Retrofit;
-import retrofit2.converter.moshi.MoshiConverterFactory;
 
 import java.util.List;
 
@@ -35,16 +33,12 @@ public class RidesServiceTest extends WireMockTest {
     @Before
     public void setUp() throws Exception {
 
-        service = new Retrofit.Builder()
-                .addConverterFactory(MoshiConverterFactory.create(new Moshi.Builder().build()))
-                .client(new OkHttpClient.Builder()
-                        .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                        .build())
-                .baseUrl("http://localhost:" + wireMockRule.port())
-                .build()
-                .create(RidesService.class);
+        SessionConfiguration sessionConfig = new SessionConfiguration.Builder()
+            .setClientId("clientId")
+            .setBaseUrl("http://localhost:" + wireMockRule.port()).build();
+        ServerTokenSession session = new ServerTokenSession(sessionConfig);
 
-
+        service = UberRidesApi.with(session).build().createService();
     }
 
     private static RideRequestParameters createRideRequest() {
