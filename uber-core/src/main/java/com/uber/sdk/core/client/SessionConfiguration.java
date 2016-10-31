@@ -83,6 +83,7 @@ public class SessionConfiguration implements Serializable {
         private Collection<Scope> scopes;
         private Collection<String> customScopes;
         private Locale locale;
+        private String baseUrl;
 
         /**
          * The Uber API requires a registered clientId to be sent along with API requests and Deeplinks.
@@ -139,6 +140,11 @@ public class SessionConfiguration implements Serializable {
          */
         public Builder setEnvironment(@Nonnull Environment environment) {
             this.environment = environment;
+            return this;
+        }
+
+        public Builder setBaseUrl(@Nonnull String url) {
+            this.baseUrl = url;
             return this;
         }
 
@@ -208,6 +214,7 @@ public class SessionConfiguration implements Serializable {
                     redirectUri,
                     DEFAULT,
                     environment,
+                    baseUrl,
                     scopes,
                     customScopes,
                     locale);
@@ -220,6 +227,7 @@ public class SessionConfiguration implements Serializable {
     private final String redirectUri;
     private final EndpointRegion endpointRegion;
     private final Environment environment;
+    private final String baseUrl;
     private final Collection<Scope> scopes;
     private final Collection<String> customScopes;
     private final Locale locale;
@@ -230,6 +238,7 @@ public class SessionConfiguration implements Serializable {
                                    @Nonnull String redirectUri,
                                    @Nonnull EndpointRegion endpointRegion,
                                    @Nonnull Environment environment,
+                                   String baseUrl,
                                    @Nonnull Collection<Scope> scopes,
                                    @Nonnull Collection<String> customScopes,
                                    @Nonnull Locale locale) {
@@ -239,6 +248,7 @@ public class SessionConfiguration implements Serializable {
         this.redirectUri = redirectUri;
         this.endpointRegion = endpointRegion;
         this.environment = environment;
+        this.baseUrl = baseUrl;
         this.scopes = scopes;
         this.customScopes = customScopes;
         this.locale = locale;
@@ -304,7 +314,9 @@ public class SessionConfiguration implements Serializable {
      */
     @Nonnull
     public String getEndpointHost() {
-        return String.format("https://%s.%s", environment.subDomain, DEFAULT.getDomain());
+        return baseUrl != null ?
+                baseUrl :
+                String.format("https://%s.%s", environment.subDomain, DEFAULT.getDomain());
     }
 
     /**
@@ -312,7 +324,9 @@ public class SessionConfiguration implements Serializable {
      */
     @Nonnull
     public String getLoginHost() {
-        return String.format("https://login.%s", DEFAULT.getDomain());
+        return baseUrl != null ?
+                baseUrl :
+                String.format("https://login.%s", DEFAULT.getDomain());
     }
 
     /**

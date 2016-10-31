@@ -3,7 +3,6 @@ package com.uber.sdk.rides.client.services;
 import com.squareup.moshi.Moshi;
 import com.uber.sdk.core.client.internal.BigDecimalAdapter;
 import com.uber.sdk.rides.WireMockTest;
-import com.uber.sdk.rides.client.services.RidesService;
 import com.uber.sdk.rides.client.model.Product;
 import com.uber.sdk.rides.client.model.Ride;
 import com.uber.sdk.rides.client.model.RideEstimate;
