@@ -33,11 +33,8 @@ import java.util.List;
  */
 public class RideReceipt {
     private String request_id;
-    private List<Charge> charges;
     @Nullable
-    private Charge surge_charge;
     private List<Charge> charge_adjustments;
-    private String normal_fare;
     private String subtotal;
     private String total_charged;
     @Nullable
@@ -56,32 +53,10 @@ public class RideReceipt {
     }
 
     /**
-     * Gets the charges made against the rider.
-     */
-    public List<Charge> getCharges() {
-        return charges;
-    }
-
-    /**
-     * Gets the surge charge. May be {@code null} if surge pricing was not in effect.
-     */
-    @Nullable
-    public Charge getSurgeCharge() {
-        return surge_charge;
-    }
-
-    /**
      * Gets the adjustments made to the charges such as promotions, and fees.
      */
     public List<Charge> getChargeAdjustments() {
         return charge_adjustments;
-    }
-
-    /**
-     * Gets the summation of the charges.
-     */
-    public String getNormalFare() {
-        return normal_fare;
     }
 
     /**

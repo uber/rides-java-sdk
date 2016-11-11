@@ -33,36 +33,22 @@ import javax.annotation.Nullable;
  */
 public class Ride {
 
-    /**
-     * Represents all possible Ride statuses
-     */
-    public enum Status {
-        @Json(name = "processing") PROCESSING("processing"),
-        @Json(name = "no_drivers_available") NO_DRIVERS_AVAILABLE("no_drivers_available"),
-        @Json(name = "accepted") ACCEPTED("accepted"),
-        @Json(name = "arriving") ARRIVING("arriving"),
-        @Json(name = "in_progress") IN_PROGRESS("in_progress"),
-        @Json(name = "driver_canceled") DRIVER_CANCELED("driver_canceled"),
-        @Json(name = "rider_canceled") RIDER_CANCELED("rider_canceled"),
-        @Json(name = "completed") COMPLETED("completed");
-
-        private String value;
-
-        Status(String value) {
-            this.value = value;
-        }
-    }
-
     private String request_id;
     private Status status;
+    @Nullable
     private Driver driver;
     @Nullable
-    private Integer eta;
-    private float surge_multiplier;
+    private Float surge_multiplier;
+    @Nullable
     private Location location;
+    @Nullable
     private Vehicle vehicle;
     private String product_id;
     private boolean shared;
+    @Nullable
+    private Location pickup;
+    @Nullable
+    private Location destination;
 
     /**
      * The unique ID of the ride.
@@ -81,21 +67,15 @@ public class Ride {
     /**
      * The object that contains driver details.
      */
+    @Nullable
     public Driver getDriver() {
         return driver;
     }
 
     /**
-     * The estimated time of vehicle arrival in minutes.
-     */
-    @Nullable
-    public Integer getEta() {
-        return eta;
-    }
-
-    /**
      * The object that contains the location information of the vehicle and driver.
      */
+    @Nullable
     public Location getLocation() {
         return location;
     }
@@ -103,6 +83,7 @@ public class Ride {
     /**
      * The object that contains vehicle details.
      */
+    @Nullable
     public Vehicle getVehicle() {
         return vehicle;
     }
@@ -111,6 +92,7 @@ public class Ride {
      * The surge pricing multiplier used to calculate the increased price of a Request. A multiplier
      * of 1.0 means surge pricing is not in effect.
      */
+    @Nullable
     public Float getSurgeMultiplier() {
         return surge_multiplier;
     }
@@ -127,5 +109,35 @@ public class Ride {
      */
     public boolean isShared() {
         return shared;
+    }
+
+    @Nullable
+    public Location getPickup() {
+        return pickup;
+    }
+
+    @Nullable
+    public Location getDestination() {
+        return destination;
+    }
+
+    /**
+     * Represents all possible Ride statuses
+     */
+    public enum Status {
+        @Json(name = "processing") PROCESSING("processing"),
+        @Json(name = "no_drivers_available") NO_DRIVERS_AVAILABLE("no_drivers_available"),
+        @Json(name = "accepted") ACCEPTED("accepted"),
+        @Json(name = "arriving") ARRIVING("arriving"),
+        @Json(name = "in_progress") IN_PROGRESS("in_progress"),
+        @Json(name = "driver_canceled") DRIVER_CANCELED("driver_canceled"),
+        @Json(name = "rider_canceled") RIDER_CANCELED("rider_canceled"),
+        @Json(name = "completed") COMPLETED("completed");
+
+        private String value;
+
+        Status(String value) {
+            this.value = value;
+        }
     }
 }

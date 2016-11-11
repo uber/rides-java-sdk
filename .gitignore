@@ -2,6 +2,7 @@
 .project
 .settings
 eclipsebin
+.gradletasknamecache
 
 bin
 gen

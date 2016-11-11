@@ -22,21 +22,26 @@
 
 package com.uber.sdk.rides.client.internal;
 
-public class PrimitiveModel {
+import com.squareup.moshi.FromJson;
+import com.squareup.moshi.ToJson;
 
-    private int someint;
-    private float somefloat;
-    private long somelong;
+import java.math.BigDecimal;
 
-    public int getSomeint() {
-        return someint;
+import javax.annotation.Nullable;
+
+
+/**
+ * Adapter used to adapt floats to {@link java.math.BigDecimal}.
+ */
+public class BigDecimalAdapter {
+
+    @ToJson
+    public float toJson(BigDecimal bigDecimal) {
+        return bigDecimal.floatValue();
     }
 
-    public float getSomefloat() {
-        return somefloat;
-    }
-
-    public long getSomelong() {
-        return somelong;
+    @FromJson
+    public BigDecimal bigDecimalFromString(@Nullable Float value) {
+        return value != null ? new BigDecimal(value.toString()) : null;
     }
 }

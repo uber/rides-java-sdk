@@ -3,9 +3,18 @@
   "product_id": "a1111c8c-c720-46c3-8534-2fcdd730040d",
   "request_id": "6a964a88-5ed9-49a0-9be9-dd09ed8c9d7a",
   "driver": null,
-  "eta": null,
   "location": null,
   "vehicle": null,
+  "pickup":{
+    "latitude":37.7872486012,
+    "longitude":-122.4026315287,
+    "eta":5
+  },
+  "destination":{
+    "latitude":37.7766874,
+    "longitude":-122.394857,
+    "eta":19
+  },
   "surge_multiplier": 1.0,
   "shared": false
 }

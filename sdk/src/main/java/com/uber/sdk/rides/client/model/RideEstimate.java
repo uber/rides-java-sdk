@@ -22,6 +22,8 @@
 
 package com.uber.sdk.rides.client.model;
 
+import java.math.BigDecimal;
+
 import javax.annotation.Nullable;
 
 /**
@@ -31,16 +33,73 @@ import javax.annotation.Nullable;
  */
 public class RideEstimate {
 
-    private Price price;
+    @Nullable
+    private Fare fare;
+    @Nullable
+    private Estimate estimate;
     @Nullable
     private Trip trip;
     @Nullable
     private Integer pickup_estimate;
 
     /**
-     * Details of the estimated fare.
+     * Details of the fare for a product that uses up front pricing.
      */
-    public static class Price {
+    public static class Fare {
+        private String display;
+        @Nullable
+        private String fare_id;
+        @Nullable
+        private String currency_code;
+        @Nullable
+        private Long expires_at;
+        @Nullable
+        private BigDecimal value;
+
+        /**
+         * A String representing the fare, should be used to communicate to the user.
+         */
+        public String getDisplay() {
+            return display;
+        }
+
+        /**
+         * The unique identifier of this fare for a user. Null if metered.
+         */
+        @Nullable
+        public String getFareId() {
+            return fare_id;
+        }
+
+        /**
+         * ISO 4217 currency code.
+         */
+        @Nullable
+        public String getCurrencyCode() {
+            return currency_code;
+        }
+
+        /**
+         * The UNIX time this fare expires at, if after this a new fare should be generated.
+         */
+        @Nullable
+        public Long getExpiresAt() {
+            return expires_at;
+        }
+
+        /**
+         * The cost of this fare, to be paired with the currency code.
+         */
+        @Nullable
+        public BigDecimal getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Details of an estimate for a product that does not use up front pricing.
+     */
+    public static class Estimate {
         @Nullable
         private Integer minimum;
         @Nullable
@@ -50,9 +109,9 @@ public class RideEstimate {
         @Nullable
         private Float surge_multiplier;
         @Nullable
-        private Integer high_estimate;
+        private BigDecimal high_estimate;
         @Nullable
-        private Integer low_estimate;
+        private BigDecimal low_estimate;
         @Nullable
         private String display;
         @Nullable
@@ -98,7 +157,7 @@ public class RideEstimate {
          * Upper bound of the estimated price.
          */
         @Nullable
-        public Integer getHighEstimate() {
+        public BigDecimal getHighEstimate() {
             return high_estimate;
         }
 
@@ -106,7 +165,7 @@ public class RideEstimate {
          * Lower bound of the estimated price.
          */
         @Nullable
-        public Integer getLowEstimate() {
+        public BigDecimal getLowEstimate() {
             return low_estimate;
         }
 
@@ -168,10 +227,19 @@ public class RideEstimate {
     }
 
     /**
-     * Details of the estimated fare. If end location is omitted, only the minimum is returned.
+     * Details of the fare, if null, use {@link #getEstimate()}.
      */
-    public Price getPrice() {
-        return price;
+    @Nullable
+    public Fare getFare() {
+        return fare;
+    }
+
+    /**
+     * Details of the estimate, if null, use {@link #getFare()}.
+     */
+    @Nullable
+    public Estimate getEstimate() {
+        return estimate;
     }
 
     /**

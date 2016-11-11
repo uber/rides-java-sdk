@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static com.uber.sdk.rides.client.SessionConfiguration.EndpointRegion.CHINA;
 import static com.uber.sdk.rides.client.SessionConfiguration.Environment.PRODUCTION;
 import static com.uber.sdk.rides.client.SessionConfiguration.Environment.SANDBOX;
 import static junit.framework.Assert.assertEquals;
@@ -53,15 +52,6 @@ public class SessionConfigurationTest {
                 .setRedirectUri("redirectUri")
                 .build();
         assertEquals("redirectUri", config.getRedirectUri());
-    }
-
-    @Test
-    public void getEndpointRegion_whenSetOnBuilder_setsOnConfiguration() throws Exception {
-        SessionConfiguration config = new SessionConfiguration.Builder()
-                .setClientId("clientId")
-                .setEndpointRegion(CHINA)
-                .build();
-        assertEquals(CHINA, config.getEndpointRegion());
     }
 
     @Test
@@ -124,7 +114,7 @@ public class SessionConfigurationTest {
     }
 
     @Test
-    public void buildSession_whenProductionEnvAndNotChina_shouldGiveNonCnProductionEndpointHost() throws Exception {
+    public void buildSession_whenProductionEnv_shouldGiveProductionEndpointHost() throws Exception {
         SessionConfiguration sessionConfig = new SessionConfiguration.Builder()
                 .setClientId("clientId")
                 .setEnvironment(PRODUCTION).build();
@@ -132,29 +122,10 @@ public class SessionConfigurationTest {
     }
 
     @Test
-    public void buildSession_whenSandboxEnvAndNotChina_shouldGiveNonCnSandboxEndpointHost() throws Exception {
+    public void buildSession_whenSandboxEnv_shouldGiveSandboxEndpointHost() throws Exception {
         SessionConfiguration sessionConfig = new SessionConfiguration.Builder()
                 .setClientId("clientId")
                 .setEnvironment(SANDBOX).build();
         assertEquals("https://sandbox-api.uber.com", sessionConfig.getEndpointHost());
-    }
-
-    @Test
-    public void buildSession_whenProductionEnvAndInChina_shouldGiveChinaProductionEndpointHost() throws Exception {
-        SessionConfiguration sessionConfig = new SessionConfiguration.Builder()
-                .setClientId("clientId")
-                .setEnvironment(PRODUCTION)
-                .setEndpointRegion(CHINA)
-                .build();
-        assertEquals("https://api.uber.com.cn", sessionConfig.getEndpointHost());
-    }
-
-    @Test
-    public void buildSession_whenSandboxEnvAndInChina_shouldGiveChinaSandboxEndpointHost() throws Exception {
-        SessionConfiguration sessionConfig = new SessionConfiguration.Builder().setEnvironment(SANDBOX)
-                .setClientId("clientId")
-                .setEndpointRegion(CHINA)
-                .build();
-        assertEquals("https://sandbox-api.uber.com.cn", sessionConfig.getEndpointHost());
     }
 }

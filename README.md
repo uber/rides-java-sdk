@@ -8,13 +8,13 @@ This SDK helps your Java App make HTTP requests to the Uber Rides API.
 #### Before you begin
 Register your app in the [Uber developer dashboard](https://developer.uber.com/dashboard). Notice that the app gets a client ID, secret, and server token required for authenticating with the API. 
 
-Note: Using Android? Be sure to checkout the [Uber Android SDK](https://github.com/uber/rides-android-sdk) in addition, which has native authentication mechanisms.
+Note: Using Android? Be sure to checkout the [Uber Android SDK](github.com/uber/rides-android-sdk) in addition, which has native authentication mechanisms.
 
 #### Gradle
 If using Gradle, add this to your project’s `build.gradle` file:
 ```gradle
 dependencies {
-    compile 'com.uber.sdk:rides:0.5.2'
+    compile 'com.uber.sdk:rides:0.6.0'
 }
 ```
 
@@ -24,7 +24,7 @@ If using Maven, add this to your project's `pom.xml` file:
 <dependency>
   <groupId>com.uber.sdk</groupId>
   <artifactId>rides</artifactId>
-  <version>0.5.2</version>
+  <version>0.6.0</version>
 </dependency>
 ```
 

@@ -326,21 +326,31 @@ public class RideRequestParameters {
         private void validate() {
             if (startPlaceId != null) {
                 if (startLatitude != null || startLongitude != null) {
-                    throw new IllegalArgumentException("Exactly one of pickup place or pickup coordinates is required.");
+                    throw new IllegalArgumentException("Exactly one of pickup place or pickup " +
+                            "coordinates must be specified");
                 }
             } else {
                 if (startLatitude == null && startLongitude == null) {
-                    throw new IllegalArgumentException("Exactly one of pickup place or pickup coordinates is required.");
+                    throw new IllegalArgumentException("Exactly one of pickup place or pickup " +
+                            "coordinates must be specified");
                 } else if (startLatitude == null || startLongitude == null) {
-                    throw new IllegalArgumentException("Need both pickup latitude and pickup longitude");
+                    throw new IllegalArgumentException("If using coordinates, both pickup " +
+                            "latitude and pickup longitude must be present");
                 }
             }
 
-            if (endPlaceId != null && (endLatitude != null || endLongitude != null)) {
-                throw new IllegalArgumentException("Cannot have both dropoff place and dropoff coordinates");
+            if (endPlaceId != null) {
+                if (endLatitude != null || endLongitude != null) {
+                    throw new IllegalArgumentException("Exactly one of dropoff place or dropoff " +
+                            "coordinates must be specified.");
+                }
             } else {
-                if ((endLatitude != null && endLongitude == null) || (endLatitude == null && endLongitude != null)) {
-                    throw new IllegalArgumentException("Need both dropoff latitude and dropoff longitude");
+                if (endLatitude == null && endLongitude == null) {
+                    throw new IllegalArgumentException("Exactly one of dropoff place or dropoff " +
+                            "coordinates must be specified.");
+                } else if (endLatitude == null || endLongitude == null) {
+                    throw new IllegalArgumentException("If using coordinates, both dropoff " +
+                            "latitude and dropoff longitude must be present");
                 }
             }
         }

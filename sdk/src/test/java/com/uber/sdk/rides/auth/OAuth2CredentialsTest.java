@@ -47,7 +47,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.uber.sdk.rides.client.SessionConfiguration.EndpointRegion.CHINA;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -146,23 +145,6 @@ public class OAuth2CredentialsTest {
 
         assertEquals("https://login.uber.com/oauth/v2/authorize?client_id=CLIENT_ID" +
                         "&response_type=code&scope=profile&redirect_uri=https%3A%2F%2Flocalhost%3A8181%2FOAuth2Callback",
-                oAuth2Credentials.getAuthorizationUrl());
-    }
-
-    @Test
-    public void getAuthorizationUrl_whenUsingServerForChina() throws Exception {
-        OAuth2Credentials oAuth2Credentials = new OAuth2Credentials.Builder()
-                .setClientSecrets("CLIENT_ID", "CLIENT_SECRET")
-                .setScopes(Arrays.asList(Scope.PROFILE, Scope.REQUEST,
-                        Scope.HISTORY))
-                .setLoginRegion(CHINA)
-                .build();
-
-        assertEquals("https://login.uber.com.cn/oauth/v2/token",
-                oAuth2Credentials.getAuthorizationCodeFlow().getTokenServerEncodedUrl());
-
-        assertEquals("https://login.uber.com.cn/oauth/v2/authorize?client_id=CLIENT_ID"
-                        + "&response_type=code&scope=history%20profile%20request",
                 oAuth2Credentials.getAuthorizationUrl());
     }
 
