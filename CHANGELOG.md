@@ -1,3 +1,6 @@
+v0.6.1 - TBD
+------------
+
 v0.6.0 - 11/11/2016
 ------------
 This release moves all our endpoints to the new 1.2 version! This update brings support to upfront pricing and fares, which is now reflected in RideEstimate and usable in RideRequestParameters.
