@@ -46,7 +46,9 @@ public class OAuth2ServiceTest extends WireMockTest {
 
     private static final String REFRESH_TOKEN = "RANDOM1234REFRESHTOKEN";
     private static final String CLIENT_ID = "MYCLIENTID123";
-    private static final String REQUEST_BODY = "refresh_token=" + REFRESH_TOKEN + "&client_id=" + CLIENT_ID;
+    private static final String CLIENT_SECRET = "MYCLIENTSECRET123";
+    private static final String GRANT_TYPE = "refresh_token";
+    private static final String REQUEST_BODY = "refresh_token=" + REFRESH_TOKEN + "&client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET + "&grant_type=" + GRANT_TYPE;
 
     private OAuth2Service oAuth2Service;
 
@@ -75,7 +77,7 @@ public class OAuth2ServiceTest extends WireMockTest {
                 .willReturn(aResponse()
                         .withBodyFile("token_token.json")));
 
-        AccessToken accessToken = oAuth2Service.refresh(REFRESH_TOKEN, CLIENT_ID).execute().body();
+        AccessToken accessToken = oAuth2Service.refresh(REFRESH_TOKEN, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE).execute().body();
 
         assertThat(accessToken.getExpiresIn()).isEqualTo(2592000);
         assertThat(accessToken.getToken()).isEqualTo("Access999Token");

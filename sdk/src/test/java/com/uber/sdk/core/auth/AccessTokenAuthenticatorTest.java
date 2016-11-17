@@ -142,7 +142,8 @@ public class AccessTokenAuthenticatorTest {
     public void testRefreshToken() throws Exception {
         when(accessToken.getRefreshToken()).thenReturn("refresh");
         when(config.getClientId()).thenReturn("clientId");
-        when(service.refresh(eq("refresh"), eq("clientId"))).thenReturn(serviceResult);
+        when(config.getClientSecret()).thenReturn("clientSecret");
+        when(service.refresh(eq("refresh"), eq("clientId"), eq("clientSecret"), eq("refresh_token"))).thenReturn(serviceResult);
         when(serviceResult.execute()).thenReturn(retrofit2.Response.success(accessToken));
         assertEquals(accessToken, authenticator.refreshToken(accessToken));
         verify(accessTokenStorage).setAccessToken(accessToken);

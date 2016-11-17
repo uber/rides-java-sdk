@@ -38,7 +38,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 public class AccessTokenAuthenticator implements Authenticator {
 
     private static final String HEADER_BEARER_ACCESS_VALUE = "Bearer %s";
-    private static final String TOKEN_URL = "https://login.%s/oauth/v2/mobile/";
+    private static final String TOKEN_URL = "https://login.%s/oauth/v2/";
 
     private final SessionConfiguration sessionConfiguration;
     private final AccessTokenStorage tokenStorage;
@@ -111,9 +111,13 @@ public class AccessTokenAuthenticator implements Authenticator {
     }
 
     AccessToken refreshToken(AccessToken auth2Token) throws IOException {
+        System.out.printf("Refreshing uber token... " + auth2Token.getToken() + auth2Token.getRefreshToken());
         AccessToken newToken = auth2Service.refresh(auth2Token.getRefreshToken(),
-                sessionConfiguration.getClientId())
+                sessionConfiguration.getClientId(),
+                sessionConfiguration.getClientSecret(),
+                "refresh_token")
                 .execute().body();
+        System.out.printf("Refreshed uber token: " + newToken.getToken() + newToken.getRefreshToken());
         tokenStorage.setAccessToken(newToken);
         return newToken;
     }

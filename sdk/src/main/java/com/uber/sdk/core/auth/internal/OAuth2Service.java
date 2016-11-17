@@ -33,5 +33,7 @@ public interface OAuth2Service {
     @FormUrlEncoded
     @POST("token")
     Call<AccessToken> refresh(@Field("refresh_token") String refreshToken,
-                              @Field("client_id") String clientId);
+                              @Field("client_id") String clientId,
+                              @Field("client_secret") String clientSecret,
+                              @Field("grant_type") String grantType);
 }
