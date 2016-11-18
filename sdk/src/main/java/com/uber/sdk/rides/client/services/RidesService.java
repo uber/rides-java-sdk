@@ -69,7 +69,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/promotions")
+    @GET("/v1.2/promotions")
     Call<Promotion> getPromotions(@Query("start_latitude") float startLatitude,
                                   @Query("start_longitude") float startLongitude,
                                   @Query("end_latitude") float endLatitude,
@@ -92,7 +92,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/me")
+    @GET("/v1.2/me")
     Call<UserProfile> getUserProfile();
 
     /**
@@ -105,7 +105,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/estimates/price")
+    @GET("/v1.2/estimates/price")
     Call<PriceEstimatesResponse> getPriceEstimates(@Query("start_latitude") float startLatitude,
                            @Query("start_longitude") float startLongitude,
                            @Query("end_latitude") float endLatitude,
@@ -122,8 +122,8 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/estimates/time")
-    Call<TimeEstimatesResponse>  getPickupTimeEstimate(@Query("start_latitude") float startLatitude,
+    @GET("/v1.2/estimates/time")
+    Call<TimeEstimatesResponse> getPickupTimeEstimate(@Query("start_latitude") float startLatitude,
                                @Query("start_longitude") float startLongitude,
                                @Nullable @Query("product_id") String productId);
 
@@ -135,7 +135,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/products")
+    @GET("/v1.2/products")
     Call<ProductsResponse> getProducts(@Query("latitude") float latitude,
                      @Query("longitude") float longitude);
 
@@ -146,7 +146,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/products/{product_id}")
+    @GET("/v1.2/products/{product_id}")
     Call<Product> getProduct(@Path("product_id") String productId);
 
     /**
@@ -156,7 +156,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @DELETE("/v1/requests/{request_id}")
+    @DELETE("/v1.2/requests/{request_id}")
     Call<Void> cancelRide(@Path("request_id") String rideId);
 
     /**
@@ -166,7 +166,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @POST("/v1/requests")
+    @POST("/v1.2/requests")
     Call<Ride> requestRide(@Body RideRequestParameters rideRequestParameters);
 
     /**
@@ -174,7 +174,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/requests/current")
+    @GET("/v1.2/requests/current")
     Call<Ride> getCurrentRide();
 
     /**
@@ -182,7 +182,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @DELETE("/v1/requests/current")
+    @DELETE("/v1.2/requests/current")
     Call<Void> cancelCurrentRide();
 
     /**
@@ -192,7 +192,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @PATCH("/v1/requests/{request_id}")
+    @PATCH("/v1.2/requests/{request_id}")
     Call<Void> updateRide(@Nonnull @Path("request_id") String rideId,
                     @Body RideUpdateParameters rideUpdateParameters);
 
@@ -203,7 +203,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/places/{place_id}")
+    @GET("/v1.2/places/{place_id}")
     Call<Place> getPlace(@Nonnull @Path("place_id") String placeId);
 
     /**
@@ -214,7 +214,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @PUT("/v1/places/{place_id}")
+    @PUT("/v1.2/places/{place_id}")
     Call<Place> setPlace(@Nonnull @Path("place_id") String placeId,
                   @Nonnull @Body PlaceParameters placeParameters);
 
@@ -225,7 +225,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/requests/{request_id}")
+    @GET("/v1.2/requests/{request_id}")
     Call<Ride> getRideDetails(@Nonnull @Path("request_id") String rideId);
 
     /**
@@ -245,7 +245,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @POST("/v1/requests/estimate")
+    @POST("/v1.2/requests/estimate")
     Call<RideEstimate> estimateRide(@Body RideRequestParameters rideRequestParameters);
 
     /**
@@ -258,7 +258,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/requests/{request_id}/map")
+    @GET("/v1.2/requests/{request_id}/map")
     Call<RideMap> getRideMap(@Nonnull @Path("request_id") String rideId);
 
     /**
@@ -266,7 +266,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @GET("/v1/payment-methods")
+    @GET("/v1.2/payment-methods")
     Call<PaymentMethodsResponse> getPaymentMethods();
 
     /**
@@ -281,7 +281,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @PUT("/v1/sandbox/products/{product_id}")
+    @PUT("/v1.2/sandbox/products/{product_id}")
     Call<Void> updateSandboxProduct(@Path("product_id") String productId,
                                     @Body SandboxProductRequestParameters sandboxProductRequestParameters);
 
@@ -296,7 +296,7 @@ public interface RidesService {
      *
      * @return the request {@link Call}
      */
-    @PUT("/v1/sandbox/requests/{request_id}")
+    @PUT("/v1.2/sandbox/requests/{request_id}")
     Call<Void> updateSandboxRide(@Path("request_id") String rideId,
                                  @Body SandboxRideRequestParameters sandboxRideRequestParameters);
 }

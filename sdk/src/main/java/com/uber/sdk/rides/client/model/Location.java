@@ -33,6 +33,8 @@ public class Location {
     private float longitude;
     @Nullable
     private Integer bearing;
+    @Nullable
+    private Integer eta;
 
     /**
      * Location must be created with a non-null latitude and longitude.
@@ -64,11 +66,19 @@ public class Location {
     }
 
     /**
-     * The current bearing of the vehicle in degrees (0-359). May be
-     * {@code null} if the bearing is unknown.
+     * The current bearing of the vehicle in degrees (0-359). {@code null} if the bearing is
+     * unknown or no associated bearing.
      */
     @Nullable
     public Integer getBearing() {
         return bearing;
+    }
+
+    /**
+     * If present, the ETA in minutes until this location is reached.
+     */
+    @Nullable
+    public Integer getEta() {
+        return eta;
     }
 }

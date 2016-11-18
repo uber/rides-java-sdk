@@ -1,5 +1,21 @@
-v0.5.3 - TBD
+v0.6.1 - TBD
 ------------
+
+v0.6.0 - 11/11/2016
+------------
+This release moves all our endpoints to the new 1.2 version! This update brings support to upfront pricing and fares, which is now reflected in RideEstimate and usable in RideRequestParameters.
+
+### Added
+- Fare to RideEstimate, this will be returned in the case of a product that supports upfront pricing.
+
+- [Pull #24](https://github.com/uber/rides-java-sdk/pull/24) Add Ride.Status
+- [Pull #24](https://github.com/uber/rides-java-sdk/pull/24) Add SMS number field to Driver
+
+### Breaking
+ - Price in RideEstimate is now Estimate and will be null for products that support upfront pricing.
+ - PriceEstimate uses BigDecimal in place of Integer for our low and high estimates.
+ - RideRequestButton now requires both a pickup and a dropoff for estimating.
+ - Removed all China endpoint support.
 
 v0.5.2 - 7/11/2016
 ------------

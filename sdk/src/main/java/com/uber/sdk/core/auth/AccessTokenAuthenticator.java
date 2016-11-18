@@ -27,7 +27,6 @@ import com.uber.sdk.core.auth.internal.AccessTokenRefreshFailedException;
 import com.uber.sdk.core.auth.internal.OAuth2Service;
 import com.uber.sdk.core.auth.internal.OAuthScopesAdapter;
 import com.uber.sdk.rides.client.SessionConfiguration;
-import com.uber.sdk.rides.client.error.ErrorParser;
 import com.uber.sdk.rides.client.internal.ApiInterceptor;
 
 import java.io.IOException;
@@ -40,7 +39,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 public class AccessTokenAuthenticator implements Authenticator {
 
     private static final String HEADER_BEARER_ACCESS_VALUE = "Bearer %s";
-    private static final String TOKEN_URL = "https://login.%s/oauth/v2/";
+    private static final String TOKEN_URL = "%s/oauth/v2/";
 
     private final SessionConfiguration sessionConfiguration;
     private final AccessTokenStorage tokenStorage;
@@ -51,8 +50,7 @@ public class AccessTokenAuthenticator implements Authenticator {
                                     AccessTokenStorage tokenStorage) {
         this(sessionConfiguration,
                 tokenStorage,
-                createOAuthService(String.format(TOKEN_URL,
-                        sessionConfiguration.getEndpointRegion().domain)));
+                createOAuthService(String.format(TOKEN_URL, sessionConfiguration.getLoginHost())));
     }
 
     AccessTokenAuthenticator(SessionConfiguration sessionConfiguration,

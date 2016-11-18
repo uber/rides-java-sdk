@@ -52,7 +52,8 @@ public class RideRequestParametersTest {
     @Test
     public void build_whenNoPickupPlaceOrCoordinatesProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Exactly one of pickup place or pickup coordinates is required.");
+        exception.expectMessage("Exactly one of pickup place or pickup coordinates must " +
+                "be specified");
 
         new RideRequestParameters.Builder().build();
     }
@@ -60,39 +61,40 @@ public class RideRequestParametersTest {
     @Test
     public void build_whenBothPickupPlaceIdAndCoordinatesProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Exactly one of pickup place or pickup coordinates is required.");
-
+        exception.expectMessage("Exactly one of pickup place or pickup coordinates must " +
+                "be specified");
         new RideRequestParameters.Builder().setPickupCoordinates(30f, -122f).setPickupPlaceId("home").build();
     }
 
     @Test
     public void build_whenBothPickupPlaceAndCoordinatesProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Exactly one of pickup place or pickup coordinates is required.");
-
+        exception.expectMessage("Exactly one of pickup place or pickup coordinates must " +
+                "be specified");
         new RideRequestParameters.Builder().setPickupCoordinates(30f, -122f).setPickupPlace(HOME).build();
     }
 
     @Test
     public void build_whenBothPickupPlaceAndLatitudeProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Exactly one of pickup place or pickup coordinates is required.");
-
+        exception.expectMessage("Exactly one of pickup place or pickup coordinates must " +
+                "be specified");
         new RideRequestParameters.Builder().setPickupCoordinates(30f, null).setPickupPlace(HOME).build();
     }
 
     @Test
     public void build_whenBothPickupPlaceAndLongitudeProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Exactly one of pickup place or pickup coordinates is required.");
-
+        exception.expectMessage("Exactly one of pickup place or pickup coordinates must " +
+                "be specified");
         new RideRequestParameters.Builder().setPickupCoordinates(null, -122f).setPickupPlace(HOME).build();
     }
 
     @Test
     public void build_whenJustPickupLatitudeProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Need both pickup latitude and pickup longitude");
+        exception.expectMessage("If using coordinates, both pickup latitude and pickup longitude " +
+                "must be present");
 
         new RideRequestParameters.Builder().setPickupCoordinates(30f, null).build();
     }
@@ -100,7 +102,8 @@ public class RideRequestParametersTest {
     @Test
     public void build_whenJustPickupLongitudeProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Need both pickup latitude and pickup longitude");
+        exception.expectMessage("If using coordinates, both pickup latitude and pickup longitude " +
+                "must be present");
 
         new RideRequestParameters.Builder().setPickupCoordinates(null, -122f).build();
     }
@@ -121,9 +124,19 @@ public class RideRequestParametersTest {
     }
 
     @Test
+    public void build_whenNoDropoffPlaceOrCoordinatesProvided_shouldFail() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Exactly one of dropoff place or dropoff coordinates must " +
+                "be specified");
+
+        new RideRequestParameters.Builder().setPickupPlace(HOME).build();
+    }
+
+    @Test
     public void build_whenBothDropoffPlaceIdAndCoordinatesProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot have both dropoff place and dropoff coordinates");
+        exception.expectMessage("Exactly one of dropoff place or dropoff coordinates must " +
+                "be specified");
 
         new RideRequestParameters.Builder()
                 .setPickupPlace(HOME)
@@ -135,7 +148,8 @@ public class RideRequestParametersTest {
     @Test
     public void build_whenBothDropoffPlaceAndCoordinatesProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot have both dropoff place and dropoff coordinates");
+        exception.expectMessage("Exactly one of dropoff place or dropoff coordinates must " +
+                "be specified");
 
         new RideRequestParameters.Builder()
                 .setPickupPlace(HOME)
@@ -147,7 +161,8 @@ public class RideRequestParametersTest {
     @Test
     public void build_whenBothDropoffPlaceAndLatitudeProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot have both dropoff place and dropoff coordinates");
+        exception.expectMessage("Exactly one of dropoff place or dropoff coordinates must " +
+                "be specified");
 
         new RideRequestParameters.Builder()
                 .setPickupPlace(HOME)
@@ -159,7 +174,8 @@ public class RideRequestParametersTest {
     @Test
     public void build_whenBothDropoffPlaceAndLongitudeProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Cannot have both dropoff place and dropoff coordinates");
+        exception.expectMessage("Exactly one of dropoff place or dropoff coordinates must " +
+                "be specified");
 
         new RideRequestParameters.Builder()
                 .setPickupPlace(HOME)
@@ -171,18 +187,19 @@ public class RideRequestParametersTest {
     @Test
     public void build_whenJustDropoffLatitudeProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Need both dropoff latitude and dropoff longitude");
+        exception.expectMessage("If using coordinates, both dropoff latitude and dropoff " +
+                "longitude must be present");
 
         new RideRequestParameters.Builder()
                 .setPickupPlace(HOME)
-                .setDropoffCoordinates(30f, null)
-                .build();
+                .setDropoffCoordinates(30f, null).build();
     }
 
     @Test
     public void build_whenJustDropoffLongitudeProvided_shouldFail() throws Exception {
         exception.expect(IllegalArgumentException.class);
-        exception.expectMessage("Need both dropoff latitude and dropoff longitude");
+        exception.expectMessage("If using coordinates, both dropoff latitude and dropoff " +
+                "longitude must be present");
 
         new RideRequestParameters.Builder()
                 .setPickupPlace(HOME)

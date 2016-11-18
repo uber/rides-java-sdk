@@ -35,6 +35,7 @@ public class Product {
     private int capacity;
     private String image;
     private boolean shared;
+    private boolean upfront_fare_enabled;
 
     /**
      * A unique identifier representing a specific product for a given latitude &amp; longitude. For
@@ -72,8 +73,18 @@ public class Product {
         return image;
     }
 
+    /**
+     * @return {@code true} if the ride may be shared with others.
+     */
     public boolean isShared() {
         return shared;
+    }
+
+    /**
+     * @return {code true} if this product is configured to work with upfront fares.
+     */
+    public boolean isUpfrontFareEnabled(){
+        return upfront_fare_enabled;
     }
 }
 

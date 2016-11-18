@@ -22,6 +22,8 @@
 
 package com.uber.sdk.rides.client.model;
 
+import java.math.BigDecimal;
+
 import javax.annotation.Nullable;
 
 /**
@@ -37,10 +39,11 @@ public class PriceEstimate {
     private String display_name;
     private String estimate;
     @Nullable
-    private Integer low_estimate;
+    private BigDecimal low_estimate;
     @Nullable
-    private Integer high_estimate;
-    private float surge_multiplier;
+    private BigDecimal high_estimate;
+    @Nullable
+    private Float surge_multiplier;
     @Nullable
     private Integer duration;
     @Nullable
@@ -81,7 +84,7 @@ public class PriceEstimate {
      * Lower bound of the estimated price.
      */
     @Nullable
-    public Integer getLowEstimate() {
+    public BigDecimal getLowEstimate() {
         return low_estimate;
     }
 
@@ -89,7 +92,7 @@ public class PriceEstimate {
      * Upper bound of the estimated price.
      */
     @Nullable
-    public Integer getHighEstimate() {
+    public BigDecimal getHighEstimate() {
         return high_estimate;
     }
 
@@ -97,7 +100,8 @@ public class PriceEstimate {
      * Expected surge multiplier. Surge is active if surge_multiplier is greater than 1. Price
      * estimate already factors in the surge multiplier.
      */
-    public float getSurgeMultiplier() {
+    @Nullable
+    public Float getSurgeMultiplier() {
         return surge_multiplier;
     }
 
