@@ -23,9 +23,11 @@
 package com.uber.sdk.core.auth;
 
 import com.squareup.moshi.Moshi;
+import com.uber.sdk.core.auth.internal.AccessTokenRefreshFailedException;
 import com.uber.sdk.core.auth.internal.OAuth2Service;
 import com.uber.sdk.core.auth.internal.OAuthScopesAdapter;
 import com.uber.sdk.rides.client.SessionConfiguration;
+import com.uber.sdk.rides.client.error.ErrorParser;
 import com.uber.sdk.rides.client.internal.ApiInterceptor;
 
 import java.io.IOException;
@@ -43,6 +45,7 @@ public class AccessTokenAuthenticator implements Authenticator {
     private final SessionConfiguration sessionConfiguration;
     private final AccessTokenStorage tokenStorage;
     private final OAuth2Service auth2Service;
+    private static String REFRESH_GRANT_TYPE = "refresh_token";
 
     public AccessTokenAuthenticator(SessionConfiguration sessionConfiguration,
                                     AccessTokenStorage tokenStorage) {
@@ -111,15 +114,18 @@ public class AccessTokenAuthenticator implements Authenticator {
     }
 
     AccessToken refreshToken(AccessToken auth2Token) throws IOException {
-        System.out.printf("Refreshing uber token... " + auth2Token.getToken() + auth2Token.getRefreshToken());
-        AccessToken newToken = auth2Service.refresh(auth2Token.getRefreshToken(),
+        retrofit2.Response<AccessToken> response = auth2Service.refresh(auth2Token.getRefreshToken(),
                 sessionConfiguration.getClientId(),
                 sessionConfiguration.getClientSecret(),
-                "refresh_token")
-                .execute().body();
-        System.out.printf("Refreshed uber token: " + newToken.getToken() + newToken.getRefreshToken());
-        tokenStorage.setAccessToken(newToken);
-        return newToken;
+                REFRESH_GRANT_TYPE)
+                .execute();
+        if (response.isSuccessful()) {
+            AccessToken newToken = response.body();
+            tokenStorage.setAccessToken(newToken);
+            return newToken;
+        } else {
+            throw new AccessTokenRefreshFailedException(response.errorBody().string());
+        }
     }
 
     boolean signedByOldToken(Response response, AccessToken oAuth2Token) {
