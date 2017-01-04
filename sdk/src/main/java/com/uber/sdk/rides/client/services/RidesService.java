@@ -34,6 +34,7 @@ import com.uber.sdk.rides.client.model.Promotion;
 import com.uber.sdk.rides.client.model.Ride;
 import com.uber.sdk.rides.client.model.RideEstimate;
 import com.uber.sdk.rides.client.model.RideMap;
+import com.uber.sdk.rides.client.model.RideReceipt;
 import com.uber.sdk.rides.client.model.RideRequestParameters;
 import com.uber.sdk.rides.client.model.RideUpdateParameters;
 import com.uber.sdk.rides.client.model.SandboxProductRequestParameters;
@@ -260,6 +261,16 @@ public interface RidesService {
      */
     @GET("/v1.2/requests/{request_id}/map")
     Call<RideMap> getRideMap(@Nonnull @Path("request_id") String rideId);
+
+    /**
+     * Get a receipt of a ride.
+     *
+     * @param rideId Unique identifier representing a ride.
+     *
+     * @return the request {@link Call}
+     */
+    @GET("/v1.2/requests/{request_id}/receipt")
+    Call<RideReceipt> getRideReceipt(@Nonnull @Path("request_id") String rideId);
 
     /**
      * Gets the {@link PaymentMethod PaymentMethods} of user and their last used method ID.
