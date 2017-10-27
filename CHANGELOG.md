@@ -1,5 +1,14 @@
-v0.6.1 - TBD
+v0.7.0 - TBD
 ------------
+This release refactors the SDK binary into three binaries and deprecates the previous one. This is a breaking change for imports for the majority of classes as we prepare for the 1.0 roadmap release with a stable API. This allows downstream dependencies to be able to avoid the oauth-client library dependency. 
+
+Check the [README](https://github.com/uber/rides-java-sdk/blob/master/README.md) for the latest integration instructions to update your gradle/maven dependency.
+
+### Breaking
+- Refactored SDK into three modules, uber-core, uber-rides, and uber-core-oauth-client-adapter. [Issue #34](https://github.com/uber/rides-java-sdk/issues/34)
+  - Repackaged com.uber.sdk.rides.auth.* classes to com.uber.sdk.core.auth.*
+  - Repackaged com.uber.sdk.rides.client.[AccessTokenSession, ServerTokenSession, Session, SessionConfiguration] to com.uber.sdk.core.client.*
+  - Moved Maven Artifact ID from 'sdk' to 'uber-rides', 'uber-core-oauth-client-adapter', and 'uber-core'. Old binary will no longer be updated.
 
 v0.6.0 - 11/11/2016
 ------------

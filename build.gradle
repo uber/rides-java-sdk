@@ -168,7 +168,9 @@ task updateChangelog() << {
     }
 }
 
-afterReleaseBuild.dependsOn ':sdk:uploadArchives'
+afterReleaseBuild.dependsOn (   ':uber-core:uploadArchives',
+                                ':uber-core-oauth-client-adapter:uploadArchives',
+                                ':uber-rides:uploadArchives')
 updateVersion.dependsOn ':githubRelease'
 commitNewVersion.dependsOn ':updateChangelog'
 githubRelease.dependsOn project(':samples').subprojects.collect { it.path + ':githubReleaseZip' }
@@ -218,14 +220,15 @@ distributions {
                     line.replaceAll('@version@', unsnapshottedVersion)
                 }
             }
-
-            from('sdk') {
-                filter { String line ->
-                    line.replaceAll('@version@', unsnapshottedVersion)
+            ['uber-core', 'uber-core-oauth-client-adapter', 'uber-rides'].each { folder ->
+                from(folder) {
+                    filter { String line ->
+                        line.replaceAll('@version@', unsnapshottedVersion)
+                    }
+                    exclude 'build'
+                    exclude '*.iml'
+                    into folder
                 }
-                exclude 'build'
-                exclude '*.iml'
-                into 'sdk'
             }
 
             from('samples') {

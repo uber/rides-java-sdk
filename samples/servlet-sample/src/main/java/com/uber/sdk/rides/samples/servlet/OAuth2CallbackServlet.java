@@ -23,8 +23,8 @@
 package com.uber.sdk.rides.samples.servlet;
 
 import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
-import com.uber.sdk.rides.auth.OAuth2Credentials;
-import com.uber.sdk.rides.client.SessionConfiguration;
+import com.uber.sdk.core.auth.OAuth2Credentials;
+import com.uber.sdk.core.client.SessionConfiguration;
 
 import java.io.IOException;
 import java.util.Random;

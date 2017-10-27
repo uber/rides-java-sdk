@@ -14,7 +14,8 @@ Note: Using Android? Be sure to checkout the [Uber Android SDK](github.com/uber/
 If using Gradle, add this to your project’s `build.gradle` file:
 ```gradle
 dependencies {
-    compile 'com.uber.sdk:rides:0.6.0'
+    compile 'com.uber.sdk:uber-rides:0.7.0'
+    compile 'com.uber.sdk:uber-core-oauth-client-adapter:0.7.0'
 }
 ```
 
@@ -23,8 +24,14 @@ If using Maven, add this to your project's `pom.xml` file:
 ```xml
 <dependency>
   <groupId>com.uber.sdk</groupId>
-  <artifactId>rides</artifactId>
-  <version>0.6.0</version>
+  <artifactId>uber-rides</artifactId>
+  <version>0.7.0</version>
+</dependency>
+
+<dependency>
+  <groupId>com.uber.sdk</groupId>
+  <artifactId>uber-core-oauth-client-adapter</artifactId>
+  <version>0.7.0</version>
 </dependency>
 ```
 

@@ -66,8 +66,17 @@ subprojects {
 
         from('.') {
             filter { String line ->
-                line.replaceAll("compile project\\(':sdk'\\)",
-                        "compile '${groupId}:${artifactId}:${unsnapshottedVersion}'")
+                line.replaceAll("compile project\\(':uber-core'\\)",
+                        "compile '${groupId}:uber-core:${unsnapshottedVersion}'")
+            }
+            filter { String line ->
+                line.replaceAll("compile project\\(':uber-core-oauth-client-adapter'\\)",
+                        "compile '${groupId}:uber-core-oauth-client-adapter:${unsnapshottedVersion}'")
+            }
+
+            filter { String line ->
+                line.replaceAll("compile project\\(':uber-rides'\\)",
+                        "compile '${groupId}:uber-rides:${unsnapshottedVersion}'")
             }
             into '.'
             exclude 'build'
