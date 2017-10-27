@@ -1,3 +1,6 @@
+v0.7.1 - TBD
+------------
+
 v0.7.0 - TBD
 ------------
 This release refactors the SDK binary into three binaries and deprecates the previous one. This is a breaking change for imports for the majority of classes as we prepare for the 1.0 roadmap release with a stable API. This allows downstream dependencies to be able to avoid the oauth-client library dependency. 
