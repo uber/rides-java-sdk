@@ -22,6 +22,7 @@
 
 package com.uber.sdk.core.client.internal;
 
+import com.uber.sdk.BuildConfig;
 import com.uber.sdk.core.auth.Authenticator;
 
 import java.io.IOException;
@@ -33,8 +34,7 @@ import okhttp3.Response;
 public class ApiInterceptor implements Interceptor {
     static final String HEADER_ACCESS_TOKEN = "Authorization";
 
-
-    static final String LIB_VERSION = "0.7.0";
+    static final String LIB_VERSION = BuildConfig.VERSION;
     static final String HEADER_ACCEPT_LANGUAGE = "Accept-Language";
     static final String HEADER_USER_AGENT = "X-Uber-User-Agent";
 
