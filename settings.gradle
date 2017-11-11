@@ -23,7 +23,6 @@
 include ':uber-core'
 include ':uber-core-oauth-client-adapter'
 include ':uber-rides'
-include ':samples'
 include ':samples:cmdline-sample'
 include ':samples:servlet-sample'
 

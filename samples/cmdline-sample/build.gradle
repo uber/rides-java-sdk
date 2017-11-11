@@ -27,15 +27,11 @@ sourceCompatibility = JavaVersion.VERSION_1_7
 
 mainClassName = 'com.uber.sdk.rides.samples.cmdline.GetUserProfile'
 
-repositories {
-    jcenter()
-}
-
 dependencies {
     compile project(':uber-core-oauth-client-adapter')
     compile project(':uber-rides')
-    compile 'com.google.oauth-client:google-oauth-client-jetty:1.19.0'
-    compile 'com.google.oauth-client:google-oauth-client-servlet:1.19.0'
+    compile deps.network.oauthClientJetty
+    compile deps.network.oauthClientServlet
 }
 
 run.standardInput = System.in

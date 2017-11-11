@@ -34,8 +34,8 @@ repositories {
 dependencies {
     compile project(':uber-core-oauth-client-adapter')
     compile project(':uber-rides')
-    compile 'com.google.oauth-client:google-oauth-client-jetty:1.19.0'
-    compile 'com.google.oauth-client:google-oauth-client-servlet:1.19.0'
-    compile 'org.eclipse.jetty:jetty-server:9.2.10.v20150310'
-    compile 'org.eclipse.jetty:jetty-servlet:9.2.10.v20150310'
+    compile deps.network.oauthClientJetty
+    compile deps.network.oauthClientServlet
+    compile deps.network.jettyServer
+    compile deps.network.jettyServlet
 }
