@@ -23,9 +23,17 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'de.fuerstenau.buildconfig'
+apply plugin: 'idea'
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
+
+buildConfig {
+    appName = project.name
+    version = project.version
+    packageName = project.group
+}
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
