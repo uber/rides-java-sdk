@@ -2,4 +2,21 @@ language: java
 
 jdk:
   - oraclejdk8
-  - openjdk8
+
+install: ./gradlew clean assemble --stacktrace
+
+script:
+  - ./gradlew check --stacktrace
+
+branches:
+  except:
+    - gh-pages
+
+notifications:
+  email: false
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.gradle
