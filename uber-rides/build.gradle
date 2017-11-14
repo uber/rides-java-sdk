@@ -34,3 +34,5 @@ dependencies {
     testCompile deps.test.mockito
     testCompile deps.test.wiremock
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

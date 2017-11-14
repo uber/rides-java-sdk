@@ -32,5 +32,5 @@ task wrapper(type: Wrapper) {
     distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
-//apply from: 'gradle/github-release.gradle'
-//apply from: 'gradle/verification.gradle'
+apply from: 'gradle/github-release.gradle'
+apply from: 'gradle/verification.gradle'
