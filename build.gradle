@@ -1,245 +1,36 @@
 /*
- * Copyright (c) 2016 Uber Technologies, Inc.
+ * Copyright (C) 2017. Uber Technologies
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-apply plugin: 'distribution'
-apply plugin: 'net.researchgate.release'
-apply plugin: 'co.riiid.gradle'
-
-import groovy.text.GStringTemplateEngine
-import org.codehaus.groovy.runtime.DateGroovyMethods
-
 buildscript {
-    repositories {
-        jcenter()
-        maven {
-            url 'https://plugins.gradle.org/m2/'
-        }
-    }
-    dependencies {
-        classpath 'net.saliman:gradle-cobertura-plugin:2.2.7'
-        classpath 'net.researchgate:gradle-release:2.2.2'
-        classpath 'co.riiid:gradle-github-plugin:0.3.1'
-        classpath 'gradle.plugin.de.fuerstenau:BuildConfigPlugin:1.1.8'
-    }
-}
-
-allprojects {
-    apply plugin: 'checkstyle'
-    apply plugin: 'maven'
-    apply plugin: 'net.saliman.cobertura'
-
-    ['githubToken', 'ossrhUsername', 'ossrhPassword',
-     'signing.keyId', 'signing.password', 'signing.secretKeyRingFile',].each {
-        checkAndDefaultProperty(it)
-    }
-
-    ext.set('unsnapshottedVersion', version.replaceAll('-SNAPSHOT', ''))
-    ext.set('samples', project(':samples').subprojects.collect { it.path })
-    ext.set('isReleaseVersion', !version.endsWith('SNAPSHOT'))
+    apply from: 'gradle/dependencies.gradle'
 
     repositories {
         jcenter()
+        maven { url deps.build.repositories.plugins }
     }
-
     dependencies {
-        compile 'org.slf4j:slf4j-log4j12:1.7.5'
-    }
-
-    checkstyle {
-        toolVersion = "6.11.2"
-    }
-
-    cobertura {
-        coverageFormats = ['html', 'xml']
-        coverageIgnoreTrivial = true
-        coverageCheckTotalLineRate = 100
-        coverageCheckTotalBranchRate = 100
-    }
-
-    task checkstyleMain(type: Checkstyle, overwrite: true) {
-        configFile = new File("{$project.projectDir}/config/checkstyle/checkstyle-main.xml")
-    }
-
-    task checkstyleTest(type: Checkstyle, overwrite: true) {
-        configFile = new File("{$project.projectDir}/config/checkstyle/checkstyle-test.xml")
+        classpath deps.build.gradlePlugins.github
+        classpath deps.build.gradlePlugins.release
     }
 }
 
-def generateReleaseNotes() {
-    def changelogSnippet = generateChangelogSnippet()
-    def model = [title  : "Uber Rides API Java SDK (Beta) v${unsnapshottedVersion}",
-                 date   : DateGroovyMethods.format(new Date(), 'MM/dd/yyyy'),
-                 snippet: changelogSnippet,
-                 assets : project.samples.collect {
-                     [
-                             title      : project(it).name,
-                             download   : githubDownloadPrefix + "v${unsnapshottedVersion}/"
-                                     + project(it).name + "-v${unsnapshottedVersion}.zip",
-                             description: project(it).description,
-                     ]
-                 }]
-    def engine = new GStringTemplateEngine()
-    def template = engine.createTemplate(rootProject.file('releasenotes.gtpl')).make(model)
-    return template.toString()
+task wrapper(type: Wrapper) {
+    gradleVersion = deps.build.gradleVersion
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
-def generateChangelogSnippet() {
-    def changelog = rootProject.file('CHANGELOG.md').text
-    def snippet = ""
-    def stop = false
-    changelog.eachLine { line, count ->
-        if (count >= 2) {
-            stop = stop || line.startsWith("v");
-            if (!stop) {
-                snippet += line + "\n";
-            }
-        }
-    }
-    return "  " + snippet.trim();
-}
-
-def checkAndDefaultProperty(prop) {
-    if (!project.hasProperty(prop)) {
-        logger.warn('Add ' + prop + ' to your ~/.gradle/gradle.properties file.')
-        rootProject.ext.set(prop, prop)
-    }
-}
-
-def checkForChangelogUpdates(task) {
-    def changelogtext = rootProject.file('CHANGELOG.md').text
-    if (!changelogtext.startsWith("v${unsnapshottedVersion} -")) {
-        throw new AssertionError(
-                "Changelog must be updated with v{$unsnapshottedVersion} before release. Please check " +
-                        rootProject.file('CHANGELOG.md').absolutePath)
-    }
-}
-
-def checkForSecrets(prject) {
-    def secretsText = prject.file('src/main/resources/secrets.properties').text
-    def expectedText = 'clientId=INSERT_CLIENT_ID_HERE\nclientSecret=INSERT_CLIENT_SECRET_HERE'
-    if (secretsText != expectedText) {
-        throw new AssertionError('Secrets may be exposed. Please check ' +
-                prject.file('src/main/resources/secrets.properties').absolutePath)
-    }
-}
-
-gradle.taskGraph.afterTask { Task task, TaskState state ->
-    if (task.path.endsWith('release') || task.path.endsWith('githubReleaseZip')
-            || task.path.endsWith('publicrepoDistZip')) {
-        checkForChangelogUpdates(task)
-        for (prject in project(':samples').subprojects) {
-            checkForSecrets(prject)
-        }
-    }
-}
-
-// Skip signing archives on Jenkins when -SNAPSHOT is being checked in.
-gradle.taskGraph.beforeTask { Task task ->
-    if (task.path.contains('sign') && !ext.isReleaseVersion) {
-        task.enabled = false
-    }
-}
-
-task updateChangelog() << {
-    def newVersion = findProperty("version").replaceAll('-SNAPSHOT', '')
-    def changelog = rootProject.file('CHANGELOG.md')
-    def changelogText = changelog.text
-    if (!changelogText.startsWith("v${newVersion} -")) {
-        def updatedChangelog = "v${newVersion} - TBD\n"
-        def dashesCount = updatedChangelog.length()-1
-        updatedChangelog += "-"*dashesCount + "\n\n"
-
-        changelog.write(updatedChangelog + changelogText)
-    }
-}
-
-afterReleaseBuild.dependsOn (   ':uber-core:uploadArchives',
-                                ':uber-core-oauth-client-adapter:uploadArchives',
-                                ':uber-rides:uploadArchives')
-updateVersion.dependsOn ':githubRelease'
-commitNewVersion.dependsOn ':updateChangelog'
-githubRelease.dependsOn project(':samples').subprojects.collect { it.path + ':githubReleaseZip' }
-
-release {
-    failOnCommitNeeded = false
-    failOnPublishNeeded = false
-    failOnSnapshotDependencies = false
-    revertOnFail = true
-    tagTemplate = "v${unsnapshottedVersion}"
-}
-
-github {
-    owner = 'uber'
-    repo = 'rides-java-sdk'
-    token = "${githubToken}"
-    tagName = "v${unsnapshottedVersion}"
-    targetCommitish = 'master'
-    name = "v${unsnapshottedVersion}"
-    body = generateReleaseNotes()
-    assets = project.samples.collect {
-        project(it).buildDir.absolutePath + '/distributions/' + project(it).name +
-                "-v${unsnapshottedVersion}.zip"
-    }
-}
-
-distributions {
-    publicrepo {
-        baseName = 'publicrepo'
-        contents {
-            from(rootDir) {
-                include 'build.gradle'
-                include 'CHANGELOG.md'
-                include 'gradle.properties'
-                include 'gradlew'
-                include 'gradlew.bat'
-                include 'LICENSE'
-                include 'releasenotes.gtpl'
-                include 'settings.gradle'
-                include 'gradle/'
-                include '.travis.yml'
-            }
-
-            from(rootDir) {
-                include 'README.md'
-                filter { String line ->
-                    line.replaceAll('@version@', unsnapshottedVersion)
-                }
-            }
-            ['uber-core', 'uber-core-oauth-client-adapter', 'uber-rides'].each { folder ->
-                from(folder) {
-                    filter { String line ->
-                        line.replaceAll('@version@', unsnapshottedVersion)
-                    }
-                    exclude 'build'
-                    exclude '*.iml'
-                    into folder
-                }
-            }
-
-            from('samples') {
-                exclude '**/build'
-                exclude '**/*.iml'
-                into 'samples'
-            }
-        }
-    }
-}
+apply from: 'gradle/github-release.gradle'
+apply from: 'gradle/verification.gradle'

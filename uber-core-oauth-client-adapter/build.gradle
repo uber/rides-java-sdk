@@ -19,122 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
-signing {
-    sign configurations.archives
-}
-
-def getReleaseRepositoryUrl() {
-    return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-            : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-}
-
-def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : "https://oss.sonatype.org/content/repositories/snapshots/"
-}
-
-def getRepositoryUsername() {
-    return hasProperty('ossrhUsername') ? ossrhUsername : ""
-}
-
-def getRepositoryPassword() {
-    return hasProperty('ossrhPassword') ? ossrhPassword : ""
-}
-
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: getReleaseRepositoryUrl()) {
-                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-            }
-
-            snapshotRepository(url: getSnapshotRepositoryUrl()) {
-                authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-            }
-
-            pom.project {
-                name POM_NAME
-                packaging 'jar'
-                artifactId artifactId
-
-                description 'The official Java SDK (beta) for the Uber Rides API.'
-                url 'https://developer.uber.com'
-
-                scm {
-                    connection 'scm:git:git@github.com:uber/rides-java-sdk.git'
-                    developerConnection 'scm:git:git@github.com:uber/rides-java-sdk.git'
-                    url 'git@github.com:uber/rides-java-sdk.git'
-                }
-
-                licenses {
-                    license {
-                        name 'MIT License'
-                        url 'http://www.opensource.org/licenses/mit-license.php'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'arogal'
-                        name 'Adam Rogal'
-                        email 'arogal@uber.com'
-                    }
-
-                    developer {
-                        id 'itstexter'
-                        name 'Alex Texter'
-                        email 'texter@uber.com'
-                    }
-
-                    developer {
-                        id 'tyvsmith'
-                        name 'Ty Smith'
-                        email 'tys@uber.com'
-                    }
-                }
-            }
-        }
-    }
-}
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compile project(':uber-core')
-    compile 'com.google.http-client:google-http-client-jackson2:1.19.0'
-    compile 'com.google.oauth-client:google-oauth-client:1.19.0'
+    compile deps.network.httpClientJackson
+    compile deps.network.oauthClient
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.1'
-    testCompile 'org.hamcrest:hamcrest-library:1.3'
-    testCompile 'org.mockito:mockito-core:1.10.8'
-
-    testCompile 'com.github.tomakehurst:wiremock:2.1.0-beta'
+    testCompile deps.test.junit
+    testCompile deps.test.assertj
+    testCompile deps.test.hamcrest
+    testCompile deps.test.mockito
+    testCompile deps.test.wiremock
 }
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
