@@ -61,7 +61,10 @@ public class AccessTokenAuthenticator implements Authenticator {
 
     @Override
     public void signRequest(Request.Builder builder) {
-        setBearerToken(builder, tokenStorage.getAccessToken());
+        if(tokenStorage.getAccessToken() != null && tokenStorage.getAccessToken().getToken() !=
+                null) {
+            setBearerToken(builder, tokenStorage.getAccessToken());
+        }
     }
 
     @Override
@@ -90,10 +93,11 @@ public class AccessTokenAuthenticator implements Authenticator {
     }
 
     synchronized Request doRefresh(Response response) throws IOException {
-        if (signedByOldToken(response, tokenStorage.getAccessToken())) {
-            return resign(response, tokenStorage.getAccessToken());
+        final AccessToken token = tokenStorage.getAccessToken();
+        if (signedByOldToken(response, token)) {
+            return resign(response, token);
         } else {
-            return refreshAndSign(response, tokenStorage.getAccessToken());
+            return refreshAndSign(response, token);
         }
     }
 
