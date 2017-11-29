@@ -31,7 +31,8 @@ import java.io.IOException;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class CredentialsAuthenticator implements Authenticator {
+public class CredentialsAuthenticator extends BaseRefreshableAuthenticator implements
+        Authenticator {
     static final String HEADER_BEARER_ACCESS_VALUE = "Bearer %s";
 
     private final Credential credential;
@@ -52,9 +53,14 @@ public class CredentialsAuthenticator implements Authenticator {
         return true;
     }
 
+
     @Override
-    public Request refresh(Response response) throws IOException {
-        return reauth(response);
+    protected Request doRefresh(Response response) throws IOException {
+        if (signedByOldToken(response, credential)) {
+            return resign(response, credential);
+        } else {
+            return refreshAndSign(response, credential);
+        }
     }
 
     @Override
@@ -67,14 +73,6 @@ public class CredentialsAuthenticator implements Authenticator {
      */
     public Credential getCredential() {
         return credential;
-    }
-
-    private synchronized Request reauth(Response response) throws IOException {
-        if (signedByOldToken(response, credential)) {
-            return resign(response, credential);
-        } else {
-            return refreshAndSign(response, credential);
-        }
     }
 
     private static void setBearerToken(Request.Builder builder, Credential credential) {

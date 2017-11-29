@@ -35,7 +35,8 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-public class AccessTokenAuthenticator implements Authenticator {
+public class AccessTokenAuthenticator extends
+        BaseRefreshableAuthenticator implements Authenticator {
 
     private static final String HEADER_BEARER_ACCESS_VALUE = "Bearer %s";
     private static final String TOKEN_URL = "%s/oauth/v2/mobile/";
@@ -61,17 +62,15 @@ public class AccessTokenAuthenticator implements Authenticator {
 
     @Override
     public void signRequest(Request.Builder builder) {
-        setBearerToken(builder, tokenStorage.getAccessToken());
+        if(tokenStorage.getAccessToken() != null && tokenStorage.getAccessToken().getToken() !=
+                null) {
+            setBearerToken(builder, tokenStorage.getAccessToken());
+        }
     }
 
     @Override
     public boolean isRefreshable() {
         return tokenStorage.getAccessToken() != null && tokenStorage.getAccessToken().getRefreshToken() != null;
-    }
-
-    @Override
-    public Request refresh(Response response) throws IOException {
-        return doRefresh(response);
     }
 
     /**
@@ -89,11 +88,13 @@ public class AccessTokenAuthenticator implements Authenticator {
         return tokenStorage;
     }
 
-    synchronized Request doRefresh(Response response) throws IOException {
-        if (signedByOldToken(response, tokenStorage.getAccessToken())) {
-            return resign(response, tokenStorage.getAccessToken());
+    protected synchronized Request doRefresh(Response response) throws IOException {
+        final AccessToken token = tokenStorage.getAccessToken();
+
+        if (signedByOldToken(response, token)) {
+            return resign(response, token);
         } else {
-            return refreshAndSign(response, tokenStorage.getAccessToken());
+            return refreshAndSign(response, token);
         }
     }
 
