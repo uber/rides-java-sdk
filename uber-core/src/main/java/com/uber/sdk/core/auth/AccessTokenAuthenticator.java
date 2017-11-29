@@ -35,7 +35,8 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-public class AccessTokenAuthenticator implements Authenticator {
+public class AccessTokenAuthenticator extends
+        BaseRefreshableAuthenticator implements Authenticator {
 
     private static final String HEADER_BEARER_ACCESS_VALUE = "Bearer %s";
     private static final String TOKEN_URL = "%s/oauth/v2/mobile/";
@@ -72,11 +73,6 @@ public class AccessTokenAuthenticator implements Authenticator {
         return tokenStorage.getAccessToken() != null && tokenStorage.getAccessToken().getRefreshToken() != null;
     }
 
-    @Override
-    public Request refresh(Response response) throws IOException {
-        return doRefresh(response);
-    }
-
     /**
      * Get SessionConfiguration used for authentication
      */
@@ -92,8 +88,9 @@ public class AccessTokenAuthenticator implements Authenticator {
         return tokenStorage;
     }
 
-    synchronized Request doRefresh(Response response) throws IOException {
+    protected synchronized Request doRefresh(Response response) throws IOException {
         final AccessToken token = tokenStorage.getAccessToken();
+
         if (signedByOldToken(response, token)) {
             return resign(response, token);
         } else {

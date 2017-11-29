@@ -67,6 +67,7 @@ public class AccessTokenAuthenticatorTest {
     @Test
     public void testSignRequest_callsSetBearerToken() throws Exception {
         when(accessTokenStorage.getAccessToken()).thenReturn(accessToken);
+        when(accessToken.getToken()).thenReturn("token");
         Request.Builder builder = dummyRequest.newBuilder();
 
         authenticator.signRequest(builder);
@@ -91,13 +92,6 @@ public class AccessTokenAuthenticatorTest {
         when(accessTokenStorage.getAccessToken()).thenReturn(accessToken);
         when(accessToken.getRefreshToken()).thenReturn("refreshToken");
         assertTrue(authenticator.isRefreshable());
-    }
-
-    @Test
-    public void testRefresh_callsRefreshToken() throws Exception {
-        doReturn(dummyRequest).when(authenticator).doRefresh(eq(dummyResponse));
-        authenticator.refresh(dummyResponse);
-        verify(authenticator).doRefresh(eq(dummyResponse));
     }
 
     @Test
