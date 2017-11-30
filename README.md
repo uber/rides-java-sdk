@@ -179,7 +179,7 @@ SessionConfiguration config = existingConfig.newBuilder().setEnvironment(Environ
 CredentialsSession session = new CredentialsSession(config, credential));
 RidesService service = UberRidesApi.with(session);
 ```
-See our [documentation](https://developer.uber.com/v1/sandbox/) to learn more about the sandbox environment.
+See our [documentation](https://developer.uber.com/docs/riders/guides/sandbox) to learn more about the sandbox environment.
 
 ### Update a ride in the sandbox
 If you request a ride in the sandbox, you can step through the different states of the ride.
