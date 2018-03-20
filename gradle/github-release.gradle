@@ -37,7 +37,7 @@ def generateReleaseNotes() {
                  assets : project.samples.collect {
                      [
                              title      : project(it).name,
-                             download   : GITHUB_DOWNLOAD_PREFIX + "v${releaseVersion}/${project(it).name}-debug.apk",
+                             download   : GITHUB_DOWNLOAD_PREFIX + "v${releaseVersion}/${project(it).name}-${releaseVersion}.jar",
                              description: project(it).description,
                      ]
                  }]
