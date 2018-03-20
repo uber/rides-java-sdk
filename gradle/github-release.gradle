@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2017. Uber Technologies
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-
 import groovy.text.GStringTemplateEngine
 import org.codehaus.groovy.runtime.DateGroovyMethods
 
@@ -47,14 +30,14 @@ def isReleaseBuild() {
 
 def generateReleaseNotes() {
     def changelogSnippet = generateChangelogSnippet()
-    def model = [title  : "Uber Rides API Java SDK (Beta) v${rootProject.version}",
+    def releaseVersion = rootProject.version.replaceAll('-SNAPSHOT', '')
+    def model = [title  : "Uber Rides API Java SDK (Beta) v${releaseVersion}",
                  date   : DateGroovyMethods.format(new Date(), 'MM/dd/yyyy'),
                  snippet: changelogSnippet,
                  assets : project.samples.collect {
                      [
                              title      : project(it).name,
-                             download   : GITHUB_DOWNLOAD_PREFIX + "v${rootProject.version}/"
-                                     + project(it).name + "-v${rootProject.version}.zip",
+                             download   : GITHUB_DOWNLOAD_PREFIX + "v${releaseVersion}/${project(it).name}-${releaseVersion}.jar",
                              description: project(it).description,
                      ]
                  }]
@@ -105,14 +88,35 @@ task updateNewVersionChangelog() << {
     }
 }
 
+task configureGithub() << {
+    github {
+        owner = GITHUB_OWNER
+        repo = GITHUB_REPO
+        token = "${GITHUB_TOKEN}"
+        tagName = "v${rootProject.version}"
+        targetCommitish = GITHUB_BRANCH
+        name = "v${rootProject.version}"
+        body = generateReleaseNotes()
+        assets = project.samples.collect {
+            "${project(it).buildDir.absolutePath}/libs/${project(it).name}-${rootProject.version}.jar"
+        }
+    }
+}
+
+githubRelease.dependsOn ":configureGithub"
+configureGithub.mustRunAfter ":createReleaseTag"
+
+updateVersion.dependsOn ":githubRelease"
+githubRelease.mustRunAfter ":configureGithub"
+
 afterReleaseBuild.dependsOn (   ':uber-core:uploadArchives',
         ':uber-core-oauth-client-adapter:uploadArchives',
         ':uber-rides:uploadArchives')
 
-updateVersion.dependsOn ":githubRelease"
+updateReleaseVersionChangelog.mustRunAfter ":afterReleaseBuild"
 preTagCommit.dependsOn ':updateReleaseVersionChangelog'
+updateNewVersionChangelog.mustRunAfter ":updateVersion"
 commitNewVersion.dependsOn ':updateNewVersionChangelog'
-githubRelease.dependsOn project(":samples").subprojects.collect { it.path + ":githubReleaseZip" }
 
 release {
     failOnCommitNeeded = false
@@ -122,65 +126,4 @@ release {
     tagTemplate = 'v$version'
     versionProperties = ['VERSION_NAME']
 }
-
-github {
-    owner = GITHUB_OWNER
-    repo = GITHUB_REPO
-    token = "${GITHUB_TOKEN}"
-    tagName = "v${rootProject.version}"
-    targetCommitish = GITHUB_BRANCH
-    name = "v${rootProject.version}"
-    body = generateReleaseNotes()
-    assets = project.samples.collect {
-        project(it).buildDir.absolutePath + "/distributions/" + project(it).name +
-                "-v${rootProject.version}.zip"
-    }
-}
-
-subprojects {
-    configure(subprojects.findAll {it.parent.name == 'samples'}) {
-        task githubReleaseZip(type: Zip) << {
-            version = "v${rootProject.version}"
-
-            from('.') {
-                filter { String line ->
-                    line.replaceAll("compile project\\(':uber-core'\\)",
-                            "compile '${groupId}:uber-core:${rootProject.version}'")
-                }
-                filter { String line ->
-                    line.replaceAll("compile project\\(':uber-core-oauth-client-adapter'\\)",
-                            "compile '${groupId}:uber-core-oauth-client-adapter:${rootProject.version}'")
-                }
-
-                filter { String line ->
-                    line.replaceAll("compile project\\(':uber-rides'\\)",
-                            "compile '${groupId}:uber-rides:${rootProject.version}'")
-                }
-                into '.'
-                exclude 'build'
-                exclude '*.iml'
-            }
-
-            from(rootProject.projectDir.absolutePath) {
-                include 'gradle/'
-                include 'gradlew'
-                include 'gradlew.bat'
-                include 'LICENSE'
-                into '.'
-            }
-
-            from('build/poms') {
-                include 'pom-default.xml'
-                rename { String fileName ->
-                    fileName.replaceAll('-default', '')
-                }
-                filter { String line ->
-                    line.replaceAll('-SNAPSHOT', '')
-                }
-                into '.'
-            }
-        }
-    }
-}
-
 
