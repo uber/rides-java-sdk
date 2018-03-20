@@ -1,8 +1,11 @@
 v0.7.1 - TBD
 ------------
+
 ### Added
+ - Fixed Release Script for proper versioning
+ - Fixed NPE in token refresh
  - Updating Versioning headers to pull from BuildConfig
- -Changed README to use Maven Badges
+ - Changed README to use Maven Badges
 
 v0.7.0 - 10/28/17
 ------------
