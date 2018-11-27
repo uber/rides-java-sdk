@@ -23,7 +23,6 @@
 package com.uber.sdk.core.client;
 
 import com.uber.sdk.core.auth.Scope;
-
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -127,5 +126,14 @@ public class SessionConfigurationTest {
                 .setClientId("clientId")
                 .setEnvironment(SANDBOX).build();
         assertEquals("https://sandbox-api.uber.com", sessionConfig.getEndpointHost());
+    }
+
+    @Test
+    public void buildSession_whenCustomEnvUrl_shouldGiveCustomEndpointHost() throws Exception {
+        SessionConfiguration sessionConfig = new SessionConfiguration.Builder()
+                .setBaseUrl("http://localhost:8888/uber-mock")
+                .setClientId("clientId")
+                .build();
+        assertEquals("http://localhost:8888/uber-mock", sessionConfig.getEndpointHost());
     }
 }
