@@ -7,7 +7,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.uber.sdk.core.auth.ProfileHintProvider;
 import com.uber.sdk.core.auth.internal.LoginPARResponse;
 import com.uber.sdk.core.auth.internal.OAuth2Service;
 import com.uber.sdk.core.auth.internal.ProfileHint;
@@ -44,19 +43,19 @@ public class LoginPARRequestTest {
         SessionConfiguration sessionConfiguration =
                 new SessionConfiguration.Builder()
                         .setClientId("clientId")
-                        .setProfileHintProvider(
-                                new ProfileHintProvider() {
-                                    @Override
-                                    public ProfileHint getProfileHint() {
-                                        return new ProfileHint
-                                                ("par", "test", "abc@gmail.com", "+11234567890");
-                                    }
-                                }
+                        .setProfileHint(
+                                new ProfileHint
+                                    .Builder()
+                                    .firstName("par")
+                                    .lastName("test")
+                                    .email("abc@gmail.com")
+                                    .phone("+11234567890")
+                                    .build()
                         )
                         .build();
         loginPARRequest = new LoginPARRequest(
                 oAuth2Service,
-                sessionConfiguration.getProfileHintProvider(),
+                sessionConfiguration.getProfileHint(),
                 sessionConfiguration.getClientId(),
                 "code",
                 callback);

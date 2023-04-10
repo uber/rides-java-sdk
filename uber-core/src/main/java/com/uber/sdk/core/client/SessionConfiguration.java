@@ -22,8 +22,8 @@
 
 package com.uber.sdk.core.client;
 
-import com.uber.sdk.core.auth.ProfileHintProvider;
 import com.uber.sdk.core.auth.Scope;
+import com.uber.sdk.core.auth.internal.ProfileHint;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -84,7 +84,7 @@ public class SessionConfiguration implements Serializable {
         private Collection<Scope> scopes;
         private Collection<String> customScopes;
         private Locale locale;
-        private ProfileHintProvider profileHintProvider;
+        private ProfileHint profileHint;
 
         /**
          * The Uber API requires a registered clientId to be sent along with API requests and Deeplinks.
@@ -175,11 +175,11 @@ public class SessionConfiguration implements Serializable {
         }
 
         /**
-         * Sets the {@link ProfileHintProvider} for prefilling some user personal information during onboarding
+         * Sets the {@link ProfileHint} for prefilling some user personal information during onboarding
          * for possible locales.
          */
-        public Builder setProfileHintProvider(@Nonnull ProfileHintProvider profileHintProvider) {
-            this.profileHintProvider = profileHintProvider;
+        public Builder setProfileHint(@Nonnull ProfileHint profileHint) {
+            this.profileHint = profileHint;
             return this;
         }
 
@@ -222,7 +222,7 @@ public class SessionConfiguration implements Serializable {
                     scopes,
                     customScopes,
                     locale,
-                    profileHintProvider);
+                    profileHint);
         }
     }
 
@@ -235,7 +235,7 @@ public class SessionConfiguration implements Serializable {
     private final Collection<Scope> scopes;
     private final Collection<String> customScopes;
     private final Locale locale;
-    private ProfileHintProvider profileHintProvider;
+    private ProfileHint profileHint;
 
     protected SessionConfiguration(@Nonnull String clientId,
                                    @Nonnull String clientSecret,
@@ -246,7 +246,7 @@ public class SessionConfiguration implements Serializable {
                                    @Nonnull Collection<Scope> scopes,
                                    @Nonnull Collection<String> customScopes,
                                    @Nonnull Locale locale,
-                                   ProfileHintProvider profileHintProvider) {
+                                   ProfileHint profileHint) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.serverToken = serverToken;
@@ -256,7 +256,7 @@ public class SessionConfiguration implements Serializable {
         this.scopes = scopes;
         this.customScopes = customScopes;
         this.locale = locale;
-        this.profileHintProvider = profileHintProvider;
+        this.profileHint = profileHint;
     }
 
     /**
@@ -327,7 +327,7 @@ public class SessionConfiguration implements Serializable {
      */
     @Nonnull
     public String getLoginHost() {
-        return String.format("https://login.%s", DEFAULT.getDomain());
+        return String.format("https://auth.%s", DEFAULT.getDomain());
     }
 
     /**
@@ -357,11 +357,11 @@ public class SessionConfiguration implements Serializable {
     }
 
     /**
-     * Gets the {@link ProfileHintProvider} used to prefill user's profile information
+     * Gets the {@link ProfileHint} used to prefill user's profile information
      * @return
      */
-    public ProfileHintProvider getProfileHintProvider() {
-        return profileHintProvider;
+    public ProfileHint getProfileHint() {
+        return profileHint;
     }
 
     public Builder newBuilder() {
@@ -370,6 +370,6 @@ public class SessionConfiguration implements Serializable {
                 .setRedirectUri(redirectUri)
                 .setEnvironment(environment)
                 .setScopes(scopes)
-                .setProfileHintProvider(profileHintProvider);
+                .setProfileHint(profileHint);
     }
 }

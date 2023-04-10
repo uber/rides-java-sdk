@@ -2,20 +2,17 @@ package com.uber.sdk.core.client.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.squareup.moshi.Json;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import com.uber.sdk.core.auth.ProfileHintProvider;
 import com.uber.sdk.core.auth.internal.LoginPARResponse;
 import com.uber.sdk.core.auth.internal.OAuth2Service;
 import com.uber.sdk.core.auth.internal.ProfileHint;
 import com.uber.sdk.core.client.SessionConfiguration;
 
-import java.io.IOException;
 import java.util.Base64;
+import java.util.Locale;
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -26,7 +23,7 @@ public class LoginPARRequest {
     private final OAuth2Service oAuth2Service;
 
     private final Callback callback;
-    private final ProfileHintProvider profileHintProvider;
+    private final ProfileHint profileHint;
     private final String clientId;
     private final String responseType;
     private final Moshi moshi;
@@ -38,7 +35,7 @@ public class LoginPARRequest {
     ) {
         this(
             createOAuthService(sessionConfiguration.getLoginHost()),
-            sessionConfiguration.getProfileHintProvider(),
+            sessionConfiguration.getProfileHint(),
             sessionConfiguration.getClientId(),
             responseType,
             callback
@@ -47,28 +44,28 @@ public class LoginPARRequest {
 
     public LoginPARRequest(
             OAuth2Service oAuth2Service,
-            ProfileHintProvider profileHintProvider,
+            ProfileHint profileHint,
             String clientId,
             String responseType,
             Callback callback
     ) {
         this.oAuth2Service = oAuth2Service;
-        this.profileHintProvider = profileHintProvider;
+        this.profileHint = profileHint;
         this.clientId = clientId;
-        this.responseType = responseType;
+        this.responseType = responseType.toLowerCase(Locale.US);
         this.callback = callback;
         this.moshi = new Moshi.Builder().build();
     }
 
-    public void executePAR() throws IOException {
+    public void executePAR() {
         JsonAdapter<ProfileHint> profileHintJsonAdapter = moshi.adapter(ProfileHint.class);
-        String profileHint = new String(
+        String profileHintString = new String(
                 Base64.getEncoder().encode(
-                        profileHintJsonAdapter.toJson(profileHintProvider.getProfileHint()).getBytes(UTF_8)
+                        profileHintJsonAdapter.toJson(profileHint).getBytes(UTF_8)
                 )
         );
         oAuth2Service
-                .loginParRequest(clientId, responseType, profileHint)
+                .loginParRequest(clientId, responseType, profileHintString)
                 .enqueue(new retrofit2.Callback<LoginPARResponse>() {
                     @Override
                     public void onResponse(Call<LoginPARResponse> call, Response<LoginPARResponse> response) {
