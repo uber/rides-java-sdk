@@ -22,6 +22,7 @@
 
 package com.uber.sdk.core.client;
 
+import com.uber.sdk.core.auth.ProfileHintProvider;
 import com.uber.sdk.core.auth.Scope;
 
 import java.io.Serializable;
@@ -83,6 +84,7 @@ public class SessionConfiguration implements Serializable {
         private Collection<Scope> scopes;
         private Collection<String> customScopes;
         private Locale locale;
+        private ProfileHintProvider profileHintProvider;
 
         /**
          * The Uber API requires a registered clientId to be sent along with API requests and Deeplinks.
@@ -173,6 +175,15 @@ public class SessionConfiguration implements Serializable {
         }
 
         /**
+         * Sets the {@link ProfileHintProvider} for prefilling some user personal information during onboarding
+         * for possible locales.
+         */
+        public Builder setProfileHintProvider(@Nonnull ProfileHintProvider profileHintProvider) {
+            this.profileHintProvider = profileHintProvider;
+            return this;
+        }
+
+        /**
          * Constructs {@link SessionConfiguration} from set Builder parameters.
          *
          * @return {@link SessionConfiguration}
@@ -210,7 +221,8 @@ public class SessionConfiguration implements Serializable {
                     environment,
                     scopes,
                     customScopes,
-                    locale);
+                    locale,
+                    profileHintProvider);
         }
     }
 
@@ -223,6 +235,7 @@ public class SessionConfiguration implements Serializable {
     private final Collection<Scope> scopes;
     private final Collection<String> customScopes;
     private final Locale locale;
+    private ProfileHintProvider profileHintProvider;
 
     protected SessionConfiguration(@Nonnull String clientId,
                                    @Nonnull String clientSecret,
@@ -232,7 +245,8 @@ public class SessionConfiguration implements Serializable {
                                    @Nonnull Environment environment,
                                    @Nonnull Collection<Scope> scopes,
                                    @Nonnull Collection<String> customScopes,
-                                   @Nonnull Locale locale) {
+                                   @Nonnull Locale locale,
+                                   ProfileHintProvider profileHintProvider) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.serverToken = serverToken;
@@ -242,6 +256,7 @@ public class SessionConfiguration implements Serializable {
         this.scopes = scopes;
         this.customScopes = customScopes;
         this.locale = locale;
+        this.profileHintProvider = profileHintProvider;
     }
 
     /**
@@ -341,11 +356,20 @@ public class SessionConfiguration implements Serializable {
         return locale;
     }
 
+    /**
+     * Gets the {@link ProfileHintProvider} used to prefill user's profile information
+     * @return
+     */
+    public ProfileHintProvider getProfileHintProvider() {
+        return profileHintProvider;
+    }
+
     public Builder newBuilder() {
         return new Builder()
                 .setClientId(clientId)
                 .setRedirectUri(redirectUri)
                 .setEnvironment(environment)
-                .setScopes(scopes);
+                .setScopes(scopes)
+                .setProfileHintProvider(profileHintProvider);
     }
 }
