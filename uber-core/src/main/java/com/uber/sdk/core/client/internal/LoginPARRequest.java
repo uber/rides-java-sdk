@@ -19,6 +19,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
+import retrofit2.http.HEAD;
 
 public class LoginPARRequest {
 
@@ -83,7 +84,7 @@ public class LoginPARRequest {
 
     static OAuth2Service createOAuthService(String baseUrl) {
         return new Retrofit.Builder()
-                .baseUrl("https://auth-test2.uber.com")
+                .baseUrl(baseUrl)
                 .addConverterFactory(MoshiConverterFactory.create())
                 .build()
                 .create(OAuth2Service.class);
