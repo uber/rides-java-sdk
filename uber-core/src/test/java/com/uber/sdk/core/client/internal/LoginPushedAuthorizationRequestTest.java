@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,16 +25,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginPARRequestTest {
+public class LoginPushedAuthorizationRequestTest {
 
     @Mock
-    private LoginPARRequest.Callback callback;
+    private LoginPushedAuthorizationRequest.Callback callback;
     @Mock
     OAuth2Service oAuth2Service;
     @Mock
     Call<LoginPARResponse> loginPARResponseCall;
     private Response<LoginPARResponse> loginPARSuccessfulResponse;
-    private LoginPARRequest loginPARRequest;
+    private LoginPushedAuthorizationRequest loginPushedAuthorizationRequest;
     private LoginPARResponse loginPARResponse = new LoginPARResponse();
     private Response<LoginPARResponse> loginPARFailureResponse = Response.error(400, ResponseBody.create(MediaType.parse(""), ""));
     @Before
@@ -53,7 +54,7 @@ public class LoginPARRequestTest {
                                     .build()
                         )
                         .build();
-        loginPARRequest = new LoginPARRequest(
+        loginPushedAuthorizationRequest = new LoginPushedAuthorizationRequest(
                 oAuth2Service,
                 sessionConfiguration.getProfileHint(),
                 sessionConfiguration.getClientId(),
@@ -71,7 +72,7 @@ public class LoginPARRequestTest {
         Class<Callback<LoginPARResponse>> loginPARResponseCallback = (Class<Callback<LoginPARResponse>>)(Class) Callback.class;
         ArgumentCaptor<Callback<LoginPARResponse>> argumentCaptor = ArgumentCaptor.forClass(loginPARResponseCallback);
         when(oAuth2Service.loginParRequest(anyString(), anyString(), anyString())).thenReturn(loginPARResponseCall);
-        loginPARRequest.executePAR();
+        loginPushedAuthorizationRequest.execute();
         verify(loginPARResponseCall).enqueue(argumentCaptor.capture());
 
         argumentCaptor.getValue().onResponse(loginPARResponseCall, loginPARSuccessfulResponse);
@@ -84,11 +85,29 @@ public class LoginPARRequestTest {
         Class<Callback<LoginPARResponse>> loginPARResponseCallback = (Class<Callback<LoginPARResponse>>)(Class) Callback.class;
         ArgumentCaptor<Callback<LoginPARResponse>> argumentCaptor = ArgumentCaptor.forClass(loginPARResponseCallback);
         when(oAuth2Service.loginParRequest(anyString(), anyString(), anyString())).thenReturn(loginPARResponseCall);
-        loginPARRequest.executePAR();
+        loginPushedAuthorizationRequest.execute();
         verify(loginPARResponseCall).enqueue(argumentCaptor.capture());
 
         argumentCaptor.getValue().onFailure(loginPARResponseCall, new RuntimeException());
 
         verify(callback).onError(isA(LoginPARRequestException.class));
+    }
+
+    @Test
+    public void executePAR_whenProfileHintIsNull_ReturnsEmptyRequestUri() throws Exception {
+        SessionConfiguration sessionConfiguration =
+                new SessionConfiguration.Builder()
+                        .setClientId("clientId")
+                        .build();
+        LoginPushedAuthorizationRequest loginPushedAuthorizationRequest = new LoginPushedAuthorizationRequest(
+                oAuth2Service,
+                sessionConfiguration.getProfileHint(),
+                sessionConfiguration.getClientId(),
+                "code",
+                callback);
+        loginPushedAuthorizationRequest.execute();
+
+        verify(callback).onSuccess("");
+        verify(oAuth2Service, never()).loginParRequest(anyString(), anyString(), anyString());
     }
 }

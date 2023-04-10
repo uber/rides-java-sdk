@@ -16,9 +16,8 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
-import retrofit2.http.HEAD;
 
-public class LoginPARRequest {
+public class LoginPushedAuthorizationRequest {
 
     private final OAuth2Service oAuth2Service;
 
@@ -28,7 +27,7 @@ public class LoginPARRequest {
     private final String responseType;
     private final Moshi moshi;
 
-    public LoginPARRequest(
+    public LoginPushedAuthorizationRequest(
             SessionConfiguration sessionConfiguration,
             String responseType,
             Callback callback
@@ -42,7 +41,7 @@ public class LoginPARRequest {
         );
     }
 
-    public LoginPARRequest(
+    public LoginPushedAuthorizationRequest(
             OAuth2Service oAuth2Service,
             ProfileHint profileHint,
             String clientId,
@@ -57,7 +56,11 @@ public class LoginPARRequest {
         this.moshi = new Moshi.Builder().build();
     }
 
-    public void executePAR() {
+    public void execute() {
+        if (profileHint == null) {
+            callback.onSuccess("");
+            return;
+        }
         JsonAdapter<ProfileHint> profileHintJsonAdapter = moshi.adapter(ProfileHint.class);
         String profileHintString = new String(
                 Base64.getEncoder().encode(
