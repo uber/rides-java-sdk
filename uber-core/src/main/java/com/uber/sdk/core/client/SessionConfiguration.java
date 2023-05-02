@@ -23,7 +23,7 @@
 package com.uber.sdk.core.client;
 
 import com.uber.sdk.core.auth.Scope;
-import com.uber.sdk.core.auth.internal.ProfileHint;
+import com.uber.sdk.core.auth.ProfileHint;
 
 import java.io.Serializable;
 import java.util.Collection;

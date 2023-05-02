@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.uber.sdk.core.auth.internal.LoginPARResponse;
 import com.uber.sdk.core.auth.internal.OAuth2Service;
-import com.uber.sdk.core.auth.internal.ProfileHint;
+import com.uber.sdk.core.auth.ProfileHint;
 import com.uber.sdk.core.client.SessionConfiguration;
 
 import org.junit.Before;

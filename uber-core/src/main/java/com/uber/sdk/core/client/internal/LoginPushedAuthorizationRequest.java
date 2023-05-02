@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.uber.sdk.core.auth.internal.LoginPARResponse;
 import com.uber.sdk.core.auth.internal.OAuth2Service;
-import com.uber.sdk.core.auth.internal.ProfileHint;
+import com.uber.sdk.core.auth.ProfileHint;
 import com.uber.sdk.core.client.SessionConfiguration;
 
 import java.util.Base64;
