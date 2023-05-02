@@ -1,4 +1,4 @@
-package com.uber.sdk.core.auth.internal;
+package com.uber.sdk.core.auth;
 
 import com.squareup.moshi.Json;
 
@@ -12,7 +12,9 @@ public class ProfileHint implements Serializable {
     private final String firstName;
     @Json(name = "last_name")
     private final String lastName;
+    @Json(name = "email")
     private final String email;
+    @Json(name = "phone")
     private final String phone;
 
     private ProfileHint(
