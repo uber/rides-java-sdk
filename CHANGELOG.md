@@ -1,6 +1,27 @@
-v0.8.1 - TBD
+v0.8.2 - TBD
 ------------
 
+v0.8.1 - 05/05/2023
+------------
+### Added
+Prefilling User Information
+ProfileHint is a new class added to supply user's personal information to the `SessionConfiguration` object.
+- It will be used by the underlying components to pre-populate user information during signup.
+- Partial information is accepted.
+```
+SessionConfiguration configuration = new SessionConfiguration.Builder()
+        .setClientId(CLIENT_ID)
+        .setRedirectUri(REDIRECT_URI)
+        .setScopes(Arrays.asList(Scope.PROFILE, Scope.RIDE_WIDGETS))
+        .setProfileHint(new ProfileHint
+                .Builder()
+                .email("john@doe.com")
+                .firstName("John")
+                .lastName("Doe")
+                .phone("1234567890")
+                .build())
+        .build();
+```
 v0.8.0 - 03/19/2018
 ------------
 
