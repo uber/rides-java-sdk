@@ -21,7 +21,7 @@
  */
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven { url deps.build.repositories.plugins }
     }
     dependencies {
@@ -44,20 +44,20 @@ buildConfig {
 
 dependencies {
 
-    implementation deps.network.retrofit
-    implementation deps.network.retrofitMoshiConverter
-    implementation deps.network.moshi
-    implementation deps.network.okhttp
-    implementation deps.network.okhttpLoggingInterceptor
-    implementation deps.misc.jsr305
+    compile deps.network.retrofit
+    compile deps.network.retrofitMoshiConverter
+    compile deps.network.moshi
+    compile deps.network.okhttp
+    compile deps.network.okhttpLoggingInterceptor
+    compile deps.misc.jsr305
 
-    testImplementation deps.test.junit
-    testImplementation deps.test.assertj
-    testImplementation deps.test.mockito
-    testImplementation deps.test.hamcrest
-    testImplementation deps.test.wiremock
-    testImplementation deps.network.retrofit
-    testImplementation deps.network.okhttp
+    testCompile deps.test.junit
+    testCompile deps.test.assertj
+    testCompile deps.test.mockito
+    testCompile deps.test.hamcrest
+    testCompile deps.test.wiremock
+    testCompile deps.network.retrofit
+    testCompile deps.network.okhttp
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
