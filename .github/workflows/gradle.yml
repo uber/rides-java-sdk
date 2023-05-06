@@ -24,8 +24,18 @@ jobs:
       with:
         java-version: '8'
         distribution: 'adopt'
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2
+    - name: Configure Gradle
+        # Gradle configuration install deps
+      run: ./gradlew help
+    - name: Build Project
       with:
         gradle-version: 4.3.1
-        arguments: build
+        arguments: assemble --stacktrace
+    - name : Testing
+      with:
+        gradle-version: 4.3.1
+        arguments: test --stacktrace
+    - name: Final Checks
+      with:
+        gradle-version: 4.3.1
+        arguments: check --stacktrace
