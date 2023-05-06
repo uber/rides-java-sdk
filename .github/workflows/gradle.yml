@@ -25,17 +25,10 @@ jobs:
         java-version: '8'
         distribution: 'adopt'
     - name: Configure Gradle
-        # Gradle configuration install deps
       run: ./gradlew help
     - name: Build Project
-      with:
-        gradle-version: 4.3.1
-        arguments: assemble --stacktrace
+      run: ./gradlew assemble --stacktrace
     - name : Testing
-      with:
-        gradle-version: 4.3.1
-        arguments: test --stacktrace
+      run: ./gradlew test --stacktrace
     - name: Final Checks
-      with:
-        gradle-version: 4.3.1
-        arguments: check --stacktrace
+      run: ./gradlew check --stacktrace
