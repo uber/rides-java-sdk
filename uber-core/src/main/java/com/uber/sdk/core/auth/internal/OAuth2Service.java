@@ -34,6 +34,15 @@ public interface OAuth2Service {
     @POST("token")
     Call<AccessToken> refresh(@Field("refresh_token") String refreshToken,
                               @Field("client_id") String clientId);
+
+    @FormUrlEncoded
+    @POST("/oauth/v2/token")
+    Call<AccessToken> token(@Field("client_id") String clientId,
+                            @Field("code_verifier") String codeVerifier,
+                            @Field("grant_type") String grantType,
+                            @Field("redirect_uri") String redirectUri,
+                            @Field("code") String authCode);
+
     @FormUrlEncoded
     @POST("/oauth/v2/par")
     Call<LoginPARResponse> loginParRequest(
