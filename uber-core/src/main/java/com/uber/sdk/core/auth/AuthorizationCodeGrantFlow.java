@@ -73,7 +73,7 @@ public class AuthorizationCodeGrantFlow implements TokenRequestFlow {
                         if (response.isSuccessful()) {
                             callback.onSuccess(response.body());
                         } else {
-                            callback.onFailure(new AuthException("Token request failed with code " + response.code()));
+                            onFailure(call, new AuthException("Token request failed with code " + response.code()));
                         }
                     }
 
