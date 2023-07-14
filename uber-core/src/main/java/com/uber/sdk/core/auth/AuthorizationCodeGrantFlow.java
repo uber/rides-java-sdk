@@ -70,7 +70,11 @@ public class AuthorizationCodeGrantFlow implements TokenRequestFlow {
                 new Callback<AccessToken>() {
                     @Override
                     public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
-                        callback.onSuccess(response.body());
+                        if (response.isSuccessful()) {
+                            callback.onSuccess(response.body());
+                        } else {
+                            callback.onFailure(new AuthException("Token request failed with code " + response.code()));
+                        }
                     }
 
                     @Override

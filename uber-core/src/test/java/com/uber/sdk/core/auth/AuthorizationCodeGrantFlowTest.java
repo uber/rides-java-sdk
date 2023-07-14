@@ -3,6 +3,7 @@ package com.uber.sdk.core.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 
+import okhttp3.MediaType;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -86,6 +89,33 @@ public class AuthorizationCodeGrantFlowTest {
 
         verify(callback).onSuccess(accessToken);
         assertThat(accessToken.getToken()).isEqualTo("accessToken");
+    }
+
+    @Test
+    public void execute_whenResponseIsNot2XX_shouldThrowError() {
+        Class<Callback<AccessToken>> tokenRequestFlowCallback = (Class<Callback<AccessToken>>)(Class) Callback.class;
+        ArgumentCaptor<Callback<AccessToken>> argumentCaptor = ArgumentCaptor.forClass(tokenRequestFlowCallback);
+        ArgumentCaptor<AuthException> exceptionCaptor = ArgumentCaptor.forClass(AuthException.class);
+        doNothing().when(callback).onSuccess(any());
+        when(oAuth2Service.token(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString())
+        ).thenReturn(accessTokenCall);
+        tokenRequestFlow.execute(callback);
+        verify(accessTokenCall).enqueue(argumentCaptor.capture());
+        argumentCaptor.getValue().onResponse(
+                accessTokenCall,
+                Response.error(
+                        400,
+                        ResponseBody.create(MediaType.parse(""), "")
+                )
+        );
+
+        verify(callback).onFailure(exceptionCaptor.capture());
+        assertThat(exceptionCaptor.getValue().getMessage()).isEqualTo("Token request failed with code 400");
     }
 
     @Test
