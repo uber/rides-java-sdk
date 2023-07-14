@@ -1,5 +1,11 @@
-v0.8.2 - TBD
+v0.8.3 - TBD
 ------------
+
+v0.8.2 - 07/14/2023
+------------
+### Added support for authorization code oauth flow with pkce
+Following this rfs https://datatracker.ietf.org/doc/html/rfc7636 added a token endpoint to fetch oauth tokens using authorization code and verifier.
+- Added AuthorizationCodeGrantFlow class to send a network request to fetch oauth tokens
 
 v0.8.1 - 05/05/2023
 ------------
