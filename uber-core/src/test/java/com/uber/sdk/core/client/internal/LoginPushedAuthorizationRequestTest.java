@@ -81,6 +81,20 @@ public class LoginPushedAuthorizationRequestTest {
     }
 
     @Test
+    public void executePAR_whenNullResponse_callsOnError() throws Exception {
+        Response<LoginPARResponse> loginPARSuccessfulResponse = Response.success(null);
+        Class<Callback<LoginPARResponse>> loginPARResponseCallback = (Class<Callback<LoginPARResponse>>)(Class) Callback.class;
+        ArgumentCaptor<Callback<LoginPARResponse>> argumentCaptor = ArgumentCaptor.forClass(loginPARResponseCallback);
+        when(oAuth2Service.loginParRequest(anyString(), anyString(), anyString())).thenReturn(loginPARResponseCall);
+        loginPushedAuthorizationRequest.execute();
+        verify(loginPARResponseCall).enqueue(argumentCaptor.capture());
+
+        argumentCaptor.getValue().onResponse(loginPARResponseCall, loginPARSuccessfulResponse);
+
+        verify(callback).onError(isA(LoginPARRequestException.class));
+    }
+
+    @Test
     public void executePAR_whenFailure_callsOnError() throws Exception {
         Class<Callback<LoginPARResponse>> loginPARResponseCallback = (Class<Callback<LoginPARResponse>>)(Class) Callback.class;
         ArgumentCaptor<Callback<LoginPARResponse>> argumentCaptor = ArgumentCaptor.forClass(loginPARResponseCallback);
