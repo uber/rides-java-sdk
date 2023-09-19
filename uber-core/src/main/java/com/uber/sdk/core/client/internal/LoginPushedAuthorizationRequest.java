@@ -72,7 +72,11 @@ public class LoginPushedAuthorizationRequest {
                 .enqueue(new retrofit2.Callback<LoginPARResponse>() {
                     @Override
                     public void onResponse(Call<LoginPARResponse> call, Response<LoginPARResponse> response) {
-                        callback.onSuccess(response.body().requestUri);
+                        if (response.isSuccessful() && response.body() != null) {
+                            callback.onSuccess(response.body().requestUri);
+                        } else {
+                            onFailure(call, new RuntimeException("bad response"));
+                        }
                     }
 
                     @Override
